@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tbAdmin', function (Blueprint $table) {
-            $table->id('idAdmin');
+        Schema::create('tbadmin', function (Blueprint $table) {
+            $table->id();
             $table->string('nomeAdmin');
             $table->string('emailAdmin')->unique();
             $table->string('senhaAdmin');
-            $table->char('cpfAdmin', 14)->unique();
-            $table->dateTime('dataNascAdmin');
+            $table->string('cpfAdmin')->unique();
+            $table->date('dataNascAdmin');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbadmins');
+        Schema::dropIfExists('tbadmin');
     }
 };

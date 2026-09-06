@@ -4,22 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbvitimaGuardiao extends Model
+class tblocalizacaoVitima extends Model
 {
-    protected $table = 'tbvitimaguardiao';
+    protected $table = 'tblocalizacaovitima';
 
     protected $fillable = [
         'idVitima',
-        'idGuardiao',
+        'latitudeLocalizacao',
+        'longitudeLocalizacao',
+        'dataHoraLocalizacao',
     ];
 
     public function vitima()
     {
         return $this->belongsTo(tbvitima::class, 'idVitima');
-    }
-
-    public function guardiao()
-    {
-        return $this->belongsTo(tbguardiao::class, 'idGuardiao');
     }
 }

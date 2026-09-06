@@ -6,20 +6,35 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbagressor extends Model
 {
-    protected $table = 'tbAgressor';
-    protected $primaryKey = 'idAgressor';
+    protected $table = 'tbagressor';
 
     protected $fillable = [
+        'imagemAgressor',
         'nomeAgressor',
         'cpfAgressor',
         'logradouroAgressor',
         'numLogradouroAgressor',
-        'cepAgressor',
         'bairroAgressor',
         'cidadeAgressor',
         'ufAgressor',
         'complementoAgressor',
-        'dataNascAgressor',
+        'dataNascimentoAgressor',
         'statusAgressor',
+        'idTornozeleira',
     ];
+
+    public function tornozeleira()
+    {
+        return $this->belongsTo(tbtornozeleira::class, 'idTornozeleira');
+    }
+
+    public function ocorrencias()
+    {
+        return $this->hasMany(tbocorrencia::class, 'idAgressor');
+    }
+
+    public function medidas()
+    {
+        return $this->hasMany(tbmedida::class, 'idAgressor');
+    }
 }

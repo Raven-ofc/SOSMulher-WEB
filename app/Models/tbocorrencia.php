@@ -6,31 +6,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbocorrencia extends Model
 {
-    protected $table = 'tbOcorrencia';
-    protected $primaryKey = 'idOcorrencia';
+    protected $table = 'tbocorrencia';
 
     protected $fillable = [
-        'dataHoraOcorrencia',
+        'dataOcorrencia',
         'descricaoOcorrencia',
         'tipoOcorrencia',
         'gravidadeOcorrencia',
-        'idAutoridade',
         'idVitima',
         'idAgressor',
+        'idAutoridade',
     ];
-
-    public function autoridade()
-    {
-        return $this->belongsTo(Autoridade::class, 'idAutoridade', 'idAutoridade');
-    }
 
     public function vitima()
     {
-        return $this->belongsTo(Vitima::class, 'idVitima', 'idVitima');
+        return $this->belongsTo(tbvitima::class, 'idVitima');
     }
 
     public function agressor()
     {
-        return $this->belongsTo(Agressor::class, 'idAgressor', 'idAgressor');
+        return $this->belongsTo(tbagressor::class, 'idAgressor');
+    }
+
+    public function autoridade()
+    {
+        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
     }
 }

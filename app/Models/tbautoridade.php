@@ -6,23 +6,37 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbautoridade extends Model
 {
-    protected $table = 'tbAutoridade';
-    protected $primaryKey = 'idAutoridade';
+    protected $table = 'tbautoridade';
 
     protected $fillable = [
         'imagemAutoridade',
         'nomeAutoridade',
+        'emailAutoridade',
+        'cpfAutoridade',
         'matriculaAutoridade',
         'cargoAutoridade',
-        'emailAutoridade',
-        'senhaAutoridade',
         'unidadeAutoridade',
+        'senhaAutoridade',
         'statusAutoridade',
     ];
 
-    // Relacionamento: uma autoridade pode ter vários telefones
     public function telefones()
     {
-        return $this->hasMany(TelefoneAutoridade::class, 'idAutoridade', 'idAutoridade');
+        return $this->hasMany(tbtelefoneAutoridade::class, 'idAutoridade');
+    }
+
+    public function ocorrencias()
+    {
+        return $this->hasMany(tbocorrencia::class, 'idAutoridade');
+    }
+
+    public function solicitacoes()
+    {
+        return $this->hasMany(tbsolicitacao::class, 'idAutoridade');
+    }
+
+    public function alertas()
+    {
+        return $this->hasMany(tbalerta::class, 'idAutoridade');
     }
 }

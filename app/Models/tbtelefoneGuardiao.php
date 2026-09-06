@@ -6,16 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbtelefoneGuardiao extends Model
 {
-    protected $table = 'tbTelefoneGuardiao';
-    protected $primaryKey = 'idTelefoneGuardiao';
+    protected $table = 'tbtelefoneguardiao';
 
     protected $fillable = [
-        'numTelefoneGuardiao',
+        'numeroTelefoneGuardiao',
         'idGuardiao',
     ];
 
     public function guardiao()
     {
-        return $this->belongsTo(Guardiao::class, 'idGuardiao', 'idGuardiao');
+        return $this->belongsTo(tbguardiao::class, 'idGuardiao');
     }
 }

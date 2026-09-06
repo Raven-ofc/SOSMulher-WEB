@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbmedida extends Model
 {
-    protected $table = 'tbMedida';
-    protected $primaryKey = 'idMedida';
+    protected $table = 'tbmedida';
 
     protected $fillable = [
         'dataInicioMedida',
         'dataFimMedida',
-        'distanciaMaximaMedida',
+        'distanciaMedida',
+        'raioAlertaMedida',
+        'descricaoMedida',
         'statusMedida',
         'idVitima',
         'idAgressor',
@@ -20,11 +21,16 @@ class tbmedida extends Model
 
     public function vitima()
     {
-        return $this->belongsTo(Vitima::class, 'idVitima', 'idVitima');
+        return $this->belongsTo(tbvitima::class, 'idVitima');
     }
 
     public function agressor()
     {
-        return $this->belongsTo(Agressor::class, 'idAgressor', 'idAgressor');
+        return $this->belongsTo(tbagressor::class, 'idAgressor');
+    }
+
+    public function violacoes()
+    {
+        return $this->hasMany(tbviolacao::class, 'idMedida');
     }
 }
