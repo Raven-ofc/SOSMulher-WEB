@@ -6,31 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbalerta extends Model
 {
-    protected $table = 'tbAlerta';
-    protected $primaryKey = 'idAlerta';
+    protected $table = 'tbalerta';
 
     protected $fillable = [
         'tipoAlerta',
+        'descricaoAlerta',
         'dataHoraAlerta',
-        'mensagemAlerta',
         'statusAlerta',
-        'idVitima',
-        'idAutoridade',
         'idViolacao',
+        'idAutoridade',
     ];
 
-    public function vitima()
+    public function violacao()
     {
-        return $this->belongsTo(Vitima::class, 'idVitima', 'idVitima');
+        return $this->belongsTo(tbviolacao::class, 'idViolacao');
     }
 
     public function autoridade()
     {
-        return $this->belongsTo(Autoridade::class, 'idAutoridade', 'idAutoridade');
-    }
-
-    public function violacao()
-    {
-        return $this->belongsTo(Violacao::class, 'idViolacao', 'idViolacao');
+        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
     }
 }

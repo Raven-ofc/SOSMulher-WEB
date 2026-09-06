@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbadmin extends Model
 {
-    protected $table = 'tbAdmin';
-    protected $primaryKey = 'idAdmin';
+    protected $table = 'tbadmin';
 
     protected $fillable = [
         'nomeAdmin',
@@ -19,6 +18,6 @@ class tbadmin extends Model
 
     public function telefones()
     {
-        return $this->hasMany(TelefoneAdmin::class, 'idAdmin', 'idAdmin');
+        return $this->hasMany(tbtelefoneAdmin::class, 'idAdmin');
     }
 }

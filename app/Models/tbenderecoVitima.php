@@ -6,24 +6,21 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbenderecoVitima extends Model
 {
-    protected $table = 'tbEnderecovitima';
-    protected $primaryKey = 'idEnderecovitima';
+    protected $table = 'tbenderecovitima';
 
     protected $fillable = [
         'logradouroVitima',
         'numLogradouroVitima',
-        'cepVitima',
         'bairroVitima',
         'cidadeVitima',
-        'complementoVitima',
         'ufVitima',
-        'latitudeVitima',
-        'longitudeVitima',
+        'complementoVitima',
+        'cepVitima',
         'idVitima',
     ];
 
     public function vitima()
     {
-        return $this->belongsTo(Vitima::class, 'idVitima', 'idVitima');
+        return $this->belongsTo(tbvitima::class, 'idVitima');
     }
 }

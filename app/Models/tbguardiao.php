@@ -6,16 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbguardiao extends Model
 {
-    protected $table = 'tbGuardiao';
-    protected $primaryKey = 'idGuardiao';
+    protected $table = 'tbguardiao';
 
     protected $fillable = [
         'imagemGuardiao',
         'nomeGuardiao',
+        'cpfGuardiao',
         'emailGuardiao',
         'senhaGuardiao',
-        'cpfGuardiao',
-        'dataNascGuardiao',
+        'dataNascimentoGuardiao',
         'statusGuardiao',
     ];
+
+    public function telefones()
+    {
+        return $this->hasMany(tbtelefoneGuardiao::class, 'idGuardiao');
+    }
+
+    public function vitimas()
+    {
+        return $this->belongsToMany(tbvitima::class, 'tbvitimaguardiao', 'idGuardiao', 'idVitima');
+    }
 }

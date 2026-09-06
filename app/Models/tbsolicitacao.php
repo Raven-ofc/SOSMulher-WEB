@@ -6,41 +6,34 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbsolicitacao extends Model
 {
-    protected $table = 'tbSolicitacao';
-    protected $primaryKey = 'idSolicitacao';
+    protected $table = 'tbsolicitacao';
 
     protected $fillable = [
-        'tipoSolicitacao',
-        'statusSolicitacao',
         'descricaoSolicitacao',
+        'tipoSolicitacao',
         'logradouroSolicitacao',
         'numLogradouroSolicitacao',
-        'cepSolicitacao',
         'bairroSolicitacao',
         'cidadeSolicitacao',
-        'complementoSolicitacao',
         'ufSolicitacao',
+        'complementoSolicitacao',
+        'cepSolicitacao',
         'latitudeSolicitacao',
         'longitudeSolicitacao',
-        'dataCriacaoSolicitacao',
-        'dataAnaliseSolicitacao',
+        'statusSolicitacao',
+        'dataSolicitacao',
+        'dataAnalise',
         'idVitima',
-        'idEnderecovitima',
         'idAutoridade',
     ];
 
     public function vitima()
     {
-        return $this->belongsTo(Vitima::class, 'idVitima', 'idVitima');
-    }
-
-    public function enderecoVitima()
-    {
-        return $this->belongsTo(EnderecoVitima::class, 'idEnderecovitima', 'idEnderecovitima');
+        return $this->belongsTo(tbvitima::class, 'idVitima');
     }
 
     public function autoridade()
     {
-        return $this->belongsTo(Autoridade::class, 'idAutoridade', 'idAutoridade');
+        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
     }
 }

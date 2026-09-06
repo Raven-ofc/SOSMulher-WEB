@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class tbtelefoneAutoridade extends Model
 {
-    protected $table = 'tbTelefoneAutoridade';
-    protected $primaryKey = 'idTelefoneAutoridade';
+    protected $table = 'tbtelefoneautoridade';
 
     protected $fillable = [
         'numTelefoneAutoridade',
@@ -16,6 +15,6 @@ class tbtelefoneAutoridade extends Model
 
     public function autoridade()
     {
-        return $this->belongsTo(Autoridade::class, 'idAutoridade', 'idAutoridade');
+        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
     }
 }
