@@ -1,65 +1,76 @@
 <?php
 
-use App\Http\Controllers\CaseController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\PeopleController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SafePlaceController;
+use App\Http\Controllers\AgressorController;
+use App\Http\Controllers\PainelController;
+use App\Http\Controllers\AcessoController;
+use App\Http\Controllers\OcorrenciaController;
+use App\Http\Controllers\SenhaController;
+use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\LocalSeguroController;
+use App\Http\Controllers\VitimaController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'home')->name('home');
-Route::view('/login', 'auth.login')->name('login');
-Route::post('/login', [LoginController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
-Route::view('/esqueci-senha', 'auth.forgot-password')->name('password.request');
-Route::post('/esqueci-senha', [PasswordController::class, 'email'])->middleware('throttle:5,1')->name('password.email');
-Route::get('/email-enviado', [PasswordController::class, 'sent'])->name('password.email.sent');
-Route::get('/redefinir-senha', [PasswordController::class, 'edit'])->name('password.reset');
-Route::post('/redefinir-senha', [PasswordController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
+Route::view('/', 'inicio')->name('home');
+Route::view('/login', 'autenticacao.acesso')->name('login');
+Route::post('/login', [AcessoController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
+Route::view('/esqueci-senha', 'autenticacao.esqueci-senha')->name('password.request');
+Route::post('/esqueci-senha', [SenhaController::class, 'email'])->middleware('throttle:5,1')->name('password.email');
+Route::get('/email-enviado', [SenhaController::class, 'sent'])->name('password.email.sent');
+Route::get('/redefinir-senha', [SenhaController::class, 'edit'])->name('password.reset');
+Route::post('/redefinir-senha', [SenhaController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
 Route::middleware(['auth', 'auth.session'])->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-    Route::get('/painel', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/logout', [AcessoController::class, 'destroy'])->name('logout');
+    Route::get('/painel', [PainelController::class, 'index'])->name('dashboard');
     Route::prefix('administracao')->name('admin.')->group(function () {
-        Route::get('/estatisticas', [DashboardController::class, 'index'])->name('statistics');
-        foreach (['vitimas' => 'victims', 'agressores' => 'aggressors'] as $path => $name) {
-            Route::prefix($path)->name($name)->group(function () use ($path) {
-                Route::get('/', [PeopleController::class, 'index'])->name('');
-                Route::get('/adicionar', [PeopleController::class, 'create'])->name('.create');
-                Route::post('/', [PeopleController::class, 'store'])->name('.store');
-                Route::redirect('/visualizar', '/administracao/'.$path)->name('.preview');
-                Route::get('/{id}/editar', [PeopleController::class, 'edit'])->whereNumber('id')->name('.edit');
-                Route::get('/{id}', [PeopleController::class, 'show'])->whereNumber('id')->name('.show');
-                Route::patch('/{id}', [PeopleController::class, 'update'])->whereNumber('id')->name('.update');
-                Route::patch('/{id}/status', [PeopleController::class, 'status'])->whereNumber('id')->name('.status');
-            });
-        }
-        Route::get('/vitimas/solicitacoes', [SafePlaceController::class, 'index'])->name('victims.requests');
-        Route::get('/locais-seguros/adicionar', [SafePlaceController::class, 'create'])->name('places.create');
-        Route::post('/locais-seguros', [SafePlaceController::class, 'store'])->name('places.store');
-        Route::patch('/locais-seguros/{id}', [SafePlaceController::class, 'decide'])->whereNumber('id')->name('places.decide');
-        Route::delete('/locais-seguros/{id}', [SafePlaceController::class, 'remove'])->whereNumber('id')->name('places.remove');
-        Route::get('/ocorrencias', [CaseController::class, 'index'])->name('occurrences');
-        Route::get('/ocorrencias/adicionar', [CaseController::class, 'create'])->name('occurrences.create');
-        Route::post('/ocorrencias', [CaseController::class, 'store'])->name('occurrences.store');
+        Route::get('/estatisticas', [PainelController::class, 'index'])->name('statistics');
+        // Vitimas
+        Route::get('/vitimas', [VitimaController::class, 'index'])->name('victims');
+        Route::get('/vitimas/adicionar', [VitimaController::class, 'create'])->name('victims.create');
+        Route::post('/vitimas', [VitimaController::class, 'store'])->name('victims.store');
+        Route::get('/vitimas/{id}/editar', [VitimaController::class, 'edit'])->whereNumber('id')->name('victims.edit');
+        Route::get('/vitimas/{id}', [VitimaController::class, 'show'])->whereNumber('id')->name('victims.show');
+        Route::patch('/vitimas/{id}', [VitimaController::class, 'update'])->whereNumber('id')->name('victims.update');
+        Route::patch('/vitimas/{id}/status', [VitimaController::class, 'status'])->whereNumber('id')->name('victims.status');
+        Route::redirect('/vitimas/visualizar', '/administracao/vitimas')->name('victims.preview');
+
+        // Agressores
+        Route::get('/agressores', [AgressorController::class, 'index'])->name('aggressors');
+        Route::get('/agressores/adicionar', [AgressorController::class, 'create'])->name('aggressors.create');
+        Route::post('/agressores', [AgressorController::class, 'store'])->name('aggressors.store');
+        Route::get('/agressores/{id}/editar', [AgressorController::class, 'edit'])->whereNumber('id')->name('aggressors.edit');
+        Route::get('/agressores/{id}', [AgressorController::class, 'show'])->whereNumber('id')->name('aggressors.show');
+        Route::patch('/agressores/{id}', [AgressorController::class, 'update'])->whereNumber('id')->name('aggressors.update');
+        Route::patch('/agressores/{id}/status', [AgressorController::class, 'status'])->whereNumber('id')->name('aggressors.status');
+        Route::redirect('/agressores/visualizar', '/administracao/agressores')->name('aggressors.preview');
+
+        Route::get('/vitimas/solicitacoes', [LocalSeguroController::class, 'index'])->name('victims.requests');
+        Route::get('/locais-seguros/adicionar', [LocalSeguroController::class, 'create'])->name('places.create');
+        Route::post('/locais-seguros', [LocalSeguroController::class, 'store'])->name('places.store');
+        Route::patch('/locais-seguros/{id}', [LocalSeguroController::class, 'decide'])->whereNumber('id')->name('places.decide');
+        Route::delete('/locais-seguros/{id}', [LocalSeguroController::class, 'remove'])->whereNumber('id')->name('places.remove');
+        Route::get('/ocorrencias', [OcorrenciaController::class, 'index'])->name('occurrences');
+        Route::get('/ocorrencias/adicionar', [OcorrenciaController::class, 'create'])->name('occurrences.create');
+        Route::post('/ocorrencias', [OcorrenciaController::class, 'store'])->name('occurrences.store');
         Route::redirect('/ocorrencias/visualizar', '/administracao/ocorrencias')->name('occurrences.preview');
         Route::redirect('/ocorrencias/visualizar/relatorio', '/administracao/ocorrencias')->name('occurrences.report');
-        Route::get('/ocorrencias/{id}', [CaseController::class, 'show'])->whereNumber('id')->name('occurrences.show');
-        Route::get('/ocorrencias/{id}/relatorio', [CaseController::class, 'report'])->whereNumber('id')->name('occurrences.finish');
-        Route::post('/ocorrencias/{id}/relatorio', [CaseController::class, 'finish'])->whereNumber('id')->name('occurrences.complete');
-        Route::get('/relatorios', [CaseController::class, 'index'])->name('reports');
+        Route::get('/ocorrencias/{id}', [OcorrenciaController::class, 'show'])->whereNumber('id')->name('occurrences.show');
+        Route::get('/ocorrencias/{id}/relatorio', [OcorrenciaController::class, 'report'])->whereNumber('id')->name('occurrences.finish');
+        Route::post('/ocorrencias/{id}/relatorio', [OcorrenciaController::class, 'finish'])->whereNumber('id')->name('occurrences.complete');
+        Route::get('/relatorios', [RelatorioController::class, 'index'])->name('reports');
         Route::redirect('/relatorios/visualizar', '/administracao/relatorios')->name('reports.preview');
-        Route::get('/relatorios/{id}', [CaseController::class, 'show'])->whereNumber('id')->name('reports.show');
-        Route::view('/perfil', 'admin.profile.show')->name('profile');
-        Route::view('/perfil/editar', 'admin.profile.edit')->name('profile.edit');
-        Route::patch('/perfil', [ProfileController::class, 'update'])->name('profile.update');
-        Route::get('/perfil/foto', [ProfileController::class, 'photo'])->name('profile.photo');
-        // Somente referências visuais: sem API, telemetria, cadastro ou cálculos.
-        Route::view('/monitoramento', 'admin.monitoring')->name('monitoring');
-        Route::view('/tornozeleiras', 'admin.devices.index')->name('devices');
-        Route::view('/tornozeleiras/adicionar', 'admin.devices.create')->name('devices.create');
-        Route::view('/medidas-protetivas', 'admin.measures.index')->name('measures');
-        Route::view('/medidas-protetivas/adicionar','admin.measures.create')->name('measures.create');
-        Route::view('/medidas-protetivas/visualizar','admin.measures.show')->name('measures.preview');
+        Route::get('/relatorios/{id}', [RelatorioController::class, 'show'])->whereNumber('id')->name('reports.show');
+        Route::get('/perfil', [PerfilController::class, 'show'])->name('profile');
+        Route::get('/perfil/editar', [PerfilController::class, 'edit'])->name('profile.edit');
+        Route::patch('/perfil', [PerfilController::class, 'update'])->name('profile.update');
+        Route::get('/perfil/foto', [PerfilController::class, 'photo'])->name('profile.photo');
+        // Telas de dispositivos e medidas: integração visual pendente.
+        // A API original da tornozeleira está em routes/api.php.
+        Route::view('/monitoramento', 'administracao.monitoramento')->name('monitoring');
+        Route::view('/tornozeleiras', 'administracao.tornozeleira.lista')->name('devices');
+        Route::view('/tornozeleiras/adicionar', 'administracao.tornozeleira.cadastro')->name('devices.create');
+        Route::view('/medidas-protetivas', 'administracao.medida-protetiva.lista')->name('measures');
+        Route::view('/medidas-protetivas/adicionar', 'administracao.medida-protetiva.cadastro')->name('measures.create');
+        Route::view('/medidas-protetivas/visualizar', 'administracao.medida-protetiva.detalhes')->name('measures.preview');
     });
 });
