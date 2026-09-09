@@ -1,0 +1,9 @@
+<svg class="logo" viewBox="0 0 150 104" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Símbolo de proteção à mulher">
+    <path d="M74 96C46 77 3 63 3 34C3 11 29 10 49 19C58 43 64 66 74 96Z" fill="#FA92C5"/>
+    <path d="M76 96C104 77 147 63 147 34C147 11 121 10 101 19C92 43 86 66 76 96Z" fill="#FA92C5"/>
+    <path d="M74 96C49 76 25 75 7 86C29 102 51 108 74 96Z" fill="#FA92C5"/>
+    <path d="M76 96C101 76 125 75 143 86C121 102 99 108 76 96Z" fill="#FA92C5"/>
+    <path d="M75 98C66 84 44 55 44 34C44 15 58 1 75 1C92 1 106 15 106 34C106 55 84 84 75 98Z" fill="#FF408C" stroke="#FFF8FF" stroke-width="2"/>
+    <circle cx="75" cy="34" r="17" fill="#FBF5FF"/>
+    <path d="M75 49V73M66 65H84" stroke="#FBF5FF" stroke-width="4" stroke-linecap="round"/>
+</svg>
