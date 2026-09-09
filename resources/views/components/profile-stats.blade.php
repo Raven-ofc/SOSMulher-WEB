@@ -1,1 +1,0 @@
-<aside class="profile-stats" aria-label="Resumo pessoal"><div class="admin-panel profile-stat"><span class="profile-stat-icon"><x-admin-icon name="headset" /></span><div><strong>{{ \Illuminate\Support\Facades\DB::table('relatorios_atendimento')->where('user_id',auth()->id())->count() }}</strong><p>Ocorrências atendidas</p></div></div></aside>

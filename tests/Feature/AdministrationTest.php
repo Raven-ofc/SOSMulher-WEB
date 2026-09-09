@@ -105,11 +105,11 @@ class AdministrationTest extends TestCase
         $this->get(route('admin.profile'))->assertOk();
     }
 
-    public function test_forms_load_and_guests_are_blocked_and_device_api_is_removed(): void
+    public function test_forms_load_and_guests_are_blocked_and_original_device_api_is_available(): void
     {
         $this->get(route('admin.victims'))->assertRedirect(route('login'));
         $this->post(route('admin.victims.store'), [])->assertRedirect(route('login'));
-        $this->getJson('/api/tornozeleiras')->assertNotFound();
+        $this->getJson('/api/tornozeleiras')->assertOk()->assertExactJson([]);
         $this->postJson('/api/tornozeleiras/1/localizacoes', [])->assertNotFound();
         $this->login();
         foreach (['admin.victims', 'admin.victims.create', 'admin.aggressors', 'admin.aggressors.create', 'admin.victims.requests', 'admin.places.create', 'admin.occurrences', 'admin.occurrences.create', 'admin.reports', 'admin.profile', 'admin.profile.edit', 'dashboard', 'admin.statistics'] as $name) {
