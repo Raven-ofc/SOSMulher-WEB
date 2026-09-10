@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('nomeAutoridade', 100);
             $table->string('emailAutoridade', 100)->unique();
             $table->string('cpfAutoridade', 14)->unique();
-            $table->date('matriculaAutoridade');
+            $table->string('matriculaAutoridade', 20)->unique();
             $table->string('cargoAutoridade', 100);
             $table->string('unidadeAutoridade', 100);
             $table->string('senhaAutoridade');
