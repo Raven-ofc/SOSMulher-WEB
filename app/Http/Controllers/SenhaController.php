@@ -16,7 +16,6 @@ class SenhaController extends Controller
     {
         $request->validate(['email' => ['required', 'email', 'max:255']]);
 
-        // Log and array transports do not deliver messages to the recipient.
         if (in_array(config('mail.default'), ['log', 'array'], true) && ! app()->runningUnitTests()) {
             return back()->withErrors(['email' => 'O envio de e-mail ainda não foi configurado. Entre em contato com a administração.'])->onlyInput('email');
         }

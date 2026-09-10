@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 
 class LocalizacaoTornozeleiraController extends Controller
 {
-    // Rota POST /api/tornozeleiras/{idTornozeleira}/localizacoes
-     
     public function store(Request $request, $idTornozeleira)
     {
         $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);
@@ -23,7 +21,6 @@ class LocalizacaoTornozeleiraController extends Controller
         $localizacao = $tornozeleira->localizacoes()->create([
             'latitudeLocalizacao'  => $validated['latitudeLocalizacao'],
             'longitudeLocalizacao' => $validated['longitudeLocalizacao'],
-            // se o ESP32 não mandar o horário, usamos o horário do servidor
             'dataHoraLocalizacao'  => $validated['dataHoraLocalizacao'] ?? now(),
         ]);
 
@@ -31,7 +28,6 @@ class LocalizacaoTornozeleiraController extends Controller
     }
 
 
-     // Rota GET /api/tornozeleiras/{idTornozeleira}/localizacoes
     public function index($idTornozeleira)
     {
         $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);

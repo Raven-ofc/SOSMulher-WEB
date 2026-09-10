@@ -58,7 +58,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        // Nullable domain fields remain nullable to preserve records created without a device.
         Schema::dropIfExists('administration_audit');
         Schema::dropIfExists('relatorios_atendimento');
         Schema::table('tbsolicitacao', function (Blueprint $t) {
