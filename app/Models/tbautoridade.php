@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class tbautoridade extends Model
+class tbautoridade extends Authenticatable
 {
+    use HasFactory, Notifiable;
+
     protected $table = 'tbautoridade';
+    protected $primaryKey = 'id';
+    protected $keyType = 'int';
+    public $incrementing = true;
 
     protected $fillable = [
         'imagemAutoridade',
@@ -19,6 +26,39 @@ class tbautoridade extends Model
         'senhaAutoridade',
         'statusAutoridade',
     ];
+
+    protected $hidden = [
+        'senhaAutoridade',
+        'remember_token',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'senhaAutoridade' => 'hashed',
+            'matriculaAutoridade' => 'date',
+        ];
+    }
+
+    public function getAuthIdentifierName()
+    {
+        return 'emailAutoridade';
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->senhaAutoridade;
+    }
+
+    public function getRememberTokenName()
+    {
+        return 'remember_token';
+    }
+
+    public function getEmailForPasswordReset()
+    {
+        return $this->emailAutoridade;
+    }
 
     public function telefones()
     {
