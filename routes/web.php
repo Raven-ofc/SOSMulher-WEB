@@ -11,7 +11,7 @@ use App\Http\Controllers\LocalSeguroController;
 use App\Http\Controllers\VitimaController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'inicio')->name('home');
+Route::view('/', 'home')->name('home');
 Route::view('/login', 'autenticacao.acesso')->name('login');
 Route::post('/login', [AcessoController::class, 'store'])->middleware('throttle:5,1')->name('login.store');
 Route::view('/esqueci-senha', 'autenticacao.esqueci-senha')->name('password.request');
@@ -24,7 +24,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/painel', [PainelController::class, 'index'])->name('dashboard');
     Route::prefix('administracao')->name('admin.')->group(function () {
         Route::get('/estatisticas', [PainelController::class, 'index'])->name('statistics');
-        // Vitimas
         Route::get('/vitimas', [VitimaController::class, 'index'])->name('victims');
         Route::get('/vitimas/adicionar', [VitimaController::class, 'create'])->name('victims.create');
         Route::post('/vitimas', [VitimaController::class, 'store'])->name('victims.store');
@@ -34,7 +33,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::patch('/vitimas/{id}/status', [VitimaController::class, 'status'])->whereNumber('id')->name('victims.status');
         Route::redirect('/vitimas/visualizar', '/administracao/vitimas')->name('victims.preview');
 
-        // Agressores
         Route::get('/agressores', [AgressorController::class, 'index'])->name('aggressors');
         Route::get('/agressores/adicionar', [AgressorController::class, 'create'])->name('aggressors.create');
         Route::post('/agressores', [AgressorController::class, 'store'])->name('aggressors.store');
@@ -64,8 +62,6 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/perfil/editar', [PerfilController::class, 'edit'])->name('profile.edit');
         Route::patch('/perfil', [PerfilController::class, 'update'])->name('profile.update');
         Route::get('/perfil/foto', [PerfilController::class, 'photo'])->name('profile.photo');
-        // Telas de dispositivos e medidas: integração visual pendente.
-        // A API original da tornozeleira está em routes/api.php.
         Route::view('/monitoramento', 'administracao.monitoramento')->name('monitoring');
         Route::view('/tornozeleiras', 'administracao.tornozeleira.lista')->name('devices');
         Route::view('/tornozeleiras/adicionar', 'administracao.tornozeleira.cadastro')->name('devices.create');

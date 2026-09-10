@@ -15,8 +15,36 @@
             <input id="monitor-search" name="search" placeholder="pesquisar..." value="{{ request('search') }}">
             <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
         </form>
-        @include('parciais.resumo-monitoramento', ['monitoring' => true])
-        @include('parciais.alertas')
+        <div class="admin-stats">
+            <div class="admin-stat">
+                <span class="stat-icon blue">@include('parciais.icone', ['name' => 'monitor'])</span>
+                <div>
+                    <strong aria-label="Não disponível">—</strong>
+                    <span>Aparelhos ativos</span>
+                </div>
+            </div>
+            <div class="admin-stat">
+                <span class="stat-icon violet">@include('parciais.icone', ['name' => 'chip'])</span>
+                <div>
+                    <strong aria-label="Não disponível">—</strong>
+                    <span>Tornozeleiras online</span>
+                </div>
+            </div>
+            <div class="admin-stat">
+                <span class="stat-icon red">@include('parciais.icone', ['name' => 'warning'])</span>
+                <div>
+                    <strong aria-label="Não disponível">—</strong>
+                    <span>Ocorrências hoje</span>
+                </div>
+            </div>
+        </div>
+        <section class="admin-panel admin-alerts">
+            <h2>Alertas recentes</h2>
+            <div class="admin-empty alert-empty">
+                @include('parciais.icone', ['name' => 'warning'])
+                <p>Alertas ainda não disponíveis.</p>
+            </div>
+        </section>
     </aside>
 </div>
 @endsection

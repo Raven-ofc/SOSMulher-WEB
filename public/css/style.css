@@ -1,4 +1,3 @@
-/* Base visual em CSS comum, compartilhada por todas as páginas. */
 html {
     line-height: 1.5;
     -webkit-text-size-adjust: 100%;
@@ -80,7 +79,6 @@ table {
     display: none !important;
 }
 
-/* Conteúdo acessível a leitores de tela. */
 .somente-leitor {
     position: absolute;
     width: 1px;
@@ -92,8 +90,6 @@ table {
     white-space: nowrap;
     border: 0;
 }
-
-/* Estilos do SOSMulher: acesso, administração, cadastros e impressão. */
 
 * {
     box-sizing: border-box;
@@ -2521,7 +2517,6 @@ button, input {
 }
 
 
-/* Paginação das listas, sem biblioteca de estilos. */
 .paginacao {
     display: flex;
     flex-wrap: wrap;
