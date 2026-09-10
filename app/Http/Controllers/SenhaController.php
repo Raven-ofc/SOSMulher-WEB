@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\tbautoridade;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +21,7 @@ class SenhaController extends Controller
         }
 
         try {
-            $status = Password::sendResetLink($request->only('email'));
+            $status = Password::sendResetLink(['emailAutoridade' => $request->email]);
         } catch (\Throwable $exception) {
             report($exception);
 
@@ -63,9 +63,9 @@ class SenhaController extends Controller
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function (User $user, string $password) {
+            function (tbautoridade $user, string $password) {
                 $user->forceFill([
-                    'password' => Hash::make($password),
+                    'senhaAutoridade' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
                 event(new PasswordReset($user));

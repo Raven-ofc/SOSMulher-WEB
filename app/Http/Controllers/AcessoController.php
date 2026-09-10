@@ -15,7 +15,12 @@ class AcessoController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        if (! Auth::attempt($credentials)) {
+        $authCredentials = [
+            'emailAutoridade' => $credentials['email'],
+            'password' => $credentials['password'],
+        ];
+
+        if (! Auth::attempt($authCredentials)) {
             throw ValidationException::withMessages([
                 'email' => 'E-mail ou senha incorretos.',
             ]);
