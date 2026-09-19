@@ -12,16 +12,16 @@ class LocalizacaoTornozeleiraController extends Controller
     {
         $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);
 
-        $validated = $request->validate([
+        $dados = $request->validate([
             'latitudeLocalizacao'  => ['required', 'numeric', 'between:-90,90'],
             'longitudeLocalizacao' => ['required', 'numeric', 'between:-180,180'],
             'dataHoraLocalizacao'  => ['nullable', 'date'],
         ]);
 
         $localizacao = $tornozeleira->localizacoes()->create([
-            'latitudeLocalizacao'  => $validated['latitudeLocalizacao'],
-            'longitudeLocalizacao' => $validated['longitudeLocalizacao'],
-            'dataHoraLocalizacao'  => $validated['dataHoraLocalizacao'] ?? now(),
+            'latitudeLocalizacao'  => $dados['latitudeLocalizacao'],
+            'longitudeLocalizacao' => $dados['longitudeLocalizacao'],
+            'dataHoraLocalizacao'  => $dados['dataHoraLocalizacao'] ?? now(),
         ]);
 
         return response()->json($localizacao, 201);

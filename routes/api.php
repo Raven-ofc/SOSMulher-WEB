@@ -10,4 +10,5 @@ Route::post('/tornozeleiras/{idTornozeleira}/localizacoes', [LocalizacaoTornozel
 Route::get('/tornozeleiras/{idTornozeleira}/localizacoes', [LocalizacaoTornozeleiraController::class, 'index']);
 Route::get('/tornozeleiras/{idTornozeleira}/localizacoes/ultima', [LocalizacaoTornozeleiraController::class, 'ultima']);
 
+
 ?>
