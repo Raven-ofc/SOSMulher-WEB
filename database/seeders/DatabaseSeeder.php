@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             TornozeleiraSeeder::class,
             AutoridadeSeeder::class,
             AdminSeeder::class,
+            userSeeder::class,
         ]);
     }
 }

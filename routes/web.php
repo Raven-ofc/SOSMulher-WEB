@@ -19,7 +19,7 @@ Route::post('/esqueci-senha', [SenhaController::class, 'email'])->middleware('th
 Route::get('/email-enviado', [SenhaController::class, 'sent'])->name('password.email.sent');
 Route::get('/redefinir-senha', [SenhaController::class, 'edit'])->name('password.reset');
 Route::post('/redefinir-senha', [SenhaController::class, 'update'])->middleware('throttle:5,1')->name('password.update');
-Route::middleware(['auth', 'auth.session'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [AcessoController::class, 'destroy'])->name('logout');
     Route::get('/painel', [PainelController::class, 'index'])->name('dashboard');
     Route::prefix('administracao')->name('admin.')->group(function () {

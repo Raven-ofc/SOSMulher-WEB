@@ -1,59 +1,74 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 
-// --- Configurações da rede ---
-const char* ssid     = "SEU_WIFI";
-const char* password = "SUA_SENHA";
+// ========================================
+// WIFI
+// ========================================
 
-// --- Configurações da API ---
-// Troque SEU_IP pelo IP da máquina rodando "php artisan serve --host=0.0.0.0"
-// e "1" pelo id da tornozeleira cadastrada no banco (tabela tbtornozeleira)
+const char* ssid     = "";
+const char* password = "";
+
+// ========================================
+// API
+// ========================================
+
+// Troque SEU_IP pelo IP da maquina rodando "php artisan serve --host=0.0.0.0"
+// e o "1" pelo id da tornozeleira cadastrada na tabela tbtornozeleira
 const char* apiUrl = "http://SEU_IP:8000/api/tornozeleiras/1/localizacoes";
 
-// Intervalo entre envios (30 segundos)
-const unsigned long INTERVALO_ENVIO = 30000;
+// Intervalo minimo entre envios (20 segundos), pra nao mandar a cada sentenca NMEA
+const unsigned long INTERVALO_ENVIO = 20000;
 unsigned long ultimoEnvio = 0;
 
-void setup() {
-  Serial.begin(115200);
+// ========================================
+// GPS
+// ========================================
+
+// ESP32 Serial2
+#define GPS_RX 16
+#define GPS_TX 17
+
+HardwareSerial gpsSerial(2);
+
+// ========================================
+// VARIÁVEIS
+// ========================================
+
+String linhaGPS = "";
+bool recebendo = false;
+
+// ========================================
+// CONECTA NO WIFI
+// ========================================
+
+void conectarWifi() {
+
+  Serial.println();
+  Serial.print("Conectando ao WiFi");
 
   WiFi.begin(ssid, password);
-  Serial.print("Conectando ao WiFi");
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nWiFi conectado!");
+
+  Serial.println();
+  Serial.print("WiFi conectado! IP: ");
   Serial.println(WiFi.localIP());
 }
 
-void loop() {
-  // Aqui entra o seu código já existente do TinyGPS++
-  // supondo que você já tem as variáveis:
-  //   double latitude  = gps.location.lat();
-  //   double longitude = gps.location.lng();
-  //   bool gpsValido   = gps.location.isValid();
-
-  if (millis() - ultimoEnvio >= INTERVALO_ENVIO) {
-    ultimoEnvio = millis();
-
-    // Substitua pelas variáveis reais do seu parsing do GPS
-    double latitude = -23.549608;
-    double longitude = -46.419186;
-    bool gpsValido = true;
-
-    if (gpsValido) {
-      enviarLocalizacao(latitude, longitude);
-    } else {
-      Serial.println("GPS ainda sem fix válido, aguardando...");
-    }
-  }
-}
+// ========================================
+// ENVIA LOCALIZACAO PARA A API
+// ========================================
 
 void enviarLocalizacao(double latitude, double longitude) {
+
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("WiFi desconectado, não é possível enviar.");
+    Serial.println("WiFi desconectado, tentando reconectar...");
+    conectarWifi();
     return;
   }
 
@@ -62,13 +77,16 @@ void enviarLocalizacao(double latitude, double longitude) {
   http.addHeader("Content-Type", "application/json");
   http.addHeader("Accept", "application/json");
 
-  // Monta o JSON com ArduinoJson
   JsonDocument doc;
   doc["latitudeLocalizacao"] = latitude;
   doc["longitudeLocalizacao"] = longitude;
 
   String jsonBody;
   serializeJson(doc, jsonBody);
+
+  Serial.println();
+  Serial.println(">>> ENVIANDO PARA A API <<<");
+  Serial.println(jsonBody);
 
   int httpCode = http.POST(jsonBody);
 
@@ -82,3 +100,234 @@ void enviarLocalizacao(double latitude, double longitude) {
 
   http.end();
 }
+
+// ========================================
+// CONVERTE COORDENADA NMEA
+// ========================================
+
+double converterCoordenada(String valor, String direcao) {
+
+  if (valor.length() == 0) {
+    return 0;
+  }
+
+  double numero = valor.toDouble();
+
+  int graus = (int)(numero / 100);
+
+  double minutos = numero - (graus * 100);
+
+  double coordenada = graus + (minutos / 60.0);
+
+  if (direcao == "S" || direcao == "W") {
+    coordenada *= -1;
+  }
+
+  return coordenada;
+}
+
+// ========================================
+// PROCESSA UMA SENTENÇA GNGGA
+// ========================================
+
+void processarGGA(String linha) {
+
+  Serial.println();
+  Serial.println(">>> SENTENCA GNGGA RECEBIDA <<<");
+
+  Serial.println(linha);
+
+  // Remove "$GNGGA,"
+  if (linha.startsWith("$GNGGA,")) {
+    linha.remove(0, 7);
+  }
+
+  // ======================================
+  // SEPARA OS CAMPOS
+  // ======================================
+
+  String campos[15];
+
+  int indice = 0;
+  int inicio = 0;
+
+  for (int i = 0; i <= linha.length(); i++) {
+
+    if (i == linha.length() || linha[i] == ',') {
+
+      if (indice < 15) {
+        campos[indice] = linha.substring(inicio, i);
+      }
+
+      indice++;
+
+      inicio = i + 1;
+    }
+  }
+
+  // ======================================
+  // DADOS
+  // ======================================
+
+  String hora = campos[0];
+
+  String latitude = campos[1];
+  String direcaoLat = campos[2];
+
+  String longitude = campos[3];
+  String direcaoLng = campos[4];
+
+  String fix = campos[5];
+
+  String satelites = campos[6];
+
+  String hdop = campos[7];
+
+  String altitude = campos[8];
+
+  // ======================================
+  // CONVERTE
+  // ======================================
+
+  double lat = converterCoordenada(
+    latitude,
+    direcaoLat
+  );
+
+  double lng = converterCoordenada(
+    longitude,
+    direcaoLng
+  );
+
+  // ======================================
+  // MOSTRA
+  // ======================================
+
+  Serial.println();
+  Serial.println("========================================");
+  Serial.println("          POSICAO DO GPS");
+  Serial.println("========================================");
+
+  Serial.print("Hora UTC: ");
+  Serial.println(hora);
+
+  Serial.print("Latitude: ");
+  Serial.println(lat, 6);
+
+  Serial.print("Longitude: ");
+  Serial.println(lng, 6);
+
+  Serial.print("Fix: ");
+  Serial.println(fix);
+
+  Serial.print("Satelites: ");
+  Serial.println(satelites);
+
+  Serial.print("HDOP: ");
+  Serial.println(hdop);
+
+  Serial.print("Altitude: ");
+  Serial.print(altitude);
+  Serial.println(" m");
+
+  Serial.println("========================================");
+
+  // ======================================
+  // ENVIA PARA A API (SE O FIX FOR VALIDO)
+  // ======================================
+
+  // fix "0" = sem posicao valida. "1" = GPS fix. "2" = DGPS fix.
+  bool fixValido = (fix != "0" && fix.length() > 0);
+
+  if (!fixValido) {
+    Serial.println("Fix invalido, aguardando sinal do GPS...");
+    return;
+  }
+
+  unsigned long agora = millis();
+
+  if (agora - ultimoEnvio >= INTERVALO_ENVIO) {
+    ultimoEnvio = agora;
+    enviarLocalizacao(lat, lng);
+  } else {
+    Serial.println("Posicao valida, mas aguardando o intervalo de envio.");
+  }
+}
+
+// ========================================
+// SETUP
+// ========================================
+
+void setup() {
+
+  // Monitor Serial
+  Serial.begin(115200);
+
+  // GPS - Serial2
+  gpsSerial.begin(
+    115200,
+    SERIAL_8N1,
+    GPS_RX,
+    GPS_TX
+  );
+
+  delay(2000);
+
+  Serial.println();
+  Serial.println("========================================");
+  Serial.println("       TESTE GPS NEO-6M - ESP32");
+  Serial.println("========================================");
+  Serial.println();
+  Serial.println("GPS Baud: 115200");
+  Serial.println("GPS TX -> GPIO16");
+  Serial.println("GPS RX -> GPIO17");
+  Serial.println();
+
+  conectarWifi();
+
+  Serial.println();
+  Serial.println("Aguardando dados do GPS...");
+  Serial.println();
+}
+
+// ========================================
+// LOOP
+// ========================================
+
+void loop() {
+
+  while (gpsSerial.available()) {
+
+    char c = gpsSerial.read();
+
+    // ====================================
+    // ENCONTROU INICIO DE SENTENCA
+    // ====================================
+
+    if (c == '$') {
+
+      // Se já tinha uma sentença sendo recebida,
+      // processa a anterior antes de começar outra.
+
+      if (recebendo && linhaGPS.length() > 0) {
+
+        if (linhaGPS.startsWith("$GNGGA")) {
+          processarGGA(linhaGPS);
+        }
+      }
+
+      // Começa nova sentença
+      linhaGPS = "$";
+      recebendo = true;
+    }
+
+    // ====================================
+    // CONTINUA RECEBENDO
+    // ====================================
+
+    else if (recebendo) {
+
+      linhaGPS += c;
+    }
+  }
+} 
