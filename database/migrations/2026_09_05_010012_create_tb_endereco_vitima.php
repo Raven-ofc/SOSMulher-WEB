@@ -18,9 +18,11 @@ return new class extends Migration
             $table->string('bairroVitima', 100);
             $table->string('cidadeVitima', 100);
             $table->string('ufVitima', 100);
-            $table->string('complementoVitima', 100);
+            $table->string('complementoVitima', 100)->nullable();
             $table->string('cepVitima', 10);
             $table->foreignId('idVitima')->constrained('tbvitima')->onDelete('cascade');
+            $table->decimal('latitudeVitima', 10, 7);
+            $table->decimal('longitudeVitima', 10, 7);
             $table->timestamps();
         });
     }

@@ -16,6 +16,9 @@ class DatabaseSeeder extends Seeder
             AutoridadeSeeder::class,
             AdminSeeder::class,
             userSeeder::class,
+            VitimaSeeder::class,
+            TelefoneVitimaSeeder::class,
+            EnderecoVitimaSeeder::class,
         ]);
     }
 }

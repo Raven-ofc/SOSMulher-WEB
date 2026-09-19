@@ -31,12 +31,6 @@ return new class extends Migration
             $t->string('localOcorrencia')->nullable();
             $t->string('bairroOcorrencia', 100)->nullable();
         });
-        Schema::table('tbsolicitacao', function (Blueprint $t) {
-            $t->unsignedBigInteger('idAutoridade')->nullable()->change();
-            $t->string('complementoSolicitacao', 100)->nullable()->change();
-            $t->foreignId('analisadoPor')->nullable()->constrained('users')->nullOnDelete();
-            $t->timestamp('removidoEm')->nullable();
-        });
         Schema::create('relatorios_atendimento', function (Blueprint $t) {
             $t->id();
             $t->foreignId('ocorrencia_id')->unique()->constrained('tbocorrencia')->restrictOnDelete();
@@ -60,10 +54,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('administration_audit');
         Schema::dropIfExists('relatorios_atendimento');
-        Schema::table('tbsolicitacao', function (Blueprint $t) {
-            $t->dropConstrainedForeignId('analisadoPor');
-            $t->dropColumn('removidoEm');
-        });
         Schema::table('tbocorrencia', function (Blueprint $t) {
             $t->dropColumn(['statusAtendimento', 'dataHoraOcorrencia', 'localOcorrencia', 'bairroOcorrencia']);
         });
