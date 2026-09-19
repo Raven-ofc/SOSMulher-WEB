@@ -16,6 +16,9 @@ class tbenderecoVitima extends Model
         'ufVitima',
         'complementoVitima',
         'cepVitima',
+        'longitudeVitima',
+        'latitudeVitima',
+        'tipoEndereco',
         'idVitima',
     ];
 
