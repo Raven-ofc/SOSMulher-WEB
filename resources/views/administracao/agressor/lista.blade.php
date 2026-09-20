@@ -1,12 +1,12 @@
-@extends('estruturas.administracao',['pageTitle'=>'Agressores','active'=>'admin.aggressors'])
+@extends('estruturas.administracao',['pageTitle'=>'Agressores','active'=>'admin.agressores.index'])
 @section('admin-content')
 <header class="admin-heading victims-heading">
     <h1>Agressores</h1>
 </header>
 <form class="occurrence-filters" method="GET">
-    <a class="victim-primary" href="{{ route('admin.aggressors.create') }}">+ Adicionar</a>
+    <a class="victim-primary" href="{{ route('admin.agressores.criar') }}">+ Adicionar</a>
     <div class="admin-search">
-        <input name="search" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('search') }}">
+        <input name="busca" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('busca') }}">
         <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
     </div>
     <select name="status" aria-label="Status">
@@ -37,7 +37,7 @@
                         <td>{{ ($agressor->telefoneAgressor ?? '—') }}</td>
                         <td>{{ ucfirst($agressor->statusAgressor) }}</td>
                         <td>
-                            <a class="admin-text-link" href="{{ route('admin.aggressors.show',$agressor->id) }}">Ver cadastro</a>
+                            <a class="admin-text-link" href="{{ route('admin.agressores.visualizar',$agressor->id) }}">Ver cadastro</a>
                         </td>
                     </tr>
                 @empty

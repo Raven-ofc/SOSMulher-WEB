@@ -1,9 +1,9 @@
-@extends('estruturas.administracao',['pageTitle'=>'Agressores','active'=>'admin.aggressors'])
+@extends('estruturas.administracao',['pageTitle'=>'Agressores','active'=>'admin.agressores.index'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Agressores</h1>
 </header>
-<a class="admin-back" href="{{ route('admin.aggressors') }}">‹ voltar</a>
+<a class="admin-back" href="{{ route('admin.agressores.index') }}">‹ voltar</a>
 <section class="admin-panel victim-detail">
     <div class="victim-profile">
         <div class="victim-profile-heading">
@@ -25,8 +25,8 @@
             </div>
         </dl>
         <div class="victim-profile-actions">
-            <a class="admin-action secondary" href="{{ route('admin.aggressors.edit',$agressor->id) }}">editar info</a>
-            <form method="POST" action="{{ route('admin.aggressors.status',$agressor->id) }}">
+            <a class="admin-action secondary" href="{{ route('admin.agressores.editar',$agressor->id) }}">editar info</a>
+            <form method="POST" action="{{ route('admin.agressores.status',$agressor->id) }}">
                 @csrf
                 @method('PATCH')
                 <input type="hidden" name="status" value="{{ $agressor->statusAgressor==='ativo'?'inativo':'ativo' }}">
@@ -39,7 +39,7 @@
             <h2>Ocorrências</h2>
             @forelse($occurrences as $item)
                 <p class="victim-related-empty">
-                    <a href="{{ route('admin.occurrences.show',$item->id) }}">
+                    <a href="{{ route('admin.ocorrencias.visualizar',$item->id) }}">
                         {{ $item->tipoOcorrencia }}
                         —
                         {{ $item->dataOcorrencia }}

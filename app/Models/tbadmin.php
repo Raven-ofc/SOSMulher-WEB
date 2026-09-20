@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbadmin extends Model
+class TbAdmin extends Model
 {
     protected $table = 'tbadmin';
 
@@ -18,6 +18,6 @@ class tbadmin extends Model
 
     public function telefones()
     {
-        return $this->hasMany(tbtelefoneAdmin::class, 'idAdmin');
+        return $this->hasMany(TbTelefoneAdmin::class, 'idAdmin');
     }
 }

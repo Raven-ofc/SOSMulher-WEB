@@ -9,6 +9,7 @@ class Cpf implements ValidationRule
 {
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
+        $value = preg_replace('/\D/', '', (string) $value);
         if (! is_string($value) || ! preg_match('/^\d{11}$/', $value) || preg_match('/^(\d)\1{10}$/', $value)) {
             $fail('Informe um CPF válido.');
 

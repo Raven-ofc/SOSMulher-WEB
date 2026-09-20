@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbtelefoneAdmin extends Model
+class TbTelefoneAdmin extends Model
 {
     protected $table = 'tbtelefoneadmin';
 
@@ -15,6 +15,6 @@ class tbtelefoneAdmin extends Model
 
     public function admin()
     {
-        return $this->belongsTo(tbadmin::class, 'idAdmin');
+        return $this->belongsTo(TbAdmin::class, 'idAdmin');
     }
 }

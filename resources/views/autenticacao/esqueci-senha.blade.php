@@ -17,7 +17,7 @@
                 <img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher">
                 <h1 class="screen-title">Esqueceu a senha?</h1>
                 <p class="screen-text">Faça a redefinição da sua senha em duas etapas:</p>
-                <form class="auth-form" method="POST" action="{{ route('password.email') }}">
+                <form class="auth-form" method="POST" action="{{ route('senha.email') }}">
                     @csrf
                     <div class="form-field">
                         <label class="form-label" for="email">E-mail institucional cadastrado</label>

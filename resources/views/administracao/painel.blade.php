@@ -1,10 +1,10 @@
-@extends('estruturas.administracao',['pageTitle'=>$statistics?'Estatísticas':'Dashboard','active'=>$statistics?'admin.statistics':'dashboard'])
+@extends('estruturas.administracao',['pageTitle'=>$estatisticas?'Estatísticas':'Dashboard','active'=>$estatisticas?'admin.estatisticas':'admin.painel'])
 @section('admin-content')
 <header class="admin-heading">
-    <h1>{{ $statistics?'Estatísticas':'Dashboard' }}</h1>
+    <h1>{{ $estatisticas?'Estatísticas':'Dashboard' }}</h1>
 </header>
 <div class="admin-stats">
-    @foreach($metrics as $label=>$value)
+    @foreach($metricas as $label=>$value)
         <div class="admin-stat">
             <div>
                 <strong>{{ $value }}</strong>
@@ -19,7 +19,7 @@
             <h2>Gráfico - Análise Semanal</h2>
             <div class="weekly-chart">
                 @if($total)
-                    <div class="data-donut" style="background:conic-gradient({{ implode(',',$stops) }})" role="img" aria-label="{{ $total }} ocorrências na última semana">
+                    <div class="data-donut" style="background:conic-gradient({{ implode(',',$paradas) }})" role="img" aria-label="{{ $total }} ocorrências na última semana">
                         <span>{{ $total }}</span>
                     </div>
                 @else
@@ -28,7 +28,7 @@
                     </div>
                 @endif
                 <ul class="chart-legend">
-                    @forelse($weekly as $row)
+                    @forelse($semanal as $row)
                         <li>
                             {{ $row->tipoOcorrencia }}
                             :
@@ -45,24 +45,24 @@
         <section class="admin-panel">
             <h2>Último semestre</h2>
             <div class="data-bars">
-                @foreach($months as $month)
+                @foreach($mensal as $month)
                     <div>
                         <strong>{{ $month['total'] }}</strong>
-                        <span style="height:{{ $month['total']/max(1,$months->max('total'))*150 }}px">
+                        <span style="height:{{ $month['total']/max(1,$mensal->max('total'))*150 }}px">
                         </span>
-                        <small>{{ $month['label'] }}</small>
+                        <small>{{ $month['rotulo'] }}</small>
                     </div>
                 @endforeach
             </div>
         </section>
     </div>
 </div>
-@unless($statistics)
+@unless($estatisticas)
     <section class="admin-panel backend-recent">
         <h2>Ocorrências recentes</h2>
-        @forelse($recent as $case)
+        @forelse($recentes as $case)
             <p>
-                <a href="{{ route('admin.occurrences.show',$case->id) }}">{{ $case->tipoOcorrencia }}</a>
+                <a href="{{ route('admin.ocorrencias.visualizar',$case->id) }}">{{ $case->tipoOcorrencia }}</a>
                 ·
                 {{ $case->dataOcorrencia }}
                 ·

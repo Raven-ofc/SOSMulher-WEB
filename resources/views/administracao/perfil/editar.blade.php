@@ -1,15 +1,15 @@
-@extends('estruturas.administracao',['pageTitle'=>'Editar perfil','active'=>'admin.profile'])
+@extends('estruturas.administracao',['pageTitle'=>'Editar perfil','active'=>'admin.perfil.editar'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Meu perfil</h1>
 </header>
 <div class="profile-grid">
-    <form class="admin-panel profile-card profile-edit-card" method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data">
+    <form class="admin-panel profile-card profile-edit-card" method="POST" action="{{ route('admin.perfil.atualizar') }}" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
         <div class="profile-identity">
             @if(auth()->user()->photo_path)
-                <img class="profile-avatar" src="{{ route('admin.profile.photo') }}" alt="Foto de perfil" style="object-fit:cover">
+                <img class="profile-avatar" src="{{ route('admin.perfil.foto') }}" alt="Foto de perfil" style="object-fit:cover">
             @else
                 <div class="profile-avatar" role="img" aria-label="Perfil sem foto">
                     {{ mb_strtoupper(mb_substr(auth()->user()->name,0,1)) }}
@@ -20,16 +20,16 @@
             <small>Até 2 MB.</small>
         </div>
         <div class="profile-fields">
-            <label for="name">Nome completo</label>
-            <input id="name" name="name" required maxlength="100" value="{{ old('name',auth()->user()->name) }}">
+            <label for="nome">Nome completo</label>
+            <input id="nome" name="nome" required maxlength="100" value="{{ old('nome',auth()->user()->name) }}">
             <label for="cpf">CPF</label>
             <input id="cpf" name="cpf" inputmode="numeric" maxlength="14" value="{{ old('cpf',auth()->user()->cpf) }}">
-            <label for="phone">Telefone</label>
-            <input id="phone" name="phone" type="tel" value="{{ old('phone',auth()->user()->phone) }}">
+            <label for="telefone">Telefone</label>
+            <input id="telefone" name="telefone" type="tel" value="{{ old('telefone',auth()->user()->phone) }}">
         </div>
         <div class="profile-edit-actions">
             <div>
-                <a class="admin-action secondary" href="{{ route('admin.profile') }}">cancelar</a>
+                <a class="admin-action secondary" href="{{ route('admin.perfil') }}">cancelar</a>
                 <button class="admin-action">salvar</button>
             </div>
         </div>

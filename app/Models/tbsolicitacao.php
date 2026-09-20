@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbsolicitacao extends Model
+class TbSolicitacao extends Model
 {
     protected $table = 'tbsolicitacao';
 
     protected $fillable = [
-        'descricaoSolicitacao',
         'tipoSolicitacao',
         'logradouroSolicitacao',
         'numLogradouroSolicitacao',
@@ -23,17 +22,19 @@ class tbsolicitacao extends Model
         'statusSolicitacao',
         'dataSolicitacao',
         'dataAnalise',
+        'analisadoPor',
+        'removidoEm',
         'idVitima',
         'idAutoridade',
     ];
 
     public function vitima()
     {
-        return $this->belongsTo(tbvitima::class, 'idVitima');
+        return $this->belongsTo(TbVitima::class, 'idVitima');
     }
 
     public function autoridade()
     {
-        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
+        return $this->belongsTo(TbAutoridade::class, 'idAutoridade');
     }
 }

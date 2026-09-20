@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbtelefoneAutoridade extends Model
+class TbTelefoneAutoridade extends Model
 {
     protected $table = 'tbtelefoneautoridade';
 
@@ -15,6 +15,6 @@ class tbtelefoneAutoridade extends Model
 
     public function autoridade()
     {
-        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
+        return $this->belongsTo(TbAutoridade::class, 'idAutoridade');
     }
 }
