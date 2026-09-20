@@ -6,71 +6,71 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TelefoneVitimaSeeder extends Seeder
+class TelefoneGuardiaoSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('tbtelefonevitima')->insert([
+        DB::table('tbtelefoneguardiao')->insert([
             [
-                'numeroTelefoneVitima' => '(11) 91134-2006',
-                'idVitima' => 1,
+                'numeroTelefoneGuardiao' => '(11) 98231-4407',
+                'idGuardiao' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98345-2341',
-                'idVitima' => 2,
+                'numeroTelefoneGuardiao' => '(11) 99715-2260',
+                'idGuardiao' => 2,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99427-1183',
-                'idVitima' => 3,
+                'numeroTelefoneGuardiao' => '(11) 97604-8813',
+                'idGuardiao' => 3,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97250-6649',
-                'idVitima' => 4,
+                'numeroTelefoneGuardiao' => '(11) 98357-1192',
+                'idGuardiao' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98806-3372',
-                'idVitima' => 5,
+                'numeroTelefoneGuardiao' => '(11) 96420-7735',
+                'idGuardiao' => 5,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96118-7704',
-                'idVitima' => 6,
+                'numeroTelefoneGuardiao' => '(11) 99188-3306',
+                'idGuardiao' => 6,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99530-2287',
-                'idVitima' => 7,
+                'numeroTelefoneGuardiao' => '(11) 3742-5519',
+                'idGuardiao' => 7,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98014-5590',
-                'idVitima' => 8,
+                'numeroTelefoneGuardiao' => '(11) 98066-4471',
+                'idGuardiao' => 8,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97382-1046',
-                'idVitima' => 9,
+                'numeroTelefoneGuardiao' => '(11) 97529-0084',
+                'idGuardiao' => 9,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96745-8830',
-                'idVitima' => 10,
+                'numeroTelefoneGuardiao' => '(11) 98940-6628',
+                'idGuardiao' => 10,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

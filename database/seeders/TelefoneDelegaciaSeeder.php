@@ -6,71 +6,71 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TelefoneVitimaSeeder extends Seeder
+class TelefoneDelegaciaSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('tbtelefonevitima')->insert([
+        DB::table('tbTelefoneDelegacia')->insert([
             [
-                'numeroTelefoneVitima' => '(11) 91134-2006',
-                'idVitima' => 1,
+                'numeroTelefoneDelegacia' => '(11) 3241-2325',
+                'idDelegacia' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98345-2341',
-                'idVitima' => 2,
+                'numeroTelefoneDelegacia' => '(11) 5687-1444',
+                'idDelegacia' => 2,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99427-1183',
-                'idVitima' => 3,
+                'numeroTelefoneDelegacia' => '(11) 2073-4188',
+                'idDelegacia' => 3,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97250-6649',
-                'idVitima' => 4,
+                'numeroTelefoneDelegacia' => '(11) 2557-6920',
+                'idDelegacia' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98806-3372',
-                'idVitima' => 5,
+                'numeroTelefoneDelegacia' => '(11) 3721-0345',
+                'idDelegacia' => 5,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96118-7704',
-                'idVitima' => 6,
+                'numeroTelefoneDelegacia' => '(11) 2521-7788',
+                'idDelegacia' => 6,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99530-2287',
-                'idVitima' => 7,
+                'numeroTelefoneDelegacia' => '(11) 2015-3390',
+                'idDelegacia' => 7,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98014-5590',
-                'idVitima' => 8,
+                'numeroTelefoneDelegacia' => '(11) 3742-6611',
+                'idDelegacia' => 8,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97382-1046',
-                'idVitima' => 9,
+                'numeroTelefoneDelegacia' => '(11) 3311-4050',
+                'idDelegacia' => 9,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96745-8830',
-                'idVitima' => 10,
+                'numeroTelefoneDelegacia' => '(11) 2211-9074',
+                'idDelegacia' => 10,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

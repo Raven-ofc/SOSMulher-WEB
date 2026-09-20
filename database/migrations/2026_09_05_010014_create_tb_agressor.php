@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string('nomeAgressor', 100);
             $table->string('cpfAgressor', 14)->unique();
             $table->string('logradouroAgressor', 255);
-            $table->string('numLogradouroAgressor', 10);
+            $table->string('numLogradouroAgressor', 100);
             $table->string('bairroAgressor', 100);
             $table->string('cidadeAgressor', 100);
-            $table->string('ufAgressor', 2);
-            $table->string('complementoAgressor', 9);
+            $table->string('ufAgressor', 10);
+            $table->string('complementoAgressor', 100)->nullable();
             $table->date('dataNascimentoAgressor');
-            $table->string('statusAgressor', 20);
+            $table->string('statusAgressor', 30);
             $table->foreignId('idTornozeleira')->constrained('tbtornozeleira')->onDelete('cascade');
             $table->timestamps();
         });

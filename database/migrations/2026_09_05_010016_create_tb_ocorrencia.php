@@ -13,13 +13,31 @@ return new class extends Migration
     {
         Schema::create('tbocorrencia', function (Blueprint $table) {
             $table->id();
+
             $table->date('dataOcorrencia');
+            $table->dateTime('dataHoraOcorrencia');
+
             $table->text('descricaoOcorrencia')->nullable();
+
             $table->string('tipoOcorrencia');
             $table->string('gravidadeOcorrencia');
-            $table->foreignId('idVitima')->constrained('tbvitima')->onDelete('cascade');
-            $table->foreignId('idAgressor')->constrained('tbagressor')->onDelete('cascade');
-            $table->foreignId('idAutoridade')->constrained('tbautoridade')->onDelete('cascade');
+            $table->string('statusAtendimento');
+
+            $table->string('bairroOcorrencia', 100);
+            $table->string('localOcorrencia', 255);
+
+            $table->foreignId('idVitima')
+                ->constrained('tbvitima')
+                ->onDelete('cascade');
+
+            $table->foreignId('idAgressor')
+                ->constrained('tbagressor')
+                ->onDelete('cascade');
+
+            $table->foreignId('idAutoridade')
+                ->constrained('tbautoridade')
+                ->onDelete('cascade');
+
             $table->timestamps();
         });
     }

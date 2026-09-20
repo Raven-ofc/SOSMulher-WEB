@@ -6,71 +6,71 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TelefoneVitimaSeeder extends Seeder
+class TelefoneAdminSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        DB::table('tbtelefonevitima')->insert([
+        DB::table('tbtelefoneadmin')->insert([
             [
-                'numeroTelefoneVitima' => '(11) 91134-2006',
-                'idVitima' => 1,
+                'numTelefoneAdmin' => '(11) 3291-4400',
+                'idAdmin' => 1,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98345-2341',
-                'idVitima' => 2,
+                'numTelefoneAdmin' => '(11) 98812-7734',
+                'idAdmin' => 2,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99427-1183',
-                'idVitima' => 3,
+                'numTelefoneAdmin' => '(11) 99160-3218',
+                'idAdmin' => 3,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97250-6649',
-                'idVitima' => 4,
+                'numTelefoneAdmin' => '(11) 97455-9021',
+                'idAdmin' => 4,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98806-3372',
-                'idVitima' => 5,
+                'numTelefoneAdmin' => '(11) 96330-1187',
+                'idAdmin' => 5,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96118-7704',
-                'idVitima' => 6,
+                'numTelefoneAdmin' => '(11) 98207-6642',
+                'idAdmin' => 6,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 99530-2287',
-                'idVitima' => 7,
+                'numTelefoneAdmin' => '(11) 99074-5513',
+                'idAdmin' => 7,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 98014-5590',
-                'idVitima' => 8,
+                'numTelefoneAdmin' => '(11) 97718-2290',
+                'idAdmin' => 8,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 97382-1046',
-                'idVitima' => 9,
+                'numTelefoneAdmin' => '(11) 98564-3376',
+                'idAdmin' => 9,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'numeroTelefoneVitima' => '(11) 96745-8830',
-                'idVitima' => 10,
+                'numTelefoneAdmin' => '(11) 96841-7709',
+                'idAdmin' => 10,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

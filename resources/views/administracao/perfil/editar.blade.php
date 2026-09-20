@@ -8,11 +8,11 @@
         @csrf
         @method('PATCH')
         <div class="profile-identity">
-            @if(auth()->user()->photo_path)
+            @if(auth()->user()->imagemAutoridade)
                 <img class="profile-avatar" src="{{ route('admin.profile.photo') }}" alt="Foto de perfil" style="object-fit:cover">
             @else
                 <div class="profile-avatar" role="img" aria-label="Perfil sem foto">
-                    {{ mb_strtoupper(mb_substr(auth()->user()->name,0,1)) }}
+                    {{ mb_strtoupper(mb_substr(auth()->user()->nomeAutoridade,0,1)) }}
                 </div>
             @endif
             <label for="photo">Alterar foto</label>
@@ -21,11 +21,11 @@
         </div>
         <div class="profile-fields">
             <label for="name">Nome completo</label>
-            <input id="name" name="name" required maxlength="100" value="{{ old('name',auth()->user()->name) }}">
+            <input id="name" name="name" required maxlength="100" value="{{ old('name',auth()->user()->nomeAutoridade) }}">
             <label for="cpf">CPF</label>
-            <input id="cpf" name="cpf" inputmode="numeric" maxlength="14" value="{{ old('cpf',auth()->user()->cpf) }}">
+            <input id="cpf" name="cpf" inputmode="numeric" maxlength="14" value="{{ old('cpf',auth()->user()->cpfAutoridade) }}">
             <label for="phone">Telefone</label>
-            <input id="phone" name="phone" type="tel" value="{{ old('phone',auth()->user()->phone) }}">
+            <input id="phone" name="phone" type="tel" value="{{ old('phone',$telefone->numTelefoneAutoridade ?? null) }}">
         </div>
         <div class="profile-edit-actions">
             <div>

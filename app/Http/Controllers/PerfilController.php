@@ -13,19 +13,21 @@ class PerfilController extends Controller
     public function show(Request $request)
     {
         $atendimentos = DB::table('relatorios_atendimento')
-            ->where('user_id', $request->user()->id)
+            ->where('idAutoridade', $request->user()->id)
             ->count();
+        $telefone = $request->user()->telefones()->first();
 
-        return view('administracao.perfil.detalhes', compact('atendimentos'));
+        return view('administracao.perfil.detalhes', compact('atendimentos', 'telefone'));
     }
 
     public function edit(Request $request)
     {
         $atendimentos = DB::table('relatorios_atendimento')
-            ->where('user_id', $request->user()->id)
+            ->where('idAutoridade', $request->user()->id)
             ->count();
+        $telefone = $request->user()->telefones()->first();
 
-        return view('administracao.perfil.editar', compact('atendimentos'));
+        return view('administracao.perfil.editar', compact('atendimentos', 'telefone'));
     }
 
     public function update(Request $request)
@@ -37,20 +39,29 @@ class PerfilController extends Controller
         ]);
         $dados = $request->validate([
             'name' => ['required', 'string', 'max:100'],
-            'cpf' => ['nullable', new Cpf, Rule::unique('users', 'cpf')->ignore($request->user()->id)],
+            'cpf' => ['nullable', new Cpf, Rule::unique('tbautoridade', 'cpfAutoridade')->ignore($request->user()->id)],
             'phone' => ['nullable', 'regex:/^\d{10,11}$/'],
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=4096,max_height=4096'],
         ]);
         $user = $request->user();
-        $old = $user->photo_path;
+        $old = $user->imagemAutoridade;
         $photo = $request->file('photo')?->store('profile-photos', 'local');
         try {
             $user->forceFill([
-                'name' => $dados['name'],
-                'cpf' => $dados['cpf'],
-                'phone' => $dados['phone'],
-                'photo_path' => $photo ?? $old,
+                'nomeAutoridade' => $dados['name'],
+                'cpfAutoridade' => $dados['cpf'],
+                'imagemAutoridade' => $photo ?? $old,
             ])->save();
+
+            // Telefone vive em tbtelefoneautoridade (um-para-muitos). Aqui
+            // editamos o primeiro registro existente, ou criamos um novo
+            // caso a autoridade ainda não tenha telefone cadastrado.
+            if ($dados['phone']) {
+                $user->telefones()->updateOrCreate(
+                    ['idAutoridade' => $user->id],
+                    ['numTelefoneAutoridade' => $dados['phone']]
+                );
+            }
         } catch (\Throwable $e) {
             if ($photo) {
                 Storage::disk('local')->delete($photo);
@@ -65,7 +76,7 @@ class PerfilController extends Controller
 
     public function photo(Request $request)
     {
-        $path = $request->user()->photo_path;
+        $path = $request->user()->imagemAutoridade;
         abort_unless($path && Storage::disk('local')->exists($path), 404);
 
         return response()->file(Storage::disk('local')->path($path), ['Cache-Control' => 'private, no-store', 'X-Content-Type-Options' => 'nosniff']);
