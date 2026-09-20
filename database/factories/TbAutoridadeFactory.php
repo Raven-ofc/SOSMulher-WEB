@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\tbautoridade;
+use App\Models\TbAutoridade;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<tbautoridade>
+ * @extends Factory<TbAutoridade>
  */
 class TbAutoridadeFactory extends Factory
 {

@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\tbtornozeleira;
+use App\Models\TbTornozeleira;
 use Illuminate\Http\Request;
 
 class LocalizacaoTornozeleiraController extends Controller
 {
     public function store(Request $request, $idTornozeleira)
     {
-        $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);
+        $tornozeleira = TbTornozeleira::findOrFail($idTornozeleira);
 
         $dados = $request->validate([
             'latitudeLocalizacao'  => ['required', 'numeric', 'between:-90,90'],
@@ -27,10 +27,9 @@ class LocalizacaoTornozeleiraController extends Controller
         return response()->json($localizacao, 201);
     }
 
-
     public function index($idTornozeleira)
     {
-        $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);
+        $tornozeleira = TbTornozeleira::findOrFail($idTornozeleira);
 
         $localizacoes = $tornozeleira->localizacoes()
             ->orderByDesc('dataHoraLocalizacao')
@@ -41,7 +40,7 @@ class LocalizacaoTornozeleiraController extends Controller
 
     public function ultima($idTornozeleira)
     {
-        $tornozeleira = tbtornozeleira::findOrFail($idTornozeleira);
+        $tornozeleira = TbTornozeleira::findOrFail($idTornozeleira);
 
         $ultima = $tornozeleira->localizacoes()
             ->orderByDesc('dataHoraLocalizacao')

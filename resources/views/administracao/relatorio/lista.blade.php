@@ -5,17 +5,17 @@
 </header>
 <form class="occurrence-filters" method="GET">
     <div class="admin-search">
-        <input name="search" aria-label="Pesquisar ocorrência" placeholder="Pesquisar..." value="{{ request('search') }}">
+        <input name="busca" aria-label="Pesquisar ocorrência" placeholder="Pesquisar..." value="{{ request('busca') }}">
         <button aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
     </div>
     <div class="admin-date-filter">
         <label>
             De
-            <input type="date" name="from" value="{{ request('from') }}">
+            <input type="date" name="de" value="{{ request('de') }}">
         </label>
         <label>
             Até
-            <input type="date" name="to" value="{{ request('to') }}">
+            <input type="date" name="ate" value="{{ request('ate') }}">
         </label>
     </div>
     <button class="admin-action secondary">Filtrar</button>
@@ -34,15 +34,15 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($records as $record)
+                @forelse($relatorios as $relatorio)
                     <tr>
-                        <td>{{ $record->dataHoraOcorrencia ?? $record->dataOcorrencia }}</td>
-                        <td>{{ $record->tipoOcorrencia }}</td>
-                        <td>{{ $record->localOcorrencia ?? '—' }}</td>
-                        <td>{{ $record->bairroOcorrencia ?? '—' }}</td>
-                        <td>{{ $record->statusAtendimento }}</td>
+                        <td>{{ $relatorio->dataHoraOcorrencia ?? $relatorio->dataOcorrencia }}</td>
+                        <td>{{ $relatorio->tipoOcorrencia }}</td>
+                        <td>{{ $relatorio->localOcorrencia ?? '—' }}</td>
+                        <td>{{ $relatorio->bairroOcorrencia ?? '—' }}</td>
+                        <td>{{ $relatorio->statusAtendimento }}</td>
                         <td>
-                            <a href="{{ route('admin.reports.show',$record->id) }}">Visualizar ↗</a>
+                            <a href="{{ route('admin.reports.show',$relatorio->id) }}">Visualizar ↗</a>
                         </td>
                     </tr>
                 @empty
@@ -57,6 +57,6 @@
             </tbody>
         </table>
     </div>
-    {{ $records->links() }}
+    {{ $relatorios->links() }}
 </section>
 @endsection

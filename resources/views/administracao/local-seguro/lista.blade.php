@@ -1,37 +1,37 @@
-@extends('estruturas.administracao',['pageTitle'=>'Solicitações de locais seguros','active'=>'admin.victims'])
+@extends('estruturas.administracao',['pageTitle'=>'Solicitações de locais seguros','active'=>'admin.vitimas.solicitacoes'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Solicitações de locais seguros</h1>
 </header>
-<a class="admin-back" href="{{ route('admin.victims') }}">‹ voltar</a>
+<a class="admin-back" href="{{ route('admin.vitimas.index') }}">‹ voltar</a>
 <p>
-    <a class="victim-primary" href="{{ route('admin.places.create') }}">+ Registrar solicitação</a>
+    <a class="victim-primary" href="{{ route('admin.locais-seguros.criar') }}">+ Registrar solicitação</a>
 </p>
 <div class="safe-request-grid">
-    @forelse($records as $record)
+    @forelse($solicitacoes as $solicitacao)
         <section class="admin-panel safe-request-card">
-            <h2>{{ $record->vitima->nomeVitima }}</h2>
+            <h2>{{ $solicitacao->vitima->nomeVitima }}</h2>
             <dl class="victim-info">
                 <div>
                     <dt>CPF:</dt>
-                    <dd>{{ $record->vitima->cpfVitima }}</dd>
+                    <dd>{{ $solicitacao->vitima->cpfVitima }}</dd>
                 </div>
                 <div>
                     <dt>Local:</dt>
-                    <dd>{{ $record->tipoSolicitacao }}</dd>
+                    <dd>{{ $solicitacao->tipoSolicitacao }}</dd>
                 </div>
                 <div>
                     <dt>Endereço:</dt>
                     <dd>
-                        {{ $record->logradouroSolicitacao }}
+                        {{ $solicitacao->logradouroSolicitacao }}
                         ,
-                        {{ $record->numLogradouroSolicitacao }}
+                        {{ $solicitacao->numLogradouroSolicitacao }}
                         —
-                        {{ $record->cidadeSolicitacao }}
+                        {{ $solicitacao->cidadeSolicitacao }}
                     </dd>
                 </div>
             </dl>
-            <form class="safe-request-actions" method="POST" action="{{ route('admin.places.decide',$record->id) }}">
+            <form class="safe-request-actions" method="POST" action="{{ route('admin.locais-seguros.decidir',$solicitacao->id) }}">
                 @csrf
                 @method('PATCH')
                 <button class="admin-action secondary" name="decision" value="reprovado">Reprovar</button>
@@ -44,5 +44,5 @@
         </section>
     @endforelse
 </div>
-{{ $records->links() }}
+{{ $solicitacoes->links() }}
 @endsection

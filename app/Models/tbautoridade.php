@@ -6,7 +6,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class tbautoridade extends Authenticatable
+class TbAutoridade extends Authenticatable
 {
     use HasFactory, Notifiable;
 
@@ -40,11 +40,6 @@ class tbautoridade extends Authenticatable
         ];
     }
 
-    public function getAuthIdentifierName()
-    {
-        return 'emailAutoridade';
-    }
-
     public function getAuthPassword()
     {
         return $this->senhaAutoridade;
@@ -62,21 +57,21 @@ class tbautoridade extends Authenticatable
 
     public function telefones()
     {
-        return $this->hasMany(tbtelefoneAutoridade::class, 'idAutoridade');
+        return $this->hasMany(TbTelefoneAutoridade::class, 'idAutoridade');
     }
 
     public function ocorrencias()
     {
-        return $this->hasMany(tbocorrencia::class, 'idAutoridade');
+        return $this->hasMany(TbOcorrencia::class, 'idAutoridade');
     }
 
     public function solicitacoes()
     {
-        return $this->hasMany(tbsolicitacao::class, 'idAutoridade');
+        return $this->hasMany(TbSolicitacao::class, 'idAutoridade');
     }
 
     public function alertas()
     {
-        return $this->hasMany(tbalerta::class, 'idAutoridade');
+        return $this->hasMany(TbAlerta::class, 'idAutoridade');
     }
 }

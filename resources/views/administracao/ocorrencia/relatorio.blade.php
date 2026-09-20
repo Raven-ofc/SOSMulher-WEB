@@ -1,27 +1,27 @@
-@extends('estruturas.administracao',['pageTitle'=>'Finalizar atendimento','active'=>'admin.occurrences'])
+@extends('estruturas.administracao',['pageTitle'=>'Finalizar atendimento','active'=>'admin.ocorrencias.index'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Finalizar atendimento</h1>
 </header>
-<a class="admin-back" href="{{ route('admin.occurrences.show',$case->id) }}">‹ voltar</a>
+<a class="admin-back" href="{{ route('admin.ocorrencias.visualizar',$ocorrencia->id) }}">‹ voltar</a>
 <section class="admin-panel">
-    <h2>{{ $case->tipoOcorrencia }}</h2>
-    <form class="report-section" method="POST" action="{{ route('admin.occurrences.complete',$case->id) }}">
+    <h2>{{ $ocorrencia->tipoOcorrencia }}</h2>
+    <form class="report-section" method="POST" action="{{ route('admin.ocorrencias.finalizar',$ocorrencia->id) }}">
         @csrf
         <div class="report-dates">
             <label>
                 Início da operação
-                <input type="datetime-local" name="start" value="{{ old('start') }}" required>
+                <input type="datetime-local" name="inicio" value="{{ old('inicio') }}" required>
             </label>
             <label>
                 Final da operação
-                <input type="datetime-local" name="end" value="{{ old('end') }}" required>
+                <input type="datetime-local" name="fim" value="{{ old('fim') }}" required>
             </label>
         </div>
-        <label for="report">Relatório do atendimento</label>
-        <textarea id="report" name="report" required minlength="20" maxlength="30000">{{ old('report') }}</textarea>
+        <label for="relato">Relatório do atendimento</label>
+        <textarea id="relato" name="relato" required minlength="20" maxlength="30000">{{ old('relato') }}</textarea>
         <div class="report-actions">
-            <a class="admin-action secondary" href="{{ route('admin.occurrences.show',$case->id) }}">cancelar</a>
+            <a class="admin-action secondary" href="{{ route('admin.ocorrencias.visualizar',$ocorrencia->id) }}">cancelar</a>
             <button class="admin-action" type="submit">Finalizar atendimento</button>
         </div>
     </form>

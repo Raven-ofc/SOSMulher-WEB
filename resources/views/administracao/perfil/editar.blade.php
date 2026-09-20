@@ -1,10 +1,10 @@
-@extends('estruturas.administracao',['pageTitle'=>'Editar perfil','active'=>'admin.profile'])
+@extends('estruturas.administracao',['pageTitle'=>'Editar perfil','active'=>'admin.perfil.editar'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Meu perfil</h1>
 </header>
 <div class="profile-grid">
-    <form class="admin-panel profile-card profile-edit-card" method="POST" action="{{ route('admin.profile.update') }}" enctype="multipart/form-data">
+    <form class="admin-panel profile-card profile-edit-card" method="POST" action="{{ route('admin.perfil.atualizar') }}" enctype="multipart/form-data">
         @csrf
         @method('PATCH')
         <div class="profile-identity">
@@ -29,7 +29,7 @@
         </div>
         <div class="profile-edit-actions">
             <div>
-                <a class="admin-action secondary" href="{{ route('admin.profile') }}">cancelar</a>
+                <a class="admin-action secondary" href="{{ route('admin.perfil') }}">cancelar</a>
                 <button class="admin-action">salvar</button>
             </div>
         </div>

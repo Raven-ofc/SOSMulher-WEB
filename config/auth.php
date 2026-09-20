@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\tbautoridade;
+use App\Models\TbAutoridade;
 
 return [
 
@@ -19,7 +19,7 @@ return [
     'providers' => [
         'autoridades' => [
             'driver' => 'eloquent',
-            'model' => tbautoridade::class,
+            'model' => TbAutoridade::class,
         ],
     ],
 

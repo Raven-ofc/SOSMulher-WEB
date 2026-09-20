@@ -1,10 +1,10 @@
-@extends('estruturas.administracao', ['pageTitle' => 'Cadastrar nova Medida Protetiva', 'active' => 'admin.measures'])
+@extends('estruturas.administracao', ['pageTitle' => 'Cadastrar nova Medida Protetiva', 'active' => 'admin.medidas-protetivas'])
 @section('admin-content')
 <header class="admin-heading detail-heading">
     <h1>Medidas Protetivas</h1>
     <p>medidaProtetiva/adicionarNovaMedidaProtetiva</p>
 </header>
-<a class="admin-back" href="{{ route('admin.measures') }}">‹ voltar</a>
+<a class="admin-back" href="{{ route('admin.medidas-protetivas') }}">‹ voltar</a>
 <div class="victim-form-intro">
     <h2>Cadastrar nova Medida Protetiva</h2>
     <p>Insira as informações para cadastrar a medida. Confira se a vítima e o agressor já foram cadastrados.</p>

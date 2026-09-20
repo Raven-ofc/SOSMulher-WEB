@@ -4,19 +4,19 @@
     <h1>Ocorrências</h1>
 </header>
 <form class="occurrence-filters" method="GET">
-    <a class="victim-primary" href="{{ route('admin.occurrences.create') }}">+ Registrar ocorrência</a>
+    <a class="victim-primary" href="{{ route('admin.ocorrencias.criar') }}">+ Registrar ocorrência</a>
     <div class="admin-search">
-        <input name="search" aria-label="Pesquisar ocorrência" placeholder="Pesquisar..." value="{{ request('search') }}">
+        <input name="busca" aria-label="Pesquisar ocorrência" placeholder="Pesquisar..." value="{{ request('busca') }}">
         <button aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
     </div>
     <div class="admin-date-filter">
         <label>
             De
-            <input type="date" name="from" value="{{ request('from') }}">
+            <input type="date" name="de" value="{{ request('de') }}">
         </label>
         <label>
             Até
-            <input type="date" name="to" value="{{ request('to') }}">
+            <input type="date" name="ate" value="{{ request('ate') }}">
         </label>
     </div>
     <button class="admin-action secondary">Filtrar</button>
@@ -35,15 +35,17 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse($records as $record)
+                @forelse($ocorrencias as $ocorrencia)
                     <tr>
-                        <td>{{ $record->dataHoraOcorrencia ?? $record->dataOcorrencia }}</td>
-                        <td>{{ $record->tipoOcorrencia }}</td>
-                        <td>{{ $record->localOcorrencia ?? '—' }}</td>
-                        <td>{{ $record->bairroOcorrencia ?? '—' }}</td>
-                        <td>{{ $record->statusAtendimento }}</td>
+                        <td>{{ $ocorrencia->dataHoraOcorrencia ?? $ocorrencia->dataOcorrencia }}</td>
+                        <td>{{ $ocorrencia->tipoOcorrencia }}</td>
+                        <td>{{ $ocorrencia->localOcorrencia ?? '—' }}</td>
+                        <td>{{ $ocorrencia->bairroOcorrencia ?? '—' }}</td>
+                        <td>{{ $ocorrencia->statusAtendimento }}</td>
                         <td>
-                            <a href="{{ route('admin.occurrences.show',$record->id) }}">Visualizar ↗</a>
+                            <a href="{{ route('admin.ocorrencias.visualizar', $ocorrencia->id) }}">
+                                Visualizar ↗
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -58,6 +60,6 @@
             </tbody>
         </table>
     </div>
-    {{ $records->links() }}
+    {{ $ocorrencias->links() }}
 </section>
 @endsection

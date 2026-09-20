@@ -1,10 +1,10 @@
-@extends('estruturas.administracao', ['pageTitle' => 'Medidas Protetivas', 'active' => 'admin.measures'])
+@extends('estruturas.administracao', ['pageTitle' => 'Medidas Protetivas', 'active' => 'admin.medidas-protetivas'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Medidas Protetivas</h1>
 </header>
-<form class="occurrence-filters victims-filters" method="GET" action="{{ route('admin.measures') }}">
-    <a class="victim-primary" href="{{ route('admin.measures.create') }}">+ Adicionar Medida</a>
+<form class="occurrence-filters victims-filters" method="GET" action="{{ route('admin.medidas-protetivas') }}">
+    <a class="victim-primary" href="{{ route('admin.medidas-protetivas.criar') }}">+ Adicionar Medida</a>
     <div class="admin-search">
         <label class="somente-leitor" for="measure-search">Pesquisar medidas protetivas</label>
         <input id="measure-search" name="search" value="{{ request('search') }}" placeholder="pesquisar...">
@@ -38,7 +38,7 @@
                             @include('parciais.icone', ['name' => 'book'])
                             <h2>Medidas ainda não disponíveis</h2>
                             <p>Os registros serão exibidos aqui quando estiverem disponíveis.</p>
-                            <a class="admin-text-link" href="{{ route('admin.measures.preview') }}">Visualizar tela individual</a>
+                            <a class="admin-text-link" href="{{ route('admin.medidas-protetivas.visualizar') }}">Visualizar tela individual</a>
                         </div>
                     </td>
                 </tr>

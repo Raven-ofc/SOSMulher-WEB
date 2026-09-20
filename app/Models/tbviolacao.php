@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbviolacao extends Model
+class TbViolacao extends Model
 {
     protected $table = 'tbviolacao';
 
@@ -20,11 +20,11 @@ class tbviolacao extends Model
 
     public function medida()
     {
-        return $this->belongsTo(tbmedida::class, 'idMedida');
+        return $this->belongsTo(TbMedida::class, 'idMedida');
     }
 
     public function alertas()
     {
-        return $this->hasMany(tbalerta::class, 'idViolacao');
+        return $this->hasMany(TbAlerta::class, 'idViolacao');
     }
 }

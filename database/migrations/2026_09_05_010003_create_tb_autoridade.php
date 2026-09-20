@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbautoridade', function (Blueprint $table) {
             $table->id();
-            $table->string('imagemAutoridade', 255);
+            $table->string('imagemAutoridade', 255) ->nullable();
             $table->string('nomeAutoridade', 100);
             $table->string('emailAutoridade', 100)->unique();
             $table->string('cpfAutoridade', 14)->unique();
