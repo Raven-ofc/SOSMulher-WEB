@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\tbagressor;
 use App\Rules\Cpf;
-use App\Support\AdminAudit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -86,7 +85,6 @@ class AgressorController extends Controller
             }
             $agressor->telefoneAgressor = $dados['phone'];
             $agressor->save();
-            AdminAudit::record('tbagressor', $agressor->id, $id ? 'update' : 'create');
         });
 
         return redirect()->route('admin.aggressors.show', $agressor->id)->with('status', 'Cadastro salvo.');
@@ -102,7 +100,6 @@ class AgressorController extends Controller
             }
             $agressor->statusAgressor = $dados['status'];
             $agressor->save();
-            AdminAudit::record('tbagressor', $id, $dados['status']);
         });
 
         return back()->with('status', 'Status atualizado.');

@@ -19,8 +19,22 @@ use Illuminate\Support\Facades\Storage;
 
 class VitimaController extends Controller
 {
-    //API
 
+    public function index()
+    {
+        $vitimas = tbvitima::paginate(10);
+
+        return view('administracao.vitima.lista', compact('vitimas'));
+    }
+
+    public function show(string $id)
+    {
+        $vitima = tbvitima::findOrFail($id);
+
+        return view('administracao.vitima.formulario', compact('vitima'));
+    }
+
+    //API
     public function indexAPIs(string $email, string $senha)
     {
         $vitima = tbvitima::leftjoin('tbtelefonevitima', 'tbtelefonevitima.idvitima', '=', 'tbvitima.id')
@@ -46,11 +60,14 @@ class VitimaController extends Controller
             'imagemVitima' => $vitima->imagemVitima,
         ]);
     }
-    public function enderecoAPI(string $id){
+
+    public function enderecoAPI(string $id)
+    {
         $endereco = tbenderecoVitima::where('tbEnderecoVitima.idVitima', $id)->first();
 
         return $endereco;
     }
+
     //Listar o id de um tbvitima específico
     public function atualizarAPI(Request $request, string $id)
     {
@@ -114,9 +131,9 @@ class VitimaController extends Controller
         return response()->json([
             'message' => 'Imagem Atualizada com sucesso!',
             'imagemVitima' => $vitima->imagemVitima
-        ],200);
+        ], 200);
     }
-     public function atualizarLocalizacaoAPI(Request $request, string $id)
+    public function atualizarLocalizacaoAPI(Request $request, string $id)
     {
         $validarDados = $request->validate([
             'longitude' => ['required', 'numeric'],
@@ -124,20 +141,22 @@ class VitimaController extends Controller
         ]);
         $vitima = tbvitima::findOrFail($id);
 
-        $local = tblocalizacaoVitima::updateOrCreate([
-            'idVitima' => $vitima->id
-        ],
-        [
-            'latitudeLocalizacao' => $validarDados['latitude'],
-            'longitudeLocalizacao' =>$validarDados['longitude'],
-            'dataHoraLocalizacao' => now(),
-        ]);
-        return response()->json ([
+        $local = tblocalizacaoVitima::updateOrCreate(
+            [
+                'idVitima' => $vitima->id
+            ],
+            [
+                'latitudeLocalizacao' => $validarDados['latitude'],
+                'longitudeLocalizacao' => $validarDados['longitude'],
+                'dataHoraLocalizacao' => now(),
+            ]
+        );
+        return response()->json([
             'message' => 'Localização atualizada com sucesso!',
-            'idVitima' => $vitima-> id,
-            'latitude' => $local -> latitudeLocalizacao,
-            'longitude' =>$local->longitudeLocalizacao,
-            'dataHora' => $local -> dataHoraLocalizacao,
+            'idVitima' => $vitima->id,
+            'latitude' => $local->latitudeLocalizacao,
+            'longitude' => $local->longitudeLocalizacao,
+            'dataHora' => $local->dataHoraLocalizacao,
         ], 200);
     }
 }

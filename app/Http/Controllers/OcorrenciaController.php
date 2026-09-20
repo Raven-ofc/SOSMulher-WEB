@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\tbagressor;
 use App\Models\tbocorrencia;
 use App\Models\tbvitima;
-use App\Support\AdminAudit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -74,7 +73,6 @@ class OcorrenciaController extends Controller
                 'descricaoOcorrencia' => $dados['description'] ?? null,
                 'statusAtendimento' => 'andamento',
             ])->save();
-            AdminAudit::record('tbocorrencia', $case->id, 'create');
 
             return $case;
         });
@@ -113,7 +111,7 @@ class OcorrenciaController extends Controller
             }
             DB::table('relatorios_atendimento')->insert([
                 'ocorrencia_id' => $id,
-                'user_id' => $request->user()->id,
+                'idAutoridade' => $request->user()->id,
                 'inicio' => str_replace('T', ' ', $dados['start']),
                 'fim' => str_replace('T', ' ', $dados['end']),
                 'relato' => $dados['report'],
@@ -121,7 +119,6 @@ class OcorrenciaController extends Controller
                 'updated_at' => now(),
             ]);
             $case->forceFill(['statusAtendimento' => 'realizado'])->save();
-            AdminAudit::record('tbocorrencia', $id, 'finish');
         });
 
         return redirect()->route('admin.reports.show', $id)->with('status', 'Atendimento finalizado e relatório salvo.');
