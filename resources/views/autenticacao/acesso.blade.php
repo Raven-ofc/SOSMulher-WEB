@@ -20,7 +20,7 @@
                 @if(session('status'))
                     <p role="status">{{ session('status') }}</p>
                 @endif
-                <form class="auth-form" method="POST" action="{{ route('login') }}">
+                <form class="auth-form" method="POST" action="{{ route('fazerLogin') }}">
                     @csrf
                     <div class="form-field">
                         <label class="form-label" for="email">E-mail institucional</label>
@@ -43,7 +43,7 @@
                     </div>
                 </form>
                 <p class="screen-footer">
-                    <a class="link" href="{{ route('password.request') }}">Esqueceu a senha? entre em contato!</a>
+                    <a class="link" href="{{ route('senha.solicitar') }}">Esqueceu a senha? entre em contato!</a>
                 </p>
             </div>
         </main>

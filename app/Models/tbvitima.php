@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbvitima extends Model
+class TbVitima extends Model
 {
     protected $table = 'tbvitima';
 
@@ -20,36 +20,36 @@ class tbvitima extends Model
 
     public function telefones()
     {
-        return $this->hasMany(tbtelefoneVitima::class, 'idVitima');
+        return $this->hasMany(TbTelefoneVitima::class, 'idVitima');
     }
 
     public function enderecos()
     {
-        return $this->hasMany(tbenderecoVitima::class, 'idVitima');
+        return $this->hasMany(TbEnderecoVitima::class, 'idVitima');
     }
 
     public function localizacoes()
     {
-        return $this->hasMany(tblocalizacaoVitima::class, 'idVitima');
+        return $this->hasMany(TbLocalizacaoVitima::class, 'idVitima');
     }
 
     public function ocorrencias()
     {
-        return $this->hasMany(tbocorrencia::class, 'idVitima');
+        return $this->hasMany(TbOcorrencia::class, 'idVitima');
     }
 
     public function medidas()
     {
-        return $this->hasMany(tbmedida::class, 'idVitima');
+        return $this->hasMany(TbMedida::class, 'idVitima');
     }
 
     public function solicitacoes()
     {
-        return $this->hasMany(tbsolicitacao::class, 'idVitima');
+        return $this->hasMany(TbSolicitacao::class, 'idVitima');
     }
 
     public function guardioes()
     {
-        return $this->belongsToMany(tbguardiao::class, 'tbvitimaguardiao', 'idVitima', 'idGuardiao');
+        return $this->belongsToMany(TbGuardiao::class, 'tbvitimaguardiao', 'idVitima', 'idGuardiao');
     }
 }

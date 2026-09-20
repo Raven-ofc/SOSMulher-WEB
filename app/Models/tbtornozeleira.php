@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbtornozeleira extends Model
+class TbTornozeleira extends Model
 {
     protected $table = 'tbtornozeleira';
 
@@ -17,11 +17,11 @@ class tbtornozeleira extends Model
 
     public function agressor()
     {
-        return $this->hasOne(tbagressor::class, 'idTornozeleira');
+        return $this->hasOne(TbAgressor::class, 'idTornozeleira');
     }
 
     public function localizacoes()
     {
-        return $this->hasMany(tblocalizacaoTornozeleira::class, 'idTornozeleira');
+        return $this->hasMany(TbLocalizacaoTornozeleira::class, 'idTornozeleira');
     }
 }

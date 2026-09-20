@@ -3,21 +3,19 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\tbtornozeleira;
+use App\Models\TbTornozeleira;
 
 class TornozeleiraController extends Controller
 {
     public function index()
     {
-        $tornozeleiras = tbtornozeleira::all();
-
+        $tornozeleiras = TbTornozeleira::all();
         return response()->json($tornozeleiras);
     }
 
     public function show($id)
     {
-        $tornozeleira = tbtornozeleira::findOrFail($id);
-
+        $tornozeleira = TbTornozeleira::findOrFail($id);
         return response()->json($tornozeleira);
     }
 }

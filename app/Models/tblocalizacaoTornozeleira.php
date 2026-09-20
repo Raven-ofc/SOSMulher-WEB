@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tblocalizacaoTornozeleira extends Model
+class TbLocalizacaoTornozeleira extends Model
 {
     protected $table = 'tblocalizacaotornozeleira';
 
@@ -17,6 +17,6 @@ class tblocalizacaoTornozeleira extends Model
 
     public function tornozeleira()
     {
-        return $this->belongsTo(tbtornozeleira::class, 'idTornozeleira');
+        return $this->belongsTo(TbTornozeleira::class, 'idTornozeleira');
     }
 }

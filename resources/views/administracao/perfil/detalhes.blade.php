@@ -1,4 +1,4 @@
-@extends('estruturas.administracao', ['pageTitle' => 'Meu perfil', 'active' => 'admin.profile'])
+@extends('estruturas.administracao', ['pageTitle' => 'Meu perfil', 'active' => 'admin.perfil'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Meu perfil</h1>
@@ -7,13 +7,13 @@
     <section class="admin-panel profile-card">
         <div class="profile-identity">
             @if(auth()->user()->photo_path)
-                <img class="profile-avatar" src="{{ route('admin.profile.photo') }}" alt="Foto de perfil" style="object-fit:cover">
+                <img class="profile-avatar" src="{{ route('admin.perfil.foto') }}" alt="Foto de perfil" style="object-fit:cover">
             @else
                 <div class="profile-avatar" role="img" aria-label="Perfil sem foto">
                     {{ mb_strtoupper(mb_substr(auth()->user()->name,0,1)) }}
                 </div>
             @endif
-            <a class="profile-edit-link" href="{{ route('admin.profile.edit') }}">editar perfil</a>
+            <a class="profile-edit-link" href="{{ route('admin.perfil.editar') }}">editar perfil</a>
         </div>
         <div class="profile-information">
             <h2>{{ auth()->user()->name }}</h2>
