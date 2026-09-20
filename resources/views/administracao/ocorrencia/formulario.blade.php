@@ -1,57 +1,57 @@
-@extends('estruturas.administracao',['pageTitle'=>'Registrar ocorrência','active'=>'admin.occurrences'])
+@extends('estruturas.administracao',['pageTitle'=>'Registrar ocorrência','active'=>'admin.ocorrencias.criar'])
 @section('admin-content')
 <header class="admin-heading">
     <h1>Registrar ocorrência</h1>
 </header>
-<a class="admin-back" href="{{ route('admin.occurrences') }}">‹ voltar</a>
-<form class="admin-panel victim-form" method="POST" action="{{ route('admin.occurrences.store') }}">
+<a class="admin-back" href="{{ route('admin.ocorrencias.index') }}">‹ voltar</a>
+<form class="admin-panel victim-form" method="POST" action="{{ route('admin.ocorrencias.salvar') }}">
     @csrf
     <fieldset>
         <legend class="somente-leitor">Pessoas e ocorrência</legend>
-        <label for="victim_id">Vítima</label>
-        <select id="victim_id" name="victim_id" required>
+        <label for="vitima_id">Vítima</label>
+        <select id="vitima_id" name="vitima_id" required>
             <option value="">Selecione</option>
-            @foreach($victims as $v)
-                <option value="{{ $v->id }}" @selected(old('victim_id')==$v->id)>
+            @foreach($vitimas as $v)
+                <option value="{{ $v->id }}" @selected(old('vitima_id')==$v->id)>
                     {{ $v->nomeVitima }}
                     —
                     {{ $v->cpfVitima }}
                 </option>
             @endforeach
         </select>
-        <label for="aggressor_id">Agressor</label>
-        <select id="aggressor_id" name="aggressor_id" required>
+        <label for="agressor_id">Agressor</label>
+        <select id="agressor_id" name="agressor_id" required>
             <option value="">Selecione</option>
-            @foreach($aggressors as $a)
-                <option value="{{ $a->id }}" @selected(old('aggressor_id')==$a->id)>
+            @foreach($agressores as $a)
+                <option value="{{ $a->id }}" @selected(old('agressor_id')==$a->id)>
                     {{ $a->nomeAgressor }}
                     —
                     {{ $a->cpfAgressor }}
                 </option>
             @endforeach
         </select>
-        <label for="type">Tipo de ocorrência</label>
-        <input id="type" name="type" required maxlength="100" value="{{ old('type') }}">
-        <label for="severity">Gravidade</label>
-        <select id="severity" name="severity" required>
+        <label for="tipo">Tipo de ocorrência</label>
+        <input id="tipo" name="tipo" required maxlength="100" value="{{ old('tipo') }}">
+        <label for="gravidade">Gravidade</label>
+        <select id="gravidade" name="gravidade" required>
             <option value="">Selecione</option>
-            @foreach(['baixa','media','alta'] as $severity)
-                <option @selected(old('severity')===$severity)>{{ $severity }}</option>
+            @foreach(['baixa','media','alta'] as $gravidade)
+                <option @selected(old('gravidade')===$gravidade)>{{ $gravidade }}</option>
             @endforeach
         </select>
     </fieldset>
     <fieldset>
         <legend class="somente-leitor">Data e local</legend>
-        <label for="occurred_at">Data e hora</label>
-        <input id="occurred_at" name="occurred_at" type="datetime-local" required value="{{ old('occurred_at') }}">
-        <label for="location">Local</label>
-        <input id="location" name="location" required maxlength="255" value="{{ old('location') }}">
-        <label for="district">Bairro</label>
-        <input id="district" name="district" required maxlength="100" value="{{ old('district') }}">
-        <label for="description">Descrição</label>
-        <textarea id="description" name="description" maxlength="10000">{{ old('description') }}</textarea>
+        <label for="data_hora">Data e hora</label>
+        <input id="data_hora" name="data_hora" type="datetime-local" required value="{{ old('data_hora') }}">
+        <label for="local">Local</label>
+        <input id="local" name="local" required maxlength="255" value="{{ old('local') }}">
+        <label for="bairro">Bairro</label>
+        <input id="bairro" name="bairro" required maxlength="100" value="{{ old('bairro') }}">
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao" maxlength="10000">{{ old('descricao') }}</textarea>
         <div class="victim-form-actions">
-            <button class="victim-primary">Registrar</button>
+            <button class="victim-primary" disabled>Registrar</button>
         </div>
     </fieldset>
 </form>

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbagressor', function (Blueprint $table) {
             $table->id();
-            $table->string('imagemAgressor', 255);
+            $table->string('imagemAgressor', 255)->nullable() ;
             $table->string('nomeAgressor', 100);
             $table->string('cpfAgressor', 14)->unique();
             $table->string('logradouroAgressor', 255);
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('complementoAgressor', 100)->nullable();
             $table->date('dataNascimentoAgressor');
             $table->string('statusAgressor', 30);
-            $table->foreignId('idTornozeleira')->constrained('tbtornozeleira')->onDelete('cascade');
+            $table->foreignId('idTornozeleira')->unique()->constrained('tbtornozeleira')->onDelete('cascade');
             $table->timestamps();
         });
     }

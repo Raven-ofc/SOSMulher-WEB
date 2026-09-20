@@ -17,7 +17,7 @@
                 <img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher">
                 <h1 class="screen-title">Redefina sua senha</h1>
                 <p class="screen-subtitle">Informe sua nova senha</p>
-                <form class="auth-form" method="POST" action="{{ route('password.update') }}">
+                <form class="auth-form" method="POST" action="{{ route('senha.atualizar') }}">
                     @csrf
                     <input type="hidden" name="email" value="{{ request('email') }}">
                     <input type="hidden" name="token" value="{{ request()->query('token', '') }}">

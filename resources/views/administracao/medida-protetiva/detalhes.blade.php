@@ -1,10 +1,10 @@
-@extends('estruturas.administracao', ['pageTitle' => 'Medidas Protetivas', 'active' => 'admin.measures'])
+@extends('estruturas.administracao', ['pageTitle' => 'Medidas Protetivas', 'active' => 'admin.medidas-protetivas'])
 @section('admin-content')
 <header class="admin-heading detail-heading">
     <h1>Medidas Protetivas</h1>
     <p>medidaProtetiva/individual</p>
 </header>
-<a class="admin-back" href="{{ route('admin.measures') }}">‹ voltar</a>
+<a class="admin-back" href="{{ route('admin.medidas-protetivas') }}">‹ voltar</a>
 <section class="admin-panel measure-detail">
     <div class="measure-summary">
         <section>

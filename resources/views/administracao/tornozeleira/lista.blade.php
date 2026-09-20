@@ -1,55 +1,172 @@
-@extends('estruturas.administracao', ['pageTitle' => 'Gerenciamento de Tornozeleiras', 'active' => 'admin.devices'])
+@extends('estruturas.administracao', [
+    'pageTitle' => 'Gerenciamento de Tornozeleiras',
+    'active' => 'admin.tornozeleiras.index'
+])
+
 @section('admin-content')
+
 <header class="admin-heading">
     <h1>Gerenciamento de Tornozeleiras</h1>
 </header>
-<form class="occurrence-filters victims-filters" method="GET" action="{{ route('admin.devices') }}">
-    <a class="victim-primary" href="{{ route('admin.devices.create') }}">+ Adicionar</a>
+
+<form
+    class="occurrence-filters victims-filters"
+    method="GET"
+    action="{{ route('admin.tornozeleiras.index') }}"
+>
+
+    <a
+        class="victim-primary"
+        href="{{ route('admin.tornozeleiras.criar') }}"
+    >
+        + Adicionar
+    </a>
+
     <div class="admin-search">
-        <label class="somente-leitor" for="device-search">Pesquisar tornozeleiras</label>
-        <input id="device-search" name="search" value="{{ request('search') }}" placeholder="pesquisar...">
-        <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
+        <label class="somente-leitor" for="device-search">
+            Pesquisar tornozeleiras
+        </label>
+
+        <input
+            id="device-search"
+            name="busca"
+            value="{{ request('busca') }}"
+            placeholder="pesquisar..."
+        >
+
+        <button type="submit" aria-label="Pesquisar">
+            @include('parciais.icone', ['name' => 'search'])
+        </button>
     </div>
-    <label class="somente-leitor" for="device-status">Status</label>
+
+    <label class="somente-leitor" for="device-status">
+        Status
+    </label>
+
     <select name="status" id="device-status">
         <option value="">Status</option>
-        <option value="ativa" @selected(request('status') === 'ativa')>Ativa</option>
-        <option value="inativa" @selected(request('status') === 'inativa')>Inativa</option>
+
+        <option
+            value="Disponível"
+            @selected(request('status') === 'Disponível')
+        >
+            Disponível
+        </option>
+
+        <option
+            value="Ativa"
+            @selected(request('status') === 'Ativa')
+        >
+            Ativa
+        </option>
+
+        <option
+            value="Inativa"
+            @selected(request('status') === 'Inativa')
+        >
+            Inativa
+        </option>
+
+        <option
+            value="Manutenção"
+            @selected(request('status') === 'Manutenção')
+        >
+            Manutenção
+        </option>
     </select>
+
 </form>
+
 <div class="device-grid">
-    <section class="admin-panel device-card" aria-label="Prévia de um cartão de tornozeleira">
-        <header>
-            <h2>Tornozeleira —</h2>
-            <span class="device-state">
-                —
-                <i aria-hidden="true">
-                </i>
-                <span class="somente-leitor">Status não disponível</span>
-            </span>
-        </header>
-        <dl class="victim-info">
-            <div>
-                <dt>Agressor:</dt>
-                <dd>—</dd>
-            </div>
-            <div>
-                <dt>Bateria:</dt>
-                <dd class="device-battery">
-                    <span aria-hidden="true">
+
+    @forelse($tornozeleiras as $tornozeleira)
+
+        <section
+            class="admin-panel device-card"
+            aria-label="Cartão da tornozeleira"
+        >
+
+            <header>
+                <h2>
+                    Tornozeleira —
+                    {{ $tornozeleira->numeroSerieTornozeleira }}
+                </h2>
+
+                <span class="device-state">
+                    {{ $tornozeleira->statusTornozeleira }}
+
+                    <i aria-hidden="true"></i>
+
+                    <span class="somente-leitor">
+                        Status da tornozeleira
                     </span>
-                    —
-                </dd>
-            </div>
-            <div>
-                <dt>Localização:</dt>
-                <dd>—</dd>
-            </div>
-        </dl>
-        <p id="device-preview-note">Prévia visual. Dispositivos ainda não disponíveis.</p>
-        <footer>
-            <button class="admin-action" type="button" disabled aria-describedby="device-preview-note">Inativar</button>
-        </footer>
-    </section>
+                </span>
+            </header>
+
+            <dl class="victim-info">
+
+                <div>
+                    <dt>Agressor:</dt>
+
+                    <dd>
+                        @if($tornozeleira->agressor)
+                            {{ $tornozeleira->agressor->nomeAgressor }}
+                        @else
+                            Não atribuída
+                        @endif
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Bateria:</dt>
+
+                    <dd class="device-battery">
+                        <span aria-hidden="true"></span>
+
+                        {{ $tornozeleira->bateriaTornozeleira }}%
+                    </dd>
+                </div>
+
+                <div>
+                    <dt>Data de instalação:</dt>
+
+                    <dd>
+                        {{ \Carbon\Carbon::parse($tornozeleira->dataInstalacaoTornozeleira)->format('d/m/Y') }}
+                    </dd>
+                </div>
+
+            </dl>
+
+            <footer>
+
+                <a
+                    class="admin-action"
+                    href="{{ route('admin.tornozeleiras.visualizar', $tornozeleira->id) }}"
+                >
+                    Visualizar
+                </a>
+
+                <a
+                    class="admin-action"
+                    href="{{ route('admin.tornozeleiras.editar', $tornozeleira->id) }}"
+                >
+                    Editar
+                </a>
+
+            </footer>
+
+        </section>
+
+    @empty
+
+        <section class="admin-panel">
+            <p>Nenhuma tornozeleira encontrada.</p>
+        </section>
+
+    @endforelse
+
 </div>
+
+{{ $tornozeleiras->links() }}
+
 @endsection

@@ -4,15 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbocorrencia extends Model
+class TbOcorrencia extends Model
 {
     protected $table = 'tbocorrencia';
 
     protected $fillable = [
         'dataOcorrencia',
+        'dataHoraOcorrencia',
         'descricaoOcorrencia',
         'tipoOcorrencia',
         'gravidadeOcorrencia',
+        'localOcorrencia',
+        'bairroOcorrencia',
+        'statusAtendimento',
         'idVitima',
         'idAgressor',
         'idAutoridade',
@@ -20,16 +24,16 @@ class tbocorrencia extends Model
 
     public function vitima()
     {
-        return $this->belongsTo(tbvitima::class, 'idVitima');
+        return $this->belongsTo(TbVitima::class, 'idVitima');
     }
 
     public function agressor()
     {
-        return $this->belongsTo(tbagressor::class, 'idAgressor');
+        return $this->belongsTo(TbAgressor::class, 'idAgressor');
     }
 
     public function autoridade()
     {
-        return $this->belongsTo(tbautoridade::class, 'idAutoridade');
+        return $this->belongsTo(TbAutoridade::class, 'idAutoridade');
     }
 }

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tbvitima', function (Blueprint $table) {
             $table->id();
-            $table->string('imagemVitima', 255);
+            $table->string('imagemVitima', 255)->nullable();
             $table->string('nomeVitima', 100);
             $table->string('cpfVitima', 14)->unique();
             $table->string('emailVitima', 100)->unique();

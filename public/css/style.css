@@ -2484,6 +2484,13 @@ button, input {
     margin-top: 24px;
 }
 
+#ufAgressor{
+    width: 81%;
+}
+#uf{
+    width: 81%;
+}
+
 @media print {
     .admin-sidebar,.admin-back,.admin-skip,.victim-detail-footer,.victim-profile-actions,.backend-feedback,form {
         display: none!important;

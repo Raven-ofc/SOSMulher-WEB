@@ -1,13 +1,13 @@
-@extends('estruturas.administracao',['pageTitle'=>'Usuárias/Vítimas','active'=>'admin.victims'])
+@extends('estruturas.administracao',['pageTitle'=>'Usuárias/Vítimas','active'=>'admin.vitimas.index'])
 @section('admin-content')
 <header class="admin-heading victims-heading">
     <h1>Usuárias/Vítimas</h1>
-    <a class="safe-requests-link" href="{{ route('admin.victims.requests') }}">Pedidos de locais seguros</a>
+    <a class="safe-requests-link" href="{{ route('admin.vitimas.solicitacoes') }}">Pedidos de locais seguros</a>
 </header>
 <form class="occurrence-filters" method="GET">
-    <a class="victim-primary" href="{{ route('admin.victims.create') }}">+ Adicionar</a>
+    <a class="victim-primary" href="{{ route('admin.vitimas.criar') }}">+ Adicionar</a>
     <div class="admin-search">
-        <input name="search" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('search') }}">
+        <input name="busca" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('busca') }}">
         <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
     </div>
     <select name="status" aria-label="Status">
@@ -40,7 +40,7 @@
                         <td>{{ $vitima->emailVitima }}</td>
                         <td>{{ ucfirst($vitima->statusVitima) }}</td>
                         <td>
-                            <a class="admin-text-link" href="{{ route('admin.victims.show',$vitima->id) }}">Ver cadastro</a>
+                            <a class="admin-text-link" href="{{ route('admin.vitimas.visualizar',$vitima->id) }}">Ver cadastro</a>
                         </td>
                     </tr>
                 @empty

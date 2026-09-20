@@ -10,7 +10,7 @@
         </div>
     </section>
     <aside class="monitoring-side" aria-label="Resumo do monitoramento">
-        <form method="GET" action="{{ route('admin.monitoring') }}" class="admin-search">
+        <form method="GET" action="{{ route('admin.monitoramento') }}" class="admin-search">
             <label class="somente-leitor" for="monitor-search">Pesquisar dispositivos</label>
             <input id="monitor-search" name="search" placeholder="pesquisar..." value="{{ request('search') }}">
             <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
