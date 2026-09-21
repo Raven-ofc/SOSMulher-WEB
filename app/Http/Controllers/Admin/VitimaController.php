@@ -6,7 +6,6 @@ use App\Models\TbVitima;
 use App\Rules\Cpf;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Models\TbEnderecoVitima;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\VitimaCadastradaMail;
@@ -17,7 +16,7 @@ class VitimaController extends BaseCrudController
     protected string $modelo = TbVitima::class;
     protected string $visualizacaoBase = 'administracao.vitima';
     protected string $rotaBase = 'admin.vitimas';
-    protected array $carregarRelacionamentos = ['telefones', 'enderecos'];
+    protected array $carregarRelacionamentos = ['telefones'];
 
     protected function colunaStatus(): string
     {
@@ -76,15 +75,6 @@ class VitimaController extends BaseCrudController
             'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')],
             'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
-            'cep' => ['required', 'string', 'regex:/^\d{5}-\d{3}$/'],
-            'logradouro' => ['required', 'string', 'max:255'],
-            'numero' => ['required', 'string', 'max:100'],
-            'complemento' => ['nullable', 'string', 'max:100'],
-            'bairro' => ['required', 'string', 'max:100'],
-            'cidade' => ['required', 'string', 'max:100'],
-            'uf' => ['required', 'string', 'size:2'],
-            'latitude' => ['required', 'numeric', 'between:-90,90'],
-            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 
@@ -96,15 +86,6 @@ class VitimaController extends BaseCrudController
             'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')->ignore($id)],
             'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
-            'cep' => ['required', 'string', 'regex:/^\d{5}-\d{3}$/'],
-            'logradouro' => ['required', 'string', 'max:255'],
-            'numero' => ['required', 'string', 'max:100'],
-            'complemento' => ['nullable', 'string', 'max:100'],
-            'bairro' => ['required', 'string', 'max:100'],
-            'cidade' => ['required', 'string', 'max:100'],
-            'uf' => ['required', 'string', 'size:2'],
-            'latitude' => ['required', 'numeric', 'between:-90,90'],
-            'longitude' => ['required', 'numeric', 'between:-180,180'],
         ];
     }
 
@@ -144,20 +125,6 @@ class VitimaController extends BaseCrudController
         } else {
             $registro->telefones()->create(['numeroTelefoneVitima' => $dados['telefone']]);
         }
-        $registro->enderecos()->updateOrCreate(
-            ['idVitima' => $registro->id],
-            [
-                'cepVitima' => $dados['cep'],
-                'logradouroVitima' => $dados['logradouro'],
-                'numLogradouroVitima' => $dados['numero'],
-                'complementoVitima' => $dados['complemento'] ?? null,
-                'bairroVitima' => $dados['bairro'],
-                'cidadeVitima' => $dados['cidade'],
-                'ufVitima' => strtoupper($dados['uf']),
-                'latitudeVitima' => $dados['latitude'],
-                'longitudeVitima' => $dados['longitude'],
-            ]
-        );
         if (!$id) {
             Mail::to($registro->emailVitima)->send(
                 new VitimaCadastradaMail(

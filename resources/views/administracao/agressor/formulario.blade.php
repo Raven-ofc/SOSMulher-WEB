@@ -82,9 +82,3 @@
     </fieldset>
 </form>
 @endsection
-
-'logradouroAgressor' => 'Rua Feliciano de Mendonça',
-'bairroAgressor' => 'Guaianases',
-'cidadeAgressor' => 'São Paulo',
-'ufAgressor' => 'SP',
-'complementoAgressor' => 'Casa 2',

@@ -37,8 +37,8 @@ class PerfilController extends \App\Http\Controllers\Controller
         ]);
 
         $dados = $request->validate([
-            'nome' => ['required', 'string', 'max:100'],
-            'cpf' => ['nullable', new Cpf, Rule::unique('users', 'cpf')->ignore($request->user()->id)],
+            'nome' => ['string', 'max:100'],
+            'cpf' => ['nullable', new Cpf, Rule::unique('tbAutoridade', 'cpfAutoridade')->ignore($request->user()->id)],
             'telefone' => ['nullable', 'regex:/^\d{10,11}$/'],
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048', 'dimensions:max_width=4096,max_height=4096'],
         ]);
@@ -49,11 +49,15 @@ class PerfilController extends \App\Http\Controllers\Controller
 
         try {
             $usuario->forceFill([
-                'name' => $dados['nome'],
-                'cpf' => $dados['cpf'],
-                'phone' => $dados['telefone'],
-                'photo_path' => $foto ?? $antiga,
+                'nomeAutoridade' => $dados['nome'],
+                'cpfAutoridade' => $dados['cpf'],
+                'imagemAutoridade' => $foto ?? $antiga,
             ])->save();
+
+            DB::table('tbTelefoneAutoridade')->updateOrInsert(
+                ['idAutoridade' => $usuario->id],
+                ['numTelefoneAutoridade' => $dados['telefone']]
+            );
         } catch (\Throwable $e) {
             if ($foto) {
                 Storage::disk('local')->delete($foto);
