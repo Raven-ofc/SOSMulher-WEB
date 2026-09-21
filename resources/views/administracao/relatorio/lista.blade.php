@@ -42,7 +42,7 @@
                         <td>{{ $relatorio->bairroOcorrencia ?? '—' }}</td>
                         <td>{{ $relatorio->statusAtendimento }}</td>
                         <td>
-                            <a href="{{ route('admin.reports.show',$relatorio->id) }}">Visualizar ↗</a>
+                            <a href="{{ route('admin.relatorios.visualizar',$relatorio->id) }}">Visualizar ↗</a>
                         </td>
                     </tr>
                 @empty

@@ -152,7 +152,7 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
             }
             DB::table('relatorios_atendimento')->insert([
                 'ocorrencia_id' => $id,
-                'user_id' => $request->user()->id,
+                'idAutoridade' => $request->user()->id,
                 'inicio' => str_replace('T', ' ', $dados['inicio']),
                 'fim' => str_replace('T', ' ', $dados['fim']),
                 'relato' => $dados['relato'],
@@ -160,7 +160,6 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
                 'updated_at' => now(),
             ]);
             $ocorrencia->forceFill(['statusAtendimento' => 'realizado'])->save();
-            AdminAudit::record('tbocorrencia', $id, 'finalizacao');
         });
 
         return redirect()->route('admin.relatorios.visualizar', $id)
