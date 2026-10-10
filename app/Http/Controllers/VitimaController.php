@@ -2,24 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\tbtelefoneVitima as ModelsTbtelefoneVitima;
 use App\Models\tbvitima;
 use App\Models\tbtelefonevitima;
 use App\Models\tbenderecoVitima;
 use App\Models\tblocalizacaoVitima;
-use App\Rules\Cpf;
-use App\Support\AdminAudit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
-use Psy\Command\WhereamiCommand;
 use Illuminate\Support\Facades\Storage;
 
 class VitimaController extends Controller
 {
-
     public function index()
     {
         $vitimas = tbvitima::paginate(10);
@@ -34,18 +26,25 @@ class VitimaController extends Controller
         return view('administracao.vitima.formulario', compact('vitima'));
     }
 
-    //API
     public function indexAPIs(string $email, string $senha)
     {
-        $vitima = tbvitima::leftjoin('tbtelefonevitima', 'tbtelefonevitima.idvitima', '=', 'tbvitima.id')
-            ->select('tbvitima.*', 'tbtelefonevitima.idvitima as idvitima', 'tbtelefonevitima.numerotelefonevitima as numFoneVitima')
+        $vitima = tbvitima::leftJoin(
+            'tbtelefonevitima',
+            'tbtelefonevitima.idvitima',
+            '=',
+            'tbvitima.id'
+        )
+            ->select(
+                'tbvitima.*',
+                'tbtelefonevitima.idvitima as idvitima',
+                'tbtelefonevitima.numerotelefonevitima as numFoneVitima'
+            )
             ->where('tbvitima.emailVitima', $email)
             ->first();
 
-
         if (!$vitima || !Hash::check($senha, $vitima->senhaVitima)) {
             return response()->json([
-                'message' => 'E-mail ou senha incorretos'
+                'message' => 'E-mail ou senha incorretos',
             ], 401);
         }
 
@@ -63,87 +62,112 @@ class VitimaController extends Controller
 
     public function enderecoAPI(string $id)
     {
-        $endereco = tbenderecoVitima::where('tbEnderecoVitima.idVitima', $id)->first();
+        $endereco = tbenderecoVitima::where(
+            'tbEnderecoVitima.idVitima',
+            $id
+        )->first();
 
         return $endereco;
     }
 
-    //Listar o id de um tbvitima específico
     public function atualizarAPI(Request $request, string $id)
     {
-        //validação
         $validarDados = $request->validate([
-            'nome' => ['min:3', 'sometimes'],
-            'email' => ['sometimes', 'max:200'],
-            'numeroTelefone' => ['sometimes', 'max:15'],
-            'imagem' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp'],
+            'nome' => ['sometimes', 'required', 'string', 'min:3'],
+            'email' => ['sometimes', 'required', 'email', 'max:200'],
+            'numeroTelefone' => ['sometimes', 'required', 'string', 'max:15'],
         ]);
 
-        //email/nome
         $vitima = tbvitima::findOrFail($id);
 
         $vitima->update([
             'nomeVitima' => $validarDados['nome'] ?? $vitima->nomeVitima,
-            'emailVitima' => $validarDados['email'] ?? $vitima->emailVitima
+            'emailVitima' => $validarDados['email'] ?? $vitima->emailVitima,
         ]);
 
-        //telefone
-        $telefoneVitima = tbtelefonevitima::where('idvitima', '=', $id)->first();
+        $telefoneVitima = tbtelefonevitima::where(
+            'idvitima',
+            $id
+        )->first();
 
         if ($telefoneVitima) {
-
             $telefoneVitima->update([
-                'numerotelefonevitima' => $validarDados['numeroTelefone'] ?? $telefoneVitima->numerotelefonevitima
+                'numerotelefonevitima' =>
+                    $validarDados['numeroTelefone']
+                    ?? $telefoneVitima->numerotelefonevitima,
             ]);
-        } else if (!empty($validarDados['numeroTelefone'])) {
+        } elseif (!empty($validarDados['numeroTelefone'])) {
             tbtelefonevitima::create([
                 'idVitima' => $id,
-                'numeroTelefoneVitima' => $validarDados['numeroTelefone']
+                'numeroTelefoneVitima' => $validarDados['numeroTelefone'],
             ]);
         }
 
-        return response()->json($vitima, 201);
+        return response()->json($vitima->fresh(), 200);
     }
+
     public function atualizarImagemAPI(Request $request, string $id)
     {
         $validarDados = $request->validate([
-            'imagem' => ['sometimes', 'image', 'mimes:jpg,jpeg,png,webp'],
+            'imagem' => [
+                'required',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5048',
+            ],
         ]);
+
         $vitima = tbvitima::findOrFail($id);
 
-        //imagem
-
-        if ($vitima->imagemVitima) {
-            storage::disk('public')->delete($vitima->imagemVitima);
-        }
-
-        //nova imagem
-
         $imagemNova = $request->file('imagem')->store(
-            'imagens/vitimas',
+            'vitimas',
             'public'
         );
 
-        $vitima->update([
-            'imagemVitima' => $imagemNova
-        ]);
+        if (!$imagemNova) {
+            return response()->json([
+                'message' => 'Não foi possível salvar a nova imagem.',
+            ], 500);
+        }
+
+        $imagemAntiga = $vitima->imagemVitima;
+
+        try {
+            $vitima->update([
+                'imagemVitima' => $imagemNova,
+            ]);
+        } catch (\Throwable $e) {
+            Storage::disk('public')->delete($imagemNova);
+
+            throw $e;
+        }
+
+        if (
+            $imagemAntiga &&
+            !filter_var($imagemAntiga, FILTER_VALIDATE_URL)
+        ) {
+            Storage::disk('public')->delete($imagemAntiga);
+        }
 
         return response()->json([
-            'message' => 'Imagem Atualizada com sucesso!',
-            'imagemVitima' => $vitima->imagemVitima
+            'message' => 'Imagem atualizada com sucesso!',
+            'imagemVitima' => $vitima->imagemVitima,
+            'urlImagem' => asset('storage/' . $vitima->imagemVitima),
         ], 200);
     }
+
     public function atualizarLocalizacaoAPI(Request $request, string $id)
     {
         $validarDados = $request->validate([
             'longitude' => ['required', 'numeric'],
             'latitude' => ['required', 'numeric'],
         ]);
+
         $vitima = tbvitima::findOrFail($id);
 
         $local = tblocalizacaoVitima::updateOrCreate(
             [
-                'idVitima' => $vitima->id
+                'idVitima' => $vitima->id,
             ],
             [
                 'latitudeLocalizacao' => $validarDados['latitude'],
@@ -151,6 +175,7 @@ class VitimaController extends Controller
                 'dataHoraLocalizacao' => now(),
             ]
         );
+
         return response()->json([
             'message' => 'Localização atualizada com sucesso!',
             'idVitima' => $vitima->id,
