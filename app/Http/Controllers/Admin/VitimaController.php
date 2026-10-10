@@ -94,7 +94,7 @@ class VitimaController extends BaseCrudController
             'telefone' => ['required', 'string'],
             'nome_mae' => ['nullable', 'string', 'max:100'],
             'nome_pai' => ['nullable', 'string', 'max:100'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'foto' => ['nullable', 'image', 'max:5048'],
             'cep' => ['required', 'string'],
             'rua' => ['required', 'string', 'max:150'],
             'numero' => ['required', 'string', 'max:20'],
@@ -113,7 +113,7 @@ class VitimaController extends BaseCrudController
             'telefone' => ['required', 'string'],
             'nome_mae' => ['nullable', 'string', 'max:100'],
             'nome_pai' => ['nullable', 'string', 'max:100'],
-            'foto' => ['nullable', 'image', 'max:2048'],
+            'foto' => ['nullable', 'image', 'max:5048'],
             'cep' => ['required', 'string'],
             'rua' => ['required', 'string', 'max:150'],
             'numero' => ['required', 'string', 'max:20'],
@@ -133,12 +133,13 @@ class VitimaController extends BaseCrudController
         }
 
         if ($request->hasFile('foto')) {
-            $caminhoFoto = $request->file('foto')->store('imagens/vitimas', 'public');
-            $dados['imagemVitima'] = $caminhoFoto;
+            $caminho = $request->file('foto')->store('vitimas', 'public');
+            $dados['imagemVitima'] = $caminho;
         }
 
         if (!$ehAtualizacao && !empty($dados['cpf'])) {
             $cpf = preg_replace('/\D/', '', $dados['cpf']);
+
             $dados['cpf'] = substr($cpf, 0, 3) . '.' .
                 substr($cpf, 3, 3) . '.' .
                 substr($cpf, 6, 3) . '-' .
@@ -147,10 +148,15 @@ class VitimaController extends BaseCrudController
 
         if (!empty($dados['telefone'])) {
             $telefone = preg_replace('/\D/', '', $dados['telefone']);
+
             if (strlen($telefone) === 11) {
-                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 5) . '-' . substr($telefone, 7, 4);
+                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
+                    substr($telefone, 2, 5) . '-' .
+                    substr($telefone, 7, 4);
             } elseif (strlen($telefone) === 10) {
-                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 4) . '-' . substr($telefone, 6, 4);
+                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
+                    substr($telefone, 2, 4) . '-' .
+                    substr($telefone, 6, 4);
             }
         }
 
@@ -164,10 +170,15 @@ class VitimaController extends BaseCrudController
     protected function aposSalvar($registro, array $dados, ?int $id): void
     {
         $telefone = $registro->telefones()->orderBy('id')->first();
+
         if ($telefone) {
-            $telefone->update(['numeroTelefoneVitima' => $dados['telefone']]);
+            $telefone->update([
+                'numeroTelefoneVitima' => $dados['telefone'],
+            ]);
         } else {
-            $registro->telefones()->create(['numeroTelefoneVitima' => $dados['telefone']]);
+            $registro->telefones()->create([
+                'numeroTelefoneVitima' => $dados['telefone'],
+            ]);
         }
 
         $dadosEndereco = [
@@ -204,7 +215,9 @@ class VitimaController extends BaseCrudController
 
     protected function dadosExtrasVisualizacao($registro): array
     {
-        $occurrences = $registro->ocorrencias()->latest('dataOcorrencia')->paginate(8);
+        $occurrences = $registro->ocorrencias()
+            ->latest('dataOcorrencia')
+            ->paginate(8);
 
         return compact('occurrences');
     }
