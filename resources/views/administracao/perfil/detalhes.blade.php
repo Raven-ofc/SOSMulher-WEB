@@ -18,23 +18,23 @@
         <div class="profile-information">
             <h2>{{ auth()->user()->nomeAutoridade }}</h2>
             <dl>
-                <div>
-                    <dt>CPF:</dt>
-                    <dd>{{ auth()->user()->cpfAutoridade ?: '—' }}</dd>
-                </div>
-                <div>
-                    <dt>Matrícula:</dt>
-                    <dd>—</dd>
-                </div>
-                <div>
-                    <dt>Telefone:</dt>
-                    <dd>{{ $telefone->numTelefoneAutoridade ?? '—' }}</dd>
-                </div>
-                <div>
-                    <dt>E-mail:</dt>
-                    <dd>{{ auth()->user()->emailAutoridade }}</dd>
-                </div>
-            </dl>
+    <div>
+        <dt>CPF:</dt>
+        <dd>{{ $cpfFormatado ?? '—' }}</dd>
+    </div>
+    <div>
+        <dt>Matrícula:</dt>
+        <dd>{{ auth()->user()->matriculaAutoridade ?: '—' }}</dd>
+    </div>
+    <div>
+        <dt>Telefone:</dt>
+        <dd>{{ $telefoneFormatado ?? '—' }}</dd>
+    </div>
+    <div>
+        <dt>E-mail:</dt>
+        <dd>{{ auth()->user()->emailAutoridade }}</dd>
+    </div>
+</dl>                   
             <h3>Informações institucionais</h3>
             <dl>
                 <div>

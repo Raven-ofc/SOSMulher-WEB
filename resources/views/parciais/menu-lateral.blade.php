@@ -1,43 +1,43 @@
 <aside class="admin-sidebar" aria-label="Menu principal">
     <a class="admin-brand" href="{{ route('admin.painel') }}" aria-label="Página inicial"><img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher"></a>
     <nav class="admin-nav">
-        <a href="{{ route('admin.painel') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.painel' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.painel') aria-current="page" @endif>
+        <a href="{{ route('admin.painel') }}" class="admin-nav-item {{ request()->routeIs('admin.painel') ? 'is-active' : '' }}" @if(request()->routeIs('admin.painel')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'home'])
             Home
         </a>
-        <a href="{{ route('admin.ocorrencias.index') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.ocorrencias.index' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.ocorrencias.index') aria-current="page" @endif>
+        <a href="{{ route('admin.ocorrencias.index') }}" class="admin-nav-item {{ request()->routeIs('admin.ocorrencias.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.ocorrencias.*')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'clip'])
             Ocorrências
         </a>
-        <a href="{{ route('admin.monitoramento') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.monitoramento' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.monitoramento') aria-current="page" @endif>
+        <a href="{{ route('admin.monitoramento') }}" class="admin-nav-item {{ request()->routeIs('admin.monitoramento') ? 'is-active' : '' }}" @if(request()->routeIs('admin.monitoramento')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'monitor'])
             Monitoramento
         </a>
-        <a href="{{ route('admin.estatisticas') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.estatisticas' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.estatisticas') aria-current="page" @endif>
+        <a href="{{ route('admin.estatisticas') }}" class="admin-nav-item {{ request()->routeIs('admin.estatisticas') ? 'is-active' : '' }}" @if(request()->routeIs('admin.estatisticas')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'chart'])
             Estatísticas
         </a>
-        <a href="{{ route('admin.relatorios.index') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.relatorios.index' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.relatorios.index') aria-current="page" @endif>
+        <a href="{{ route('admin.relatorios.index') }}" class="admin-nav-item {{ request()->routeIs('admin.relatorios.*') ? 'is-active' : '' }}" @if(request()->routeIs('admin.relatorios.*')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'archive'])
             Relatórios
         </a>
         <div class="registration-menu">
-            <a href="{{ route('admin.vitimas.index') }}" class="admin-nav-item {{ in_array($active ?? '', ['admin.vitimas.index', 'admin.agressores.index', 'admin.tornozeleiras.index', 'admin.medidas-protetivas']) ? 'is-active' : '' }}">
+            <a href="{{ route('admin.vitimas.index') }}" class="admin-nav-item {{ in_array(request()->route()->getName(), ['admin.vitimas.index', 'admin.vitimas.create', 'admin.vitimas.show', 'admin.vitimas.edit', 'admin.agressores.index', 'admin.agressores.create', 'admin.agressores.show', 'admin.agressores.edit', 'admin.tornozeleiras.index', 'admin.tornozeleiras.create', 'admin.tornozeleiras.show', 'admin.tornozeleiras.edit', 'admin.medidas-protetivas', 'admin.medidas-protetivas.create', 'admin.medidas-protetivas.show', 'admin.medidas-protetivas.edit']) ? 'is-active' : '' }}">
                 @include('parciais.icone', ['name' => 'book'])
                 Cadastros
             </a>
-            @if(in_array($active ?? '', ['admin.vitimas.index', 'admin.agressores.index', 'admin.tornozeleiras.index', 'admin.medidas-protetivas']))
+            @if(in_array(request()->route()->getName(), ['admin.vitimas.index', 'admin.vitimas.create', 'admin.vitimas.show', 'admin.vitimas.edit', 'admin.agressores.index', 'admin.agressores.create', 'admin.agressores.show', 'admin.agressores.edit', 'admin.tornozeleiras.index', 'admin.tornozeleiras.create', 'admin.tornozeleiras.show', 'admin.tornozeleiras.edit', 'admin.medidas-protetivas', 'admin.medidas-protetivas.create', 'admin.medidas-protetivas.show', 'admin.medidas-protetivas.edit']))
                 <div class="registration-subnav" aria-label="Tipos de cadastro">
-                    <a href="{{ route('admin.vitimas.index') }}" @if(($active ?? '') === 'admin.vitimas.index') aria-current="page" @endif>Vítimas</a>
-                    <a href="{{ route('admin.agressores.index') }}" @if(($active ?? '') === 'admin.agressores.index') aria-current="page" @endif>Agressores</a>
-                    <a href="{{ route('admin.tornozeleiras.index') }}" @if(($active ?? '') === 'admin.tornozeleiras.index') aria-current="page" @endif>Tornozeleiras</a>
-                    <a href="{{ route('admin.medidas-protetivas') }}" @if(($active ?? '') === 'admin.medidas-protetivas') aria-current="page" @endif>Medidas protetivas</a>
+                    <a href="{{ route('admin.vitimas.index') }}" @if(request()->routeIs('admin.vitimas.*')) aria-current="page" @endif>Vítimas</a>
+                    <a href="{{ route('admin.agressores.index') }}" @if(request()->routeIs('admin.agressores.*')) aria-current="page" @endif>Agressores</a>
+                    <a href="{{ route('admin.tornozeleiras.index') }}" @if(request()->routeIs('admin.tornozeleiras.*')) aria-current="page" @endif>Tornozeleiras</a>
+                    <a href="{{ route('admin.medidas-protetivas') }}" @if(request()->routeIs('admin.medidas-protetivas*')) aria-current="page" @endif>Medidas protetivas</a>
                 </div>
             @endif
         </div>
     </nav>
     <div class="admin-sidebar-bottom">
-        <a href="{{ route('admin.perfil') }}" class="admin-nav-item {{ ($active ?? '') === 'admin.perfil' ? 'is-active' : '' }}" @if(($active ?? '') === 'admin.perfil') aria-current="page" @endif>
+        <a href="{{ route('admin.perfil') }}" class="admin-nav-item {{ request()->routeIs('admin.perfil') ? 'is-active' : '' }}" @if(request()->routeIs('admin.perfil')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'settings'])
             Configurações
         </a>

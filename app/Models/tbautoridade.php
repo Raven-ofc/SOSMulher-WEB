@@ -36,7 +36,6 @@ class TbAutoridade extends Authenticatable
     {
         return [
             'senhaAutoridade' => 'hashed',
-            'matriculaAutoridade' => 'date',
         ];
     }
 

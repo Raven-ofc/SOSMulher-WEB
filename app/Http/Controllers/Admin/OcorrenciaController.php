@@ -64,7 +64,6 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
 
     public function update(Request $request, int $id)
     {
-        // Ocorrências não podem ser editadas, apenas finalizadas
         abort(405, 'Ocorrências não podem ser editadas. Use a finalização.');
     }
 
@@ -77,7 +76,9 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
     {
         return view('administracao.ocorrencia.formulario', [
             'vitimas' => TbVitima::where('statusVitima', 'ativo')->orderBy('nomeVitima')->get(),
-            'agressores' => TbAgressor::where('statusAgressor', 'ativo')->orderBy('nomeAgressor')->get(),
+            'agressores' => TbAgressor::whereIn('statusAgressor', ['Monitorado', 'Foragido'])
+                ->orderBy('nomeAgressor')
+                ->get(),
         ]);
     }
 
@@ -85,11 +86,13 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
     {
         $dados = $request->validate([
             'vitima_id' => ['required', Rule::exists('tbvitima', 'id')->where('statusVitima', 'ativo')],
-            'agressor_id' => ['required', Rule::exists('tbagressor', 'id')->where('statusAgressor', 'ativo')],
+            'agressor_id' => ['required', Rule::exists('tbagressor', 'id')->whereIn('statusAgressor', ['Monitorado', 'Foragido'])],
             'tipo' => ['required', 'string', 'max:100'],
             'gravidade' => ['required', Rule::in(['baixa', 'media', 'alta'])],
             'data_hora' => ['required', 'date_format:Y-m-d\TH:i', 'before_or_equal:now'],
-            'local' => ['required', 'string', 'max:255'],
+            'cep' => ['nullable', 'string', 'max:9'],
+            'rua' => ['required', 'string', 'max:200'],
+            'numero' => ['required', 'string', 'max:50'],
             'bairro' => ['required', 'string', 'max:100'],
             'descricao' => ['nullable', 'string', 'max:10000'],
         ], [
@@ -98,16 +101,18 @@ class OcorrenciaController extends \App\Http\Controllers\Controller
             'data_hora.required' => 'Informe a data e hora da ocorrência.',
         ]);
 
-        $ocorrencia = DB::transaction(function () use ($dados) {
+        $ocorrencia = DB::transaction(function () use ($dados, $request) {
             $ocorrencia = new TbOcorrencia;
             $ocorrencia->forceFill([
+                'idAutoridade' => $request->user()->id, 
                 'idVitima' => $dados['vitima_id'],
                 'idAgressor' => $dados['agressor_id'],
                 'tipoOcorrencia' => $dados['tipo'],
                 'gravidadeOcorrencia' => $dados['gravidade'],
                 'dataOcorrencia' => substr($dados['data_hora'], 0, 10),
                 'dataHoraOcorrencia' => str_replace('T', ' ', $dados['data_hora']),
-                'localOcorrencia' => $dados['local'],
+                'cep' => $dados['cep'] ?? null,
+                'localOcorrencia' => $dados['rua'] . ', ' . $dados['numero'],
                 'bairroOcorrencia' => $dados['bairro'],
                 'descricaoOcorrencia' => $dados['descricao'] ?? null,
                 'statusAtendimento' => 'andamento',

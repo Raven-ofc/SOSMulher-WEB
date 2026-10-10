@@ -1,7 +1,7 @@
 @extends('estruturas.administracao',['pageTitle'=>'Usuárias/Vítimas','active'=>'admin.vitimas.index'])
 @section('admin-content')
 <header class="admin-heading victims-heading">
-    <h1>Usuárias/Vítimas</h1>
+    <h1>Vítimas</h1>
     <a class="safe-requests-link" href="{{ route('admin.vitimas.solicitacoes') }}">Pedidos de locais seguros</a>
 </header>
 <form class="occurrence-filters" method="GET">

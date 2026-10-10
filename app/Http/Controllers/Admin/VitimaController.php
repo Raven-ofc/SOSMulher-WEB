@@ -16,7 +16,7 @@ class VitimaController extends BaseCrudController
     protected string $modelo = TbVitima::class;
     protected string $visualizacaoBase = 'administracao.vitima';
     protected string $rotaBase = 'admin.vitimas';
-    protected array $carregarRelacionamentos = ['telefones'];
+    protected array $carregarRelacionamentos = ['telefones', 'endereco'];
 
     protected function colunaStatus(): string
     {
@@ -35,13 +35,30 @@ class VitimaController extends BaseCrudController
 
     protected function mapearDados(array $dados): array
     {
-        return [
+        $mapeado = [
             'nomeVitima' => $dados['nome'],
-            'cpfVitima' => $dados['cpf'],
-            'dataNascimentoVitima' => $dados['data_nascimento'],
             'emailVitima' => $dados['email'],
-            'senhaVitima' => Hash::make($dados['senha_temporaria']),
+            'nomeMaeVitima' => $dados['nome_mae'] ?? null,
+            'nomePaiVitima' => $dados['nome_pai'] ?? null,
         ];
+
+        if (!empty($dados['imagemVitima'])) {
+            $mapeado['imagemVitima'] = $dados['imagemVitima'];
+        }
+
+        if (array_key_exists('cpf', $dados)) {
+            $mapeado['cpfVitima'] = $dados['cpf'];
+        }
+
+        if (array_key_exists('data_nascimento', $dados)) {
+            $mapeado['dataNascimentoVitima'] = $dados['data_nascimento'];
+        }
+
+        if (!empty($dados['senha_temporaria'])) {
+            $mapeado['senhaVitima'] = Hash::make($dados['senha_temporaria']);
+        }
+
+        return $mapeado;
     }
 
     protected function variavelLista(): string
@@ -74,7 +91,17 @@ class VitimaController extends BaseCrudController
             'cpf' => ['required', 'string', new Cpf, Rule::unique('tbvitima', 'cpfVitima')],
             'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')],
-            'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
+            'telefone' => ['required', 'string'],
+            'nome_mae' => ['nullable', 'string', 'max:100'],
+            'nome_pai' => ['nullable', 'string', 'max:100'],
+            'foto' => ['nullable', 'image', 'max:2048'],
+            'cep' => ['required', 'string'],
+            'rua' => ['required', 'string', 'max:150'],
+            'numero' => ['required', 'string', 'max:20'],
+            'bairro' => ['required', 'string', 'max:100'],
+            'cidade' => ['required', 'string', 'max:100'],
+            'uf' => ['required', 'string', 'max:2'],
+            'complemento' => ['nullable', 'string', 'max:100'],
         ];
     }
 
@@ -82,38 +109,55 @@ class VitimaController extends BaseCrudController
     {
         return [
             'nome' => ['required', 'string', 'max:100'],
-            'cpf' => ['required', 'string', new Cpf, Rule::unique('tbvitima', 'cpfVitima')->ignore($id)],
-            'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
             'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')->ignore($id)],
-            'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
+            'telefone' => ['required', 'string'],
+            'nome_mae' => ['nullable', 'string', 'max:100'],
+            'nome_pai' => ['nullable', 'string', 'max:100'],
+            'foto' => ['nullable', 'image', 'max:2048'],
+            'cep' => ['required', 'string'],
+            'rua' => ['required', 'string', 'max:150'],
+            'numero' => ['required', 'string', 'max:20'],
+            'bairro' => ['required', 'string', 'max:100'],
+            'cidade' => ['required', 'string', 'max:100'],
+            'uf' => ['required', 'string', 'max:2'],
+            'complemento' => ['nullable', 'string', 'max:100'],
         ];
     }
 
     protected function processarDados(Request $request, array $dados): array
     {
-        // Formata o CPF
-        $cpf = preg_replace('/\D/', '', $dados['cpf']);
-        $dados['cpf'] = substr($cpf, 0, 3) . '.' .
-            substr($cpf, 3, 3) . '.' .
-            substr($cpf, 6, 3) . '-' .
-            substr($cpf, 9, 2);
+        $ehAtualizacao = (bool) $request->route('id');
 
-        // Formata o telefone
-        $telefone = preg_replace('/\D/', '', $dados['telefone']);
-
-        if (strlen($telefone) === 11) {
-            $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
-                substr($telefone, 2, 5) . '-' .
-                substr($telefone, 7, 4);
-        } elseif (strlen($telefone) === 10) {
-            $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
-                substr($telefone, 2, 4) . '-' .
-                substr($telefone, 6, 4);
+        if ($ehAtualizacao) {
+            unset($dados['cpf'], $dados['data_nascimento'], $dados['senha_temporaria']);
         }
 
-        if (!$request->route('id') && empty($dados['senha_temporaria'])) {
+        if ($request->hasFile('foto')) {
+            $caminhoFoto = $request->file('foto')->store('imagens/vitimas', 'public');
+            $dados['imagemVitima'] = $caminhoFoto;
+        }
+
+        if (!$ehAtualizacao && !empty($dados['cpf'])) {
+            $cpf = preg_replace('/\D/', '', $dados['cpf']);
+            $dados['cpf'] = substr($cpf, 0, 3) . '.' .
+                substr($cpf, 3, 3) . '.' .
+                substr($cpf, 6, 3) . '-' .
+                substr($cpf, 9, 2);
+        }
+
+        if (!empty($dados['telefone'])) {
+            $telefone = preg_replace('/\D/', '', $dados['telefone']);
+            if (strlen($telefone) === 11) {
+                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 5) . '-' . substr($telefone, 7, 4);
+            } elseif (strlen($telefone) === 10) {
+                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' . substr($telefone, 2, 4) . '-' . substr($telefone, 6, 4);
+            }
+        }
+
+        if (!$ehAtualizacao && empty($dados['senha_temporaria'])) {
             $dados['senha_temporaria'] = Str::random(12);
         }
+
         return $dados;
     }
 
@@ -125,6 +169,23 @@ class VitimaController extends BaseCrudController
         } else {
             $registro->telefones()->create(['numeroTelefoneVitima' => $dados['telefone']]);
         }
+
+        $dadosEndereco = [
+            'logradouroVitima' => $dados['rua'],
+            'numLogradouroVitima' => $dados['numero'],
+            'bairroVitima' => $dados['bairro'],
+            'cidadeVitima' => $dados['cidade'],
+            'ufVitima' => $dados['uf'],
+            'complementoVitima' => $dados['complemento'] ?? null,
+            'cepVitima' => $dados['cep'],
+        ];
+
+        if ($registro->endereco) {
+            $registro->endereco()->update($dadosEndereco);
+        } else {
+            $registro->endereco()->create($dadosEndereco);
+        }
+
         if (!$id) {
             Mail::to($registro->emailVitima)->send(
                 new VitimaCadastradaMail(

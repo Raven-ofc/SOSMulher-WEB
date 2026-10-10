@@ -15,12 +15,19 @@ class TbVitima extends Model
         'emailVitima',
         'senhaVitima',
         'dataNascimentoVitima',
+        'nomeMaeVitima', 
+        'nomePaiVitima',
         'statusVitima',
     ];
 
     public function telefones()
     {
         return $this->hasMany(TbTelefoneVitima::class, 'idVitima');
+    }
+
+    public function endereco()
+    {
+        return $this->hasOne(TbEnderecoVitima::class, 'idVitima');
     }
 
     public function enderecos()

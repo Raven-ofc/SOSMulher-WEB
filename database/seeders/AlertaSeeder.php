@@ -8,11 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class AlertaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * Alertas gerados a partir das violações e encaminhados às autoridades responsáveis.
-     */
     public function run(): void
     {
         DB::table('tbalerta')->insert([
