@@ -59,11 +59,6 @@ textarea {
     resize: vertical;
 }
 
-img, svg {
-    display: block;
-    vertical-align: middle;
-}
-
 img {
     max-width: 100%;
     height: auto;
@@ -398,14 +393,12 @@ button, input {
     .back-link {
         left: 24px;
     }
-
 }
 
 @media (prefers-reduced-motion: reduce) {
     .btn {
         transition: none;
     }
-
 }
 
 .admin-shell {
@@ -1080,6 +1073,40 @@ button, input {
     margin-top: 26px;
 }
 
+.report-print-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 35px;
+    border-top: 1px solid #e8e2f1;
+    padding-top: 20px;
+}
+
+.report-print-container .btn-print {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: #bfaeff;
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 600;
+    padding: 10px 28px;
+    min-height: 48px;
+    border-radius: 28px;
+    border: none;
+    box-shadow: 0 3px 3px #0003;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.report-print-container .btn-print:hover {
+    background: #ae97f6;
+}
+
+.report-print-container .btn-print svg {
+    width: 22px;
+    height: 22px;
+}
+
 .monitoring-grid {
     display: grid;
     grid-template-columns: minmax(0,1fr) 228px;
@@ -1153,7 +1180,6 @@ button, input {
         margin-right: 0;
         gap: 16px;
     }
-
 }
 
 @media (max-width: 1000px) {
@@ -1190,7 +1216,6 @@ button, input {
         gap: 16px;
         flex-wrap: wrap;
     }
-
 }
 
 @media (max-width: 700px) {
@@ -1353,7 +1378,6 @@ button, input {
         font-size: 1rem;
         padding: 12px 16px;
     }
-
 }
 
 .victims-heading {
@@ -1718,7 +1742,6 @@ button, input {
     .safe-requests-link {
         max-width: 350px;
     }
-
 }
 
 @media (max-width: 850px) {
@@ -1763,7 +1786,6 @@ button, input {
     .safe-request-grid {
         grid-template-columns: 1fr;
     }
-
 }
 
 @media (max-width: 700px) {
@@ -1807,7 +1829,6 @@ button, input {
     .victim-related h2 {
         font-size: 1.1875rem;
     }
-
 }
 
 .registration-subnav {
@@ -1862,7 +1883,6 @@ button, input {
     .aggressor-detail .victim-related {
         min-height: 180px;
     }
-
 }
 
 .device-grid {
@@ -1977,7 +1997,6 @@ button, input {
         grid-template-columns: repeat(2,minmax(0,1fr));
         gap: 18px;
     }
-
 }
 
 @media (max-width: 800px) {
@@ -1993,7 +2012,6 @@ button, input {
     .device-form fieldset {
         padding: 24px;
     }
-
 }
 
 .measure-detail {
@@ -2080,7 +2098,6 @@ button, input {
         grid-column: 1 / -1;
         justify-self: start;
     }
-
 }
 
 @media (max-width: 700px) {
@@ -2101,7 +2118,6 @@ button, input {
         align-items: stretch;
         padding: 15px 24px 0;
     }
-
 }
 
 .profile-grid {
@@ -2318,7 +2334,6 @@ button, input {
     .profile-stats {
         grid-template-columns: 1fr 1fr;
     }
-
 }
 
 @media (max-width: 700px) {
@@ -2361,7 +2376,6 @@ button, input {
     .profile-photo-edit {
         right: 0;
     }
-
 }
 
 .bulletin-detail .occurrence-summary {
@@ -2395,7 +2409,6 @@ button, input {
     .bulletin-detail .occurrence-summary {
         min-height: 0;
     }
-
 }
 
 .statistics-charts {
@@ -2414,7 +2427,6 @@ button, input {
     .statistics-charts .dashboard-charts {
         grid-template-columns: 1fr;
     }
-
 }
 
 .backend-feedback {
@@ -2492,7 +2504,7 @@ button, input {
 }
 
 @media print {
-    .admin-sidebar,.admin-back,.admin-skip,.victim-detail-footer,.victim-profile-actions,.backend-feedback,form {
+    .admin-sidebar,.admin-back,.admin-skip,.victim-detail-footer,.victim-profile-actions,.backend-feedback,form,.report-print-container {
         display: none!important;
     }
 
@@ -2520,9 +2532,7 @@ button, input {
     .victim-related {
         border: 0;
     }
-
 }
-
 
 .paginacao {
     display: flex;
@@ -2565,6 +2575,222 @@ button, input {
 
 .paginacao-desabilitada {
     opacity: .5;
+}
+
+.btn-upload {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 6px 14px;
+    background: #bfaeff;
+    color: white;
+    font-size: 0.875rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-upload:hover {
+    background: #ae97f6;
+}
+
+.campo-bloqueado {
+    background: #ece8f3 !important;
+    color: #8a8499 !important;
+    cursor: not-allowed !important;
+    border-color: #cfc7dd !important;
+}
+
+.campo-ajuda {
+    margin: -14px 0 18px;
+    font-size: .8125rem;
+    color: #968da8;
+}
+
+.victim-form-full {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 28px 30px 34px;
+}
+
+.victim-form-full > h2 {
+    color: #746d90;
+    font-size: 1.375rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+}
+
+.victim-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+}
+
+.victim-form-full fieldset {
+    border: 0;
+    padding: 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.victim-form-full fieldset + fieldset {
+    border-left: 1px solid #e8e2f1;
+    padding-left: 30px;
+}
+
+.victim-form-section-title {
+    color: #6a6186;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    margin: 0 0 15px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.victim-form-section-title + .victim-form-section-title,
+.victim-form-full .victim-form-section-title.mt {
+    margin-top: 18px;
+}
+
+.victim-form-full label {
+    display: block;
+    color: #776f91;
+    margin-bottom: 8px;
+}
+
+.victim-form-full input[type="text"],
+.victim-form-full input[type="email"],
+.victim-form-full input[type="tel"],
+.victim-form-full input[type="date"],
+.victim-form-full input[type="file"],
+.victim-form-full input:not([type]) {
+    display: block;
+    width: 100%;
+    max-width: none;
+    min-height: 48px;
+    padding: 11px 20px;
+    border: 1px solid #b7adc9;
+    border-radius: 19px;
+    background: #f5f1fa;
+    color: #6d607c;
+    margin-bottom: 18px;
+    font-size: 1rem;
+}
+
+.victim-form-full input[type="file"] {
+    padding: 10px 14px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.victim-form-full input::placeholder {
+    color: #98919f;
+    font-size: .9375rem;
+}
+
+.victim-form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.victim-form-row-cep {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 15px;
+}
+
+.victim-form-row-num {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 15px;
+}
+
+.victim-form-cidade-uf {
+    display: flex;
+    gap: 10px;
+}
+
+.victim-form-cidade-uf input#cidade {
+    flex: 1;
+}
+
+.victim-form-cidade-uf input#uf {
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.victim-form-readonly {
+    background: #ece8f3 !important;
+    color: #8a8499 !important;
+    cursor: default;
+}
+
+.victim-form-actions-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    padding-top: 22px;
+    border-top: 1px solid #e8e2f1;
+}
+
+.victim-form-actions-bar .victim-primary {
+    width: 300px;
+    max-width: 100%;
+}
+
+/* Campos bloqueados (já existiam, reforço) */
+.campo-bloqueado {
+    background: #ece8f3 !important;
+    color: #8a8499 !important;
+    cursor: not-allowed !important;
+    border-color: #cfc7dd !important;
+}
+
+.campo-ajuda {
+    margin: -10px 0 16px;
+    font-size: .8125rem;
+    color: #968da8;
+}
+
+@media (max-width: 900px) {
+    .victim-form-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .victim-form-full fieldset + fieldset {
+        border-left: 0;
+        padding-left: 0;
+        border-top: 1px solid #e8e2f1;
+        padding-top: 24px;
+    }
+
+    .victim-form-row-cep {
+        grid-template-columns: 1fr;
+    }
+
+    .victim-form-row-num {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .victim-form-full {
+        padding: 22px 18px 28px;
+    }
+
+    .victim-form-row-2,
+    .victim-form-row-num {
+        grid-template-columns: 1fr;
+    }
+
+    .victim-form-actions-bar .victim-primary {
+        width: 100%;
+    }
 }
 
 @media (max-width: 600px) {

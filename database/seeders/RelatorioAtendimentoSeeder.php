@@ -11,7 +11,7 @@ class RelatorioAtendimentoSeeder extends Seeder
     /**
      * Run the database seeds.
      *
-     * Um relatório por ocorrência (a coluna ocorrencia_id é única).
+     * Relatórios apenas para ocorrências que já foram CONCLUÍDAS.
      */
     public function run(): void
     {
@@ -44,15 +44,6 @@ class RelatorioAtendimentoSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'ocorrencia_id' => 4,
-                'idAutoridade' => 5,
-                'inicio' => '2026-09-16 08:55:00',
-                'fim' => '2026-09-16 10:40:00',
-                'relato' => 'Agressor abordado a duzentos metros do local de trabalho da vítima. Alegou estar a caminho de uma entrevista de emprego, versão não confirmada pelo histórico de deslocamento do dispositivo. Caso encaminhado à delegacia para análise de descumprimento.',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
                 'ocorrencia_id' => 5,
                 'idAutoridade' => 6,
                 'inicio' => '2026-06-30 15:45:00',
@@ -67,24 +58,6 @@ class RelatorioAtendimentoSeeder extends Seeder
                 'inicio' => '2026-09-14 19:20:00',
                 'fim' => '2026-09-14 21:15:00',
                 'relato' => 'A portaria impediu o acesso do agressor e acionou a Patrulha Maria da Penha. Imagens do circuito interno foram requisitadas e anexadas ao boletim de ocorrência. A vítima optou por permanecer na casa da irmã durante a semana seguinte.',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'ocorrencia_id' => 7,
-                'idAutoridade' => 8,
-                'inicio' => '2026-09-17 02:40:00',
-                'fim' => '2026-09-17 09:55:00',
-                'relato' => 'Tornozeleira localizada rompida sobre a calçada, a cerca de um quilômetro da residência do agressor. A vítima foi removida para endereço protegido com apoio da assistência social e difusão de busca foi emitida para as unidades da região leste.',
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s'),
-            ],
-            [
-                'ocorrencia_id' => 8,
-                'idAutoridade' => 9,
-                'inicio' => '2026-09-18 06:30:00',
-                'fim' => '2026-09-18 08:05:00',
-                'relato' => 'Constatada bateria crítica por mais de doze horas sem recarga. O agressor foi intimado por telefone a comparecer à central de monitoramento no mesmo dia, sob pena de representação por descumprimento das condições do monitoramento.',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

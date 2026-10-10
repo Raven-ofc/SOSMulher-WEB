@@ -15,10 +15,13 @@ class RelatorioController extends Controller
             'search' => ['nullable', 'string', 'max:100'],
             'from' => ['nullable', 'date_format:Y-m-d'],
             'to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:from'],
-            'status' => ['nullable', Rule::in(['andamento', 'realizado'])],
+            'status' => ['nullable', Rule::in(['andamento', 'realizado', 'concluido'])],
         ]);
+
         $query = tbocorrencia::with(['vitima', 'agressor']);
-        $query->where('statusAtendimento', 'realizado');
+
+        $query->whereIn('statusAtendimento', ['realizado', 'concluido']);
+
         if ($v = $dados['search'] ?? null) {
             $query->where(fn ($query) => $query->where('tipoOcorrencia', 'like', "%$v%")->orWhere('localOcorrencia', 'like', "%$v%"));
         }
@@ -32,7 +35,9 @@ class RelatorioController extends Controller
             $query->where('statusAtendimento', $v);
         }
 
-        return view('administracao.relatorio.lista', ['records' => $query->latest('dataOcorrencia')->paginate(15)->withQueryString()]);
+        return view('administracao.relatorio.lista', [
+            'relatorios' => $query->latest('dataOcorrencia')->paginate(15)->withQueryString()
+        ]);
     }
 
     public function show(Request $request, int $id)

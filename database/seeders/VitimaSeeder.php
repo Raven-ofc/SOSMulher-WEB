@@ -2,16 +2,12 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class VitimaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         DB::table('tbvitima')->insert([
@@ -22,8 +18,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '113.402.006-00',
                 'emailVitima' => 'MariaPn@gmail.com',
                 'dataNascimentoVitima' => '1945-02-01',
+                'nomeMaeVitima' => 'Francisca da Penha',
+                'nomePaiVitima' => 'Manuel do Nascimento',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/8qVH18DS8DaPY6UZYys6L6pseHz7TLIXmDDrLnk9.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -34,8 +32,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '230.620.110-00',
                 'emailVitima' => 'amyHouse@gmail.com',
                 'dataNascimentoVitima' => '1983-09-14',
+                'nomeMaeVitima' => 'Janis Winehouse',
+                'nomePaiVitima' => 'Mitch Winehouse',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/S2h9AXol4FSLQnqg7WrEyJuHv0S9FByBzwUapiGF.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -46,8 +46,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '132.677.360-72',
                 'emailVitima' => 'adriana.flima@gmail.com',
                 'dataNascimentoVitima' => '1991-04-22',
+                'nomeMaeVitima' => 'Maria Aparecida Ferreira Lima',
+                'nomePaiVitima' => 'José Carlos Lima',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/adriana-ferreira-lima.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -58,8 +60,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '260.647.468-66',
                 'emailVitima' => 'bia.nogueira.campos@outlook.com',
                 'dataNascimentoVitima' => '1996-11-08',
+                'nomeMaeVitima' => 'Sônia Nogueira Campos',
+                'nomePaiVitima' => 'Paulo Roberto Campos',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/beatriz-nogueira-campos.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -70,8 +74,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '723.430.980-26',
                 'emailVitima' => 'claudia.rsantos@gmail.com',
                 'dataNascimentoVitima' => '1978-06-30',
+                'nomeMaeVitima' => 'Regina Célia dos Santos',
+                'nomePaiVitima' => 'Antonio dos Santos',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/claudia-regina-santos.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -82,8 +88,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '500.978.820-97',
                 'emailVitima' => 'dani.moraes.pinheiro@gmail.com',
                 'dataNascimentoVitima' => '1988-01-19',
+                'nomeMaeVitima' => 'Lucia Moraes Pinheiro',
+                'nomePaiVitima' => 'Carlos Alberto Pinheiro',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/daniela-moraes-pinheiro.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -94,8 +102,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '812.191.361-66',
                 'emailVitima' => 'eliane.bsilva@yahoo.com.br',
                 'dataNascimentoVitima' => '1969-09-03',
+                'nomeMaeVitima' => 'Aparecida Barbosa da Silva',
+                'nomePaiVitima' => 'Manoel da Silva',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/eliane-barbosa-silva.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -106,8 +116,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '939.909.169-47',
                 'emailVitima' => 'fernanda.trocha@gmail.com',
                 'dataNascimentoVitima' => '1999-03-12',
+                'nomeMaeVitima' => 'Tereza Tavares Rocha',
+                'nomePaiVitima' => 'Fernando Rocha',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/fernanda-tavares-rocha.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -118,8 +130,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '985.435.346-07',
                 'emailVitima' => 'gabi.souzamartins@gmail.com',
                 'dataNascimentoVitima' => '1993-07-27',
+                'nomeMaeVitima' => 'Vera Souza Martins',
+                'nomePaiVitima' => 'Marcos Martins',
                 'statusVitima' => 'inativo',
-                'imagemVitima' => 'imagens/vitimas/gabriela-souza-martins.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1507152832244-10d45c7eda57?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
@@ -130,8 +144,10 @@ class VitimaSeeder extends Seeder
                 'cpfVitima' => '247.510.799-56',
                 'emailVitima' => 'helena.rantunes@outlook.com',
                 'dataNascimentoVitima' => '1985-12-05',
+                'nomeMaeVitima' => 'Marta Ribeiro Antunes',
+                'nomePaiVitima' => 'Roberto Antunes',
                 'statusVitima' => 'ativo',
-                'imagemVitima' => 'imagens/vitimas/helena-ribeiro-antunes.jpg',
+                'imagemVitima' => 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ],

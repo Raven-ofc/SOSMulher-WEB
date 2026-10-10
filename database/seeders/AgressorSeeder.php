@@ -8,9 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class AgressorSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         DB::table('tbagressor')->insert([

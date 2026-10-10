@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\TbOcorrencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
-class RelatorioController extends \App\Http\Controllers\Controller
+class RelatorioController extends Controller
 {
     public function index(Request $request)
     {
@@ -15,10 +15,17 @@ class RelatorioController extends \App\Http\Controllers\Controller
             'busca' => ['nullable', 'string', 'max:100'],
             'de' => ['nullable', 'date_format:Y-m-d'],
             'ate' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:de'],
-            'status' => ['nullable', Rule::in(['andamento', 'realizado'])],
         ]);
 
-        $query = TbOcorrencia::with(['vitima', 'agressor'])->where('statusAtendimento', 'realizado');
+        $query = TbOcorrencia::with(['vitima', 'agressor']);
+
+        $query->whereExists(function ($sub) {
+            $sub->select(DB::raw(1))
+                ->from('relatorios_atendimento')
+                ->whereColumn('relatorios_atendimento.ocorrencia_id', 'tbocorrencia.id');
+        });
+
+        $query->whereIn('statusAtendimento', ['realizado', 'concluido']);
 
         if ($v = $dados['busca'] ?? $request->query('search')) {
             $query->where(fn ($q) => $q->where('tipoOcorrencia', 'like', "%$v%")->orWhere('localOcorrencia', 'like', "%$v%"));
@@ -29,21 +36,13 @@ class RelatorioController extends \App\Http\Controllers\Controller
         if ($v = $dados['ate'] ?? $request->query('to')) {
             $query->whereDate('dataOcorrencia', '<=', $v);
         }
-        if ($v = $dados['status'] ?? null) {
-            $query->where('statusAtendimento', $v);
-        }
 
         return view('administracao.relatorio.lista', [
             'relatorios' => $query->latest('dataOcorrencia')->paginate(15)->withQueryString()
         ]);
     }
 
-    public function show(int $id)
-    {
-        return $this->visualizar($id);
-    }
-
-    public function visualizar(int $id)
+    public function show(Request $request, int $id)
     {
         $ocorrencia = TbOcorrencia::with(['vitima', 'agressor'])->findOrFail($id);
         $relatorio = DB::table('relatorios_atendimento')->where('ocorrencia_id', $id)->first();
