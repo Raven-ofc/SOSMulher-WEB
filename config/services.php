@@ -34,5 +34,10 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'nominatim' => [
+        'url' => env(
+            'NOMINATIM_URL',
+            'https://nominatim.openstreetmap.org'
+        ),
+    ],
 ];

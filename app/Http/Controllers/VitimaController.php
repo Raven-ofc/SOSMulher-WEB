@@ -6,9 +6,11 @@ use App\Models\tbvitima;
 use App\Models\tbtelefonevitima;
 use App\Models\tbenderecoVitima;
 use App\Models\tblocalizacaoVitima;
+use App\Models\TbVitima as ModelsTbVitima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\Fluent\Concerns\Has;
 
 class VitimaController extends Controller
 {

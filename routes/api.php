@@ -19,5 +19,6 @@ Route::get('/vitima/{email}/{senha}', 'App\Http\Controllers\VitimaController@ind
 Route::get('/endereco/{id}','App\Http\Controllers\VitimaController@enderecoAPI');
 Route::put('/atualizarVitima/{id}', 'App\Http\Controllers\VitimaController@AtualizarAPI');
 Route::post('/atualizarImagem/{id}', 'App\Http\Controllers\VitimaController@atualizarImagemAPI');
+Route::post('/recuperarSenha', 'App\Http\Controllers\Admin\VitimaController@recuperarSenhaAPI');
 Route::put('/atualizarLocalizacao/{id}', 'App\Http\Controllers\VitimaController@atualizarLocalizacaoAPI')
 ?>
