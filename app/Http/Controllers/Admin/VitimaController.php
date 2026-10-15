@@ -9,7 +9,9 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\VitimaCadastradaMail;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\ValidationException;
 
 class VitimaController extends BaseCrudController
 {
@@ -123,6 +125,40 @@ class VitimaController extends BaseCrudController
             'complemento' => ['nullable', 'string', 'max:100'],
         ];
     }
+    private function buscarCoord(string $dadosEndereco): ?array
+    {
+        try {
+            $resposta = Http::withHeaders([
+                'User-Agent' => 'SOSMulher/1.0',
+            ])->timeout(5)->get(config('services.nominatim.url') . '/search', [
+                'q' => $dadosEndereco,
+                'format' => 'jsonv2',
+                'limit' => 1,
+                'countrycodes' => 'br',
+            ]);
+            if (!$resposta->successful()) {
+                throw ValidationException::withMessages([
+                    'rua' => 'Não foi possível validar o endereço. Tente novamente.',
+                ]);
+            }
+            $resultado = $resposta->json();
+
+            if (empty($resultado) || !isset($resultado[0]['lat'], $resultado[0]['lon'])) {
+                throw ValidationException::withMessages([
+                    'rua' => 'O endereço cadastrado não foi encontrado. Verifique os dados.',
+                ]);
+            }
+            return [
+                'latitudeVitima' => (float) $resultado[0]['lat'],
+                'longitudeVitima' => (float) $resultado[0]['lon'],
+            ];
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            throw ValidationException::withMessages([
+                'rua' => 'Não foi possível validar o endereço. Tente novamente.',
+            ]);
+        }
+    }
+
 
     protected function processarDados(Request $request, array $dados): array
     {
@@ -164,6 +200,21 @@ class VitimaController extends BaseCrudController
             $dados['senha_temporaria'] = Str::random(12);
         }
 
+        $enderecoCompleto = implode(',', array_filter([
+            $dados['rua'] ?? null,
+            $dados['numero'] ?? null,
+            $dados['bairro'] ?? null,
+            $dados['cidade'] ?? null,
+            $dados['uf'] ?? null,
+            $dados['cep'] ?? null,
+            'Brasil',
+        ]));
+
+        $coordenadas = $this->buscarCoord($enderecoCompleto);
+
+        $dados['latitudeVitima'] = $coordenadas['latitudeVitima'];
+        $dados['longitudeVitima'] = $coordenadas['longitudeVitima'];
+
         return $dados;
     }
 
@@ -189,6 +240,8 @@ class VitimaController extends BaseCrudController
             'ufVitima' => $dados['uf'],
             'complementoVitima' => $dados['complemento'] ?? null,
             'cepVitima' => $dados['cep'],
+            'latitudeVitima' => $dados['latitudeVitima'],
+            'longitudeVitima' => $dados['longitudeVitima'],
         ];
 
         if ($registro->endereco) {
@@ -205,6 +258,37 @@ class VitimaController extends BaseCrudController
                 )
             );
         }
+    }
+
+    public function recuperarSenhaAPI(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $vitima = TbVitima::where('emailVitima', '=', $request->email)->first();
+
+        if (!$vitima) {
+            return response()->json([
+                'message' => 'Seu cadastro não foi encontrado, verifique se digitou seu email corretamente.',
+            ], 404);
+        }
+
+        $senhaTemporaria = Str::random(12);
+
+        $vitima->senhaVitima = Hash::make($senhaTemporaria);
+        $vitima->save();
+
+        Mail::to($vitima->emailVitima)->send(
+            new VitimaCadastradaMail(
+                $vitima->nomeVitima,
+                $senhaTemporaria
+            )
+        );
+
+        return response()->json([
+            'message'=> 'Verifique se sua senha chegou em seu email.'
+        ],200);
     }
 
     protected function temVinculosAtivos($registro): bool
