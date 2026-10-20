@@ -7,6 +7,10 @@ use App\Models\TbVitima;
 use App\Support\Formatos;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use App\Mail\VitimaCadastradaMail;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Lista, detalhes e edição de vítimas.
@@ -88,6 +92,40 @@ class VitimaController extends BaseCrudController
             'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
+    private function buscarCoord(string $dadosEndereco): ?array
+    {
+        try {
+            $resposta = Http::withHeaders([
+                'User-Agent' => 'SOSMulher/1.0',
+            ])->timeout(5)->get(config('services.nominatim.url') . '/search', [
+                'q' => $dadosEndereco,
+                'format' => 'jsonv2',
+                'limit' => 1,
+                'countrycodes' => 'br',
+            ]);
+            if (!$resposta->successful()) {
+                throw ValidationException::withMessages([
+                    'rua' => 'Não foi possível validar o endereço. Tente novamente.',
+                ]);
+            }
+            $resultado = $resposta->json();
+
+            if (empty($resultado) || !isset($resultado[0]['lat'], $resultado[0]['lon'])) {
+                throw ValidationException::withMessages([
+                    'rua' => 'O endereço cadastrado não foi encontrado. Verifique os dados.',
+                ]);
+            }
+            return [
+                'latitudeVitima' => (float) $resultado[0]['lat'],
+                'longitudeVitima' => (float) $resultado[0]['lon'],
+            ];
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            throw ValidationException::withMessages([
+                'rua' => 'Não foi possível validar o endereço. Tente novamente.',
+            ]);
+        }
+    }
+
 
     /** CPF e data de nascimento não mudam depois do cadastro; por isso são descartados na edição. */
     protected function normalizarEntrada(array $dados, ?int $id = null): array
@@ -113,6 +151,21 @@ class VitimaController extends BaseCrudController
             $dados['imagemVitima'] = $request->file('foto')->store('vitimas', 'public');
         }
 
+        $enderecoCompleto = implode(',', array_filter([
+            $dados['rua'] ?? null,
+            $dados['numero'] ?? null,
+            $dados['bairro'] ?? null,
+            $dados['cidade'] ?? null,
+            $dados['uf'] ?? null,
+            $dados['cep'] ?? null,
+            'Brasil',
+        ]));
+
+        $coordenadas = $this->buscarCoord($enderecoCompleto);
+
+        $dados['latitudeVitima'] = $coordenadas['latitudeVitima'];
+        $dados['longitudeVitima'] = $coordenadas['longitudeVitima'];
+
         return $dados;
     }
 
@@ -134,6 +187,8 @@ class VitimaController extends BaseCrudController
             'ufVitima' => $dados['uf'],
             'complementoVitima' => $dados['complemento'] ?? null,
             'cepVitima' => $dados['cep'],
+            'latitudeVitima' => $dados['latitudeVitima'],
+            'longitudeVitima' => $dados['longitudeVitima'],
         ];
 
         // Só atualiza as coordenadas quando a API de CEP devolveu novas (evita perder as antigas).
@@ -147,6 +202,37 @@ class VitimaController extends BaseCrudController
         } else {
             $registro->endereco()->create($dadosEndereco);
         }
+    }
+
+    public function recuperarSenhaAPI(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+        ]);
+
+        $vitima = TbVitima::where('emailVitima', '=', $request->email)->first();
+
+        if (!$vitima) {
+            return response()->json([
+                'message' => 'Seu cadastro não foi encontrado, verifique se digitou seu email corretamente.',
+            ], 404);
+        }
+
+        $senhaTemporaria = Str::random(12);
+
+        $vitima->senhaVitima = Hash::make($senhaTemporaria);
+        $vitima->save();
+
+        Mail::to($vitima->emailVitima)->send(
+            new VitimaCadastradaMail(
+                $vitima->nomeVitima,
+                $senhaTemporaria
+            )
+        );
+
+        return response()->json([
+            'message'=> 'Verifique se sua senha chegou em seu email.'
+        ],200);
     }
 
     protected function temVinculosAtivos($registro): bool
