@@ -7,7 +7,7 @@
 
 <header class="admin-heading detail-heading">
     <h1>Gerenciamento de Tornozeleiras</h1>
-    <p>tornozeleira/visualizar</p>
+    
 </header>
 
 <a

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AcessoController;
+use App\Http\Controllers\Auth\AcessoController;
 use App\Http\Controllers\Auth\SenhaController;
 use App\Http\Controllers\AutoridadeController;
 use App\Http\Controllers\Admin\PainelController;

@@ -29,7 +29,7 @@
             </div>
             <div>
                 <dt>Status:</dt>
-                <dd>{{ $ocorrencia->statusAtendimento }}</dd>
+                <dd>@include('parciais.status-ocorrencia', ['ocorrencia' => $ocorrencia])</dd>
             </div>
         </dl>
         <p>{{ $ocorrencia->descricaoOcorrencia }}</p>

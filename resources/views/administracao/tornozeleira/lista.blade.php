@@ -17,9 +17,9 @@
 
     <a
         class="victim-primary"
-        href="{{ route('admin.tornozeleiras.criar') }}"
+        href="{{ route('admin.cadastro.index') }}"
     >
-        + Adicionar
+        + Novo cadastro
     </a>
 
     <div class="admin-search">

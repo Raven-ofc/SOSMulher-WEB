@@ -149,5 +149,16 @@ class MedidaSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
         ]);
+
+        // Campos novos da medida: tipos aplicados e nível de risco.
+        $riscos = [1 => 'alto', 2 => 'medio', 3 => 'medio', 4 => 'alto', 5 => 'baixo', 6 => 'alto', 7 => 'alto', 8 => 'medio', 9 => 'baixo', 10 => 'medio'];
+        foreach ($riscos as $id => $risco) {
+            DB::table('tbmedida')->where('id', $id)->update([
+                'nivelRiscoMedida' => $risco,
+                'tiposMedida' => json_encode(['proibicao_aproximacao', 'proibicao_contato', 'monitoramento_eletronico']),
+                'numeroProcessoMedida' => sprintf('%07d-%02d.2026.8.26.%04d', 1000 + $id * 17, 10 + $id, 100 + $id),
+                'varaMedida' => 'Vara de Violência Doméstica e Familiar contra a Mulher',
+            ]);
+        }
     }
 }

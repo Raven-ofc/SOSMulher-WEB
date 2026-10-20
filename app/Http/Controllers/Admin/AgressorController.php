@@ -2,42 +2,39 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\TbTornozeleira;
+use App\Models\TbOcorrencia;
 use App\Models\TbAgressor;
-use App\Rules\Cpf;
+use App\Support\Formatos;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+/**
+ * Lista, detalhes e edição de agressores.
+ * O CADASTRO de um novo agressor (e a atribuição da tornozeleira) acontece somente
+ * no fluxo unificado (CadastroController).
+ */
 class AgressorController extends BaseCrudController
 {
+    public const STATUS = ['Monitorado', 'Foragido', 'Preso', 'Inativo'];
+
     protected string $modelo = TbAgressor::class;
     protected string $visualizacaoBase = 'administracao.agressor';
     protected string $rotaBase = 'admin.agressores';
+    protected array $carregarRelacionamentos = ['tornozeleira'];
 
     protected function colunaStatus(): string
     {
         return 'statusAgressor';
     }
 
-    protected function dadosExtrasCriacao(): array
+    protected function statusPermitidos(): array
     {
-        return [
-            'tornozeleiras' => TbTornozeleira::where('statusTornozeleira', 'Disponível')
-                ->get(),
-        ];
+        return self::STATUS;
     }
 
-    protected function dadosExtrasEdicao(): array
+    protected function statusInativo(): string
     {
-        return [
-            'tornozeleiras' => TbTornozeleira::where('statusTornozeleira', 'Disponível')
-                ->get(),
-        ];
-    }
-
-    protected function tabelaAuditoria(): string
-    {
-        return 'tbagressor';
+        return 'Inativo';
     }
 
     protected function colunasBusca(): array
@@ -47,19 +44,31 @@ class AgressorController extends BaseCrudController
 
     protected function mapearDados(array $dados): array
     {
-        return [
+        $mapeado = [
             'nomeAgressor' => $dados['nome'],
-            'cpfAgressor' => $dados['cpf'],
-            'dataNascimentoAgressor' => $dados['data_nascimento'],
-
-            'logradouroAgressor' => $dados['logradouro'],
-            'numLogradouroAgressor' => $dados['numLogradouro'],
-            'bairroAgressor' => $dados['bairroAgressor'],
-            'cidadeAgressor' => $dados['cidadeAgressor'],
-            'ufAgressor' => $dados['ufAgressor'],
-            'complementoAgressor' => $dados['complementoAgressor'],
-            'idTornozeleira' => $dados['idTornozeleira'],
+            'nomeMaeAgressor' => $dados['nome_mae'] ?? null,
+            'nomePaiAgressor' => $dados['nome_pai'] ?? null,
+            'telefoneAgressor' => $dados['telefone'],
+            'emailAgressor' => $dados['email'] ?? null,
+            'cepAgressor' => $dados['cep'],
+            'logradouroAgressor' => $dados['rua'],
+            'numLogradouroAgressor' => $dados['numero'],
+            'bairroAgressor' => $dados['bairro'],
+            'cidadeAgressor' => $dados['cidade'],
+            'ufAgressor' => $dados['uf'],
+            'complementoAgressor' => $dados['complemento'] ?? null,
         ];
+
+        if (!empty($dados['imagemAgressor'])) {
+            $mapeado['imagemAgressor'] = $dados['imagemAgressor'];
+        }
+
+        if (!empty($dados['latitude']) && !empty($dados['longitude'])) {
+            $mapeado['latitudeAgressor'] = $dados['latitude'];
+            $mapeado['longitudeAgressor'] = $dados['longitude'];
+        }
+
+        return $mapeado;
     }
 
     protected function variavelLista(): string
@@ -81,71 +90,62 @@ class AgressorController extends BaseCrudController
     {
         return [
             'busca' => ['nullable', 'string', 'max:100'],
-            'status' => ['nullable', Rule::in(['ativo', 'inativo'])],
+            'status' => ['nullable', Rule::in(self::STATUS)],
         ];
     }
 
-    protected function aposSalvar($registro, array $dados, ?int $id): void
-    {
-        $tornozeleira = TbTornozeleira::findOrFail($dados['idTornozeleira']);
-
-        $tornozeleira->update([
-            'statusTornozeleira' => 'Ativa',
-        ]);
-    }
-
-    protected function regrasCriacao(): array
-    {
-        return [
-            'nome' => ['required', 'string', 'max:100'],
-            'cpf' => ['required', 'string', new Cpf, Rule::unique('tbagressor', 'cpfAgressor')],
-            'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
-
-            'logradouro' => ['required', 'string', 'max:150'],
-            'numLogradouro' => ['required', 'string', 'max:20'],
-            'bairroAgressor' => ['required', 'string', 'max:100'],
-            'cidadeAgressor' => ['required', 'string', 'max:100'],
-            'ufAgressor' => ['required', 'string', 'size:2'],
-            'complementoAgressor' => ['nullable', 'string', 'max:100'],
-            'idTornozeleira' => [
-                'required',
-                'exists:tbtornozeleira,id',
-            ],
-
-        ];
-    }
-
+    /** Mesmos campos do cadastro da vítima. O CPF e a data de nascimento não mudam após o cadastro. */
     protected function regrasAtualizacao(int $id = null): array
     {
         return [
-            'nome' => ['required', 'string', 'max:100'],
-            'cpf' => ['required', 'string', new Cpf, Rule::unique('tbagressor', 'cpfAgressor')->ignore($id)],
-            'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
-
-            'logradouro' => ['required', 'string', 'max:150'],
-            'numLogradouro' => ['required', 'string', 'max:20'],
-            'bairroAgressor' => ['required', 'string', 'max:100'],
-            'cidadeAgressor' => ['required', 'string', 'max:100'],
-            'ufAgressor' => ['required', 'string', 'size:2'],
-            'complementoAgressor' => ['nullable', 'string', 'max:100'],
-
-            'idTornozeleira' => [
-                'required',
-                'exists:tbtornozeleira,id',
-            ],
+            'nome' => ['required', 'string', 'max:100', 'regex:/^\S+(\s+\S+)+$/u'],
+            'foto' => ['nullable', 'image', 'max:5120'],
+            'nome_mae' => ['required', 'string', 'max:100'],
+            'nome_pai' => ['nullable', 'string', 'max:100'],
+            'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
+            'email' => ['nullable', 'email', 'max:100'],
+            'cep' => ['required', 'string', 'regex:/^\d{5}-\d{3}$/'],
+            'rua' => ['required', 'string', 'max:150'],
+            'numero' => ['required', 'string', 'max:20'],
+            'bairro' => ['required', 'string', 'max:100'],
+            'cidade' => ['required', 'string', 'max:100'],
+            'uf' => ['required', 'string', Rule::in(Formatos::UFS)],
+            'complemento' => ['nullable', 'string', 'max:100'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 
-    protected function processarDados(Request $request, array $dados): array
+    protected function normalizarEntrada(array $dados, ?int $id = null): array
     {
-        $dados['cpf'] = preg_replace('/\D/', '', $dados['cpf']);
+        unset($dados['cpf'], $dados['data_nascimento'], $dados['idTornozeleira']);
+
+        if (isset($dados['telefone'])) {
+            $dados['telefone'] = Formatos::telefone($dados['telefone']);
+        }
+        if (isset($dados['cep'])) {
+            $dados['cep'] = Formatos::cep($dados['cep']);
+        }
+        if (isset($dados['uf'])) {
+            $dados['uf'] = strtoupper(trim($dados['uf']));
+        }
+
+        return $dados;
+    }
+
+    protected function processarDados(Request $request, array $dados, ?int $id = null): array
+    {
+        if ($request->hasFile('foto')) {
+            $dados['imagemAgressor'] = $request->file('foto')->store('agressores', 'public');
+        }
+
         return $dados;
     }
 
     protected function temVinculosAtivos($registro): bool
     {
-        return $registro->medidas()->where('statusMedida', 'ativo')->exists()
-            || $registro->ocorrencias()->where('statusAtendimento', 'andamento')->exists();
+        return $registro->medidas()->where('statusMedida', 'Ativa')->exists()
+            || $registro->ocorrencias()->whereIn('statusAtendimento', [TbOcorrencia::STATUS_ABERTA, TbOcorrencia::STATUS_ANDAMENTO])->exists();
     }
 
     protected function dadosExtrasVisualizacao($registro): array

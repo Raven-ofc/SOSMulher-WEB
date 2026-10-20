@@ -4,291 +4,181 @@
 ])
 
 @section('admin-content')
+@php
+    $coresDonut = ['#ff6a59', '#ffc64f', '#49b5ee', '#35b76d', '#a174ee', '#f48fb1', '#80cbc4'];
+    $classesMetricas = ['Abertas' => 'metrica-aberta', 'Em andamento' => 'metrica-andamento', 'Encerradas' => 'metrica-encerrada'];
+@endphp
 
 <header class="admin-heading">
-
-    <h1>
-        {{ $estatisticas ? 'Estatísticas' : 'Dashboard' }}
-    </h1>
-
+    <h1>{{ $estatisticas ? 'Estatísticas' : 'Dashboard' }}</h1>
+    @if($estatisticas)
+        <p>Visão geral das ocorrências, medidas protetivas e equipamentos.</p>
+    @endif
 </header>
 
-
-{{-- ========================================================= --}}
-{{-- MÉTRICAS --}}
-{{-- ========================================================= --}}
-
+{{-- ============================ Indicadores ============================ --}}
 <div class="admin-stats">
-
     @foreach($metricas as $label => $value)
-
-        <div class="admin-stat">
-
+        <div class="admin-stat {{ $classesMetricas[$label] ?? '' }}">
             <div>
-
-                <strong>
-                    {{ $value }}
-                </strong>
-
-                <span>
-                    {{ $label }}
-                </span>
-
+                <strong>{{ $value }}</strong>
+                <span>{{ $label }}</span>
             </div>
-
         </div>
-
     @endforeach
-
 </div>
 
-
-{{-- ========================================================= --}}
-{{-- GRÁFICOS --}}
-{{-- ========================================================= --}}
-
-<div class="statistics-charts">
-
-    <div class="dashboard-charts">
-
-
-        {{-- ================================================= --}}
-        {{-- GRÁFICO DE ROSCA --}}
-        {{-- ================================================= --}}
-
-        <section class="admin-panel">
-
-            <h2>
-                Ocorrências por tipo
-            </h2>
-
-            <div class="weekly-chart">
-
-                @if($total > 0)
-
-                    <div
-                        class="data-donut"
-                        style="
-                            background: conic-gradient(
-                                {{ implode(',', $paradas) }}
-                            );
-                        "
-                        role="img"
-                        aria-label="Distribuição das {{ $total }} ocorrências por tipo"
-                    >
-
-                        <span>
-                            {{ $total }}
-                        </span>
-
-                    </div>
-
-                @else
-
-                    <div class="empty-donut">
-
-                        <span>
-                            Sem dados
-                        </span>
-
-                    </div>
-
-                @endif
-
-
-                {{-- ========================================= --}}
-                {{-- LEGENDA --}}
-                {{-- ========================================= --}}
-
-                <ul
-                    class="chart-legend"
-                    style="
-                        list-style: none;
-                        margin: 12px 0 0;
-                        padding: 0;
-                    "
-                >
-
-                    @php
-
-                        /*
-                         * MESMAS CORES DO GRÁFICO
-                         */
-                        $coresLegenda = [
-                            '#ff6a59',
-                            '#ffc64f',
-                            '#49b5ee',
-                            '#35b76d',
-                            '#a174ee',
-                        ];
-
-                    @endphp
-
-
-                    @forelse($porTipo as $index => $row)
-
-                        <li
-                            style="
-                                display: flex;
-                                align-items: center;
-                                gap: 8px;
-                                margin: 4px 0;
-                                padding: 0;
-                            "
-                        >
-
-                            {{-- ================================= --}}
-                            {{-- BOLINHA COLORIDA --}}
-                            {{-- ================================= --}}
-
-                            <span
-                                style="
-                                    display: inline-block !important;
-                                    width: 10px !important;
-                                    height: 10px !important;
-                                    min-width: 10px !important;
-                                    min-height: 10px !important;
-                                    max-width: 10px !important;
-                                    max-height: 10px !important;
-                                    flex: 0 0 10px !important;
-                                    border-radius: 50% !important;
-                                    background-color: {{ $coresLegenda[$index % count($coresLegenda)] }} !important;
-                                "
-                            ></span>
-
-
-                            {{-- ================================= --}}
-                            {{-- NOME --}}
-                            {{-- ================================= --}}
-
-                            <span
-                                style="
-                                    flex: 1;
-                                    margin: 0;
-                                    padding: 0;
-                                "
-                            >
-                                {{ $row->tipoOcorrencia }}
-                            </span>
-
-
-                            {{-- ================================= --}}
-                            {{-- QUANTIDADE --}}
-                            {{-- ================================= --}}
-
-                            <strong>
-                                {{ $row->total }}
-                            </strong>
-
-                        </li>
-
-                    @empty
-
-                        <li>
-                            Nenhuma ocorrência registrada.
-                        </li>
-
-                    @endforelse
-
-                </ul>
-
+@if($estatisticas)
+    <div class="admin-stats kpis-extra">
+        @foreach($kpis as $label => $value)
+            <div class="admin-stat">
+                <div>
+                    <strong>{{ $value }}</strong>
+                    <span>{{ $label }}</span>
+                </div>
             </div>
-
-        </section>
-
-
-        {{-- ================================================= --}}
-        {{-- ÚLTIMO SEMESTRE --}}
-        {{-- ================================================= --}}
-
-        <section class="admin-panel">
-
-            <h2>
-                Último semestre
-            </h2>
-
-            <div class="data-bars">
-
-                @foreach($mensal as $month)
-
-                    <div>
-
-                        <strong>
-                            {{ $month['total'] }}
-                        </strong>
-
-                        <span
-                            style="
-                                height: {{
-                                    ($month['total'] /
-                                    max(1, $mensal->max('total')))
-                                    * 150
-                                }}px;
-                            "
-                        ></span>
-
-                        <small>
-                            {{ $month['rotulo'] }}
-                        </small>
-
-                    </div>
-
-                @endforeach
-
+        @endforeach
+        <div class="admin-stat">
+            <div>
+                <strong>{{ $reincidentes }}</strong>
+                <span>Agressores reincidentes</span>
             </div>
-
-        </section>
-
+        </div>
     </div>
 
-</div>
+    {{-- ============================ Gráficos ============================ --}}
+    <div class="graficos-grade">
+        <section class="admin-panel grafico-painel">
+            <h2>Evolução diária (últimos 30 dias)</h2>
+            <div class="grafico-caixa grafico-largo"><canvas data-grafico="diario" data-tipo="line" role="img" aria-label="Ocorrências por dia nos últimos 30 dias"></canvas></div>
+        </section>
 
+        <section class="admin-panel grafico-painel">
+            <h2>Ocorrências por tipo</h2>
+            <div class="grafico-caixa"><canvas data-grafico="tipo" data-tipo="doughnut" role="img" aria-label="Ocorrências por tipo"></canvas></div>
+        </section>
 
-{{-- ========================================================= --}}
-{{-- OCORRÊNCIAS RECENTES --}}
-{{-- ========================================================= --}}
+        <section class="admin-panel grafico-painel">
+            <h2>Por status</h2>
+            <div class="grafico-caixa"><canvas data-grafico="status" data-tipo="doughnut" role="img" aria-label="Ocorrências por status"></canvas></div>
+        </section>
 
-@unless($estatisticas)
+        <section class="admin-panel grafico-painel">
+            <h2>Por gravidade</h2>
+            <div class="grafico-caixa"><canvas data-grafico="gravidade" data-tipo="bar" role="img" aria-label="Ocorrências por gravidade"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Últimos 12 meses</h2>
+            <div class="grafico-caixa"><canvas data-grafico="mensal" data-tipo="bar" role="img" aria-label="Ocorrências por mês"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Bairros com mais ocorrências</h2>
+            <div class="grafico-caixa"><canvas data-grafico="bairro" data-tipo="barh" role="img" aria-label="Ocorrências por bairro"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Por região</h2>
+            <div class="grafico-caixa"><canvas data-grafico="regiao" data-tipo="bar" role="img" aria-label="Ocorrências por região"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Horário do dia</h2>
+            <div class="grafico-caixa"><canvas data-grafico="faixa" data-tipo="bar" role="img" aria-label="Ocorrências por faixa horária"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Dia da semana</h2>
+            <div class="grafico-caixa"><canvas data-grafico="diaSemana" data-tipo="bar" role="img" aria-label="Ocorrências por dia da semana"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Medidas protetivas por status</h2>
+            <div class="grafico-caixa"><canvas data-grafico="medidas" data-tipo="doughnut" data-rotulo="Medidas" role="img" aria-label="Medidas por status"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Nível de risco das medidas</h2>
+            <div class="grafico-caixa"><canvas data-grafico="risco" data-tipo="bar" data-rotulo="Medidas" role="img" aria-label="Medidas por nível de risco"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Tornozeleiras por status</h2>
+            <div class="grafico-caixa"><canvas data-grafico="tornozeleiras" data-tipo="doughnut" data-rotulo="Tornozeleiras" role="img" aria-label="Tornozeleiras por status"></canvas></div>
+        </section>
+
+        <section class="admin-panel grafico-painel">
+            <h2>Bateria das tornozeleiras ativas</h2>
+            <div class="grafico-caixa"><canvas data-grafico="bateria" data-tipo="bar" data-rotulo="Tornozeleiras" role="img" aria-label="Faixas de bateria"></canvas></div>
+        </section>
+    </div>
+
+    <script type="application/json" id="dados-graficos">{!! json_encode($graficos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
+@else
+    {{-- ============================ Home ============================ --}}
+    <div class="statistics-charts">
+        <div class="dashboard-charts">
+            <section class="admin-panel">
+                <h2>Ocorrências por tipo</h2>
+                <div class="weekly-chart">
+                    @if($total > 0)
+                        <div class="data-donut" style="background: conic-gradient({{ implode(',', $paradas) }});" role="img" aria-label="Distribuição das {{ $total }} ocorrências por tipo">
+                            <span>{{ $total }}</span>
+                        </div>
+                    @else
+                        <div class="empty-donut"><span>Sem dados</span></div>
+                    @endif
+
+                    <ul class="chart-legend">
+                        @forelse($porTipo as $tipo => $quantidade)
+                            <li>
+                                <span class="legenda-bolinha" style="background-color: {{ $coresDonut[$loop->index % count($coresDonut)] }}"></span>
+                                <span class="legenda-nome">{{ $tipo }}</span>
+                                <strong>{{ $quantidade }}</strong>
+                            </li>
+                        @empty
+                            <li>Nenhuma ocorrência registrada.</li>
+                        @endforelse
+                    </ul>
+                </div>
+            </section>
+
+            <section class="admin-panel">
+                <h2>Último semestre</h2>
+                <div class="data-bars">
+                    @foreach($mensal as $month)
+                        <div>
+                            <strong>{{ $month['total'] }}</strong>
+                            <span style="height: {{ ($month['total'] / max(1, $mensal->max('total'))) * 150 }}px;"></span>
+                            <small>{{ $month['rotulo'] }}</small>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+        </div>
+    </div>
 
     <section class="admin-panel backend-recent">
-
-        <h2>
-            Ocorrências recentes
-        </h2>
-
-        @forelse($recentes as $case)
-
-            <p>
-
-                <a href="{{ route(
-                    'admin.ocorrencias.visualizar',
-                    $case->id
-                ) }}">
-
-                    {{ $case->tipoOcorrencia }}
-
-                </a>
-
-                ·
-
-                {{ $case->dataOcorrencia }}
-
-                ·
-
-                {{ $case->statusAtendimento }}
-
-            </p>
-
-        @empty
-
-            <p>
-                Nenhuma ocorrência registrada.
-            </p>
-
-        @endforelse
-
+        <h2>Ocorrências recentes</h2>
+        <ul class="lista-recentes">
+            @forelse($recentes as $case)
+                <li class="item-status item-{{ $case->statusClasse() }}">
+                    <a href="{{ route('admin.ocorrencias.visualizar', $case->id) }}">{{ $case->tipoOcorrencia }}</a>
+                    <span class="recente-data">{{ \Carbon\Carbon::parse($case->dataHoraOcorrencia)->format('d/m/Y H:i') }}</span>
+                    @include('parciais.status-ocorrencia', ['ocorrencia' => $case])
+                </li>
+            @empty
+                <li>Nenhuma ocorrência registrada.</li>
+            @endforelse
+        </ul>
     </section>
-
-@endunless
-
+@endif
 @endsection
+
+@if($estatisticas)
+    @push('scripts')
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+        <script src="{{ asset('js/estatisticas.js') }}"></script>
+    @endpush
+@endif

@@ -11,8 +11,8 @@
     </header>
 
     <form class="occurrence-filters" method="GET">
-        <a class="victim-primary" href="{{ route('admin.vitimas.criar') }}">
-            + Adicionar
+        <a class="victim-primary" href="{{ route('admin.cadastro.index') }}">
+            + Novo cadastro
         </a>
 
         <div class="admin-search">

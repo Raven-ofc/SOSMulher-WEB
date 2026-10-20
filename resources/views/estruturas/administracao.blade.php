@@ -13,6 +13,13 @@
     <body class="app-body">
         <div class="admin-shell">
             <a class="admin-skip" href="#admin-content">Ir para o conteúdo</a>
+            <header class="admin-topbar">
+                <button type="button" class="admin-menu-toggle" data-menu-toggle aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+                <img class="admin-topbar-logo" src="{{ asset('img/logo.svg') }}" alt="SOSMulher">
+            </header>
+            <div class="admin-overlay" data-menu-fechar></div>
             @include('parciais.menu-lateral')
             <main class="admin-main" id="admin-content">
                 @if(session('status'))
@@ -20,8 +27,12 @@
                         {{ session('status') }}
                     </div>
                 @endif
-                @if($errors->any())
-                    <div class="admin-panel backend-feedback" role="alert">
+                @if(session('aviso'))
+                    <div class="admin-panel backend-feedback aviso" role="alert">{{ session('aviso') }}</div>
+                @endif
+                @if($errors->any() && !request()->routeIs('admin.cadastro.*'))
+                    <div class="admin-panel backend-feedback erro-geral" role="alert">
+                        <strong>Corrija os campos destacados:</strong>
                         <ul>
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>

@@ -35,12 +35,12 @@
             </thead>
             <tbody>
                 @forelse($relatorios as $relatorio)
-                    <tr>
+                    <tr class="linha-status linha-{{ $relatorio->statusClasse() }}">
                         <td>{{ $relatorio->dataHoraOcorrencia ?? $relatorio->dataOcorrencia }}</td>
                         <td>{{ $relatorio->tipoOcorrencia }}</td>
                         <td>{{ $relatorio->localOcorrencia ?? '—' }}</td>
                         <td>{{ $relatorio->bairroOcorrencia ?? '—' }}</td>
-                        <td>{{ $relatorio->statusAtendimento }}</td>
+                        <td>@include('parciais.status-ocorrencia', ['ocorrencia' => $relatorio])</td>
                         <td>
                             <a href="{{ route('admin.relatorios.visualizar',$relatorio->id) }}">Visualizar ↗</a>
                         </td>
