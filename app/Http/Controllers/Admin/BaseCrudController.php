@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 abstract class BaseCrudController extends \App\Http\Controllers\Controller
@@ -110,13 +111,13 @@ abstract class BaseCrudController extends \App\Http\Controllers\Controller
     public function alterarStatus(Request $request, int $id)
     {
         $dados = $request->validate([
-            'status' => ['required', 'string', 'in:ativo,inativo']
+            'status' => ['required', 'string', Rule::in($this->statusPermitidos())]
         ]);
 
         DB::transaction(function () use ($id, $dados) {
             $registro = $this->modelo::lockForUpdate()->findOrFail($id);
 
-            if ($dados['status'] === 'inativo' && $this->temVinculosAtivos($registro)) {
+            if ($dados['status'] === $this->statusInativo() && $this->temVinculosAtivos($registro)) {
                 throw ValidationException::withMessages([
                     'status' => 'Há vínculos ativos. Resolva antes de inativar.'
                 ]);
@@ -133,10 +134,11 @@ abstract class BaseCrudController extends \App\Http\Controllers\Controller
     {
         $registro = $id ? $this->modelo::findOrFail($id) : new $this->modelo;
         $regras = $id ? $this->regrasAtualizacao($id) : $this->regrasCriacao();
-        $dados = $this->processarDados($request, $request->all());
+        // 1) normaliza o que foi digitado (CPF, telefone...), 2) valida, 3) executa efeitos (upload de foto etc.)
+        $dados = $this->normalizarEntrada($request->all(), $id);
         $request->merge($dados);
         $dados = $request->validate($regras);
-        $dados = $this->processarDados($request, $dados);
+        $dados = $this->processarDados($request, $dados, $id);
 
         $registro->forceFill($this->mapearDados($dados));
         if (!$id) {
@@ -210,8 +212,25 @@ abstract class BaseCrudController extends \App\Http\Controllers\Controller
     {
         return [];
     }
-    protected function processarDados(Request $request, array $dados): array
+    /** Formata os dados antes da validação (sem efeitos colaterais). */
+    protected function normalizarEntrada(array $dados, ?int $id = null): array
     {
         return $dados;
+    }
+
+    /** Roda depois da validação; é aqui que se grava arquivo, gera senha etc. */
+    protected function processarDados(Request $request, array $dados, ?int $id = null): array
+    {
+        return $dados;
+    }
+
+    protected function statusPermitidos(): array
+    {
+        return ['ativo', 'inativo'];
+    }
+
+    protected function statusInativo(): string
+    {
+        return 'inativo';
     }
 }

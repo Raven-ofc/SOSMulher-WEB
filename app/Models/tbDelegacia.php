@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class tbDelegacia extends Model
+class TbDelegacia extends Model
 {
     protected $table = 'tbdelegacia';
 
@@ -24,6 +24,6 @@ class tbDelegacia extends Model
 
     public function telefones()
     {
-        return $this->hasMany(tbtelefonedelegacia::class, 'idDelegacia');
+        return $this->hasMany(TbTelefoneDelegacia::class, 'idDelegacia');
     }
 }

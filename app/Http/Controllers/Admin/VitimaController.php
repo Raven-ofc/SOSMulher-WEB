@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\TbOcorrencia;
 use App\Models\TbVitima;
-use App\Rules\Cpf;
+use App\Support\Formatos;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use App\Mail\VitimaCadastradaMail;
-use Illuminate\Support\Facades\Mail;
 
+/**
+ * Lista, detalhes e edição de vítimas.
+ * O CADASTRO de uma nova vítima acontece somente no fluxo unificado (CadastroController).
+ */
 class VitimaController extends BaseCrudController
 {
     protected string $modelo = TbVitima::class;
@@ -21,11 +22,6 @@ class VitimaController extends BaseCrudController
     protected function colunaStatus(): string
     {
         return 'statusVitima';
-    }
-
-    protected function tabelaAuditoria(): string
-    {
-        return 'tbvitima';
     }
 
     protected function colunasBusca(): array
@@ -44,18 +40,6 @@ class VitimaController extends BaseCrudController
 
         if (!empty($dados['imagemVitima'])) {
             $mapeado['imagemVitima'] = $dados['imagemVitima'];
-        }
-
-        if (array_key_exists('cpf', $dados)) {
-            $mapeado['cpfVitima'] = $dados['cpf'];
-        }
-
-        if (array_key_exists('data_nascimento', $dados)) {
-            $mapeado['dataNascimentoVitima'] = $dados['data_nascimento'];
-        }
-
-        if (!empty($dados['senha_temporaria'])) {
-            $mapeado['senhaVitima'] = Hash::make($dados['senha_temporaria']);
         }
 
         return $mapeado;
@@ -84,84 +68,49 @@ class VitimaController extends BaseCrudController
         ];
     }
 
-    protected function regrasCriacao(): array
-    {
-        return [
-            'nome' => ['required', 'string', 'max:100'],
-            'cpf' => ['required', 'string', new Cpf, Rule::unique('tbvitima', 'cpfVitima')],
-            'data_nascimento' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
-            'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')],
-            'telefone' => ['required', 'string'],
-            'nome_mae' => ['nullable', 'string', 'max:100'],
-            'nome_pai' => ['nullable', 'string', 'max:100'],
-            'foto' => ['nullable', 'image', 'max:5048'],
-            'cep' => ['required', 'string'],
-            'rua' => ['required', 'string', 'max:150'],
-            'numero' => ['required', 'string', 'max:20'],
-            'bairro' => ['required', 'string', 'max:100'],
-            'cidade' => ['required', 'string', 'max:100'],
-            'uf' => ['required', 'string', 'max:2'],
-            'complemento' => ['nullable', 'string', 'max:100'],
-        ];
-    }
-
     protected function regrasAtualizacao(int $id = null): array
     {
         return [
-            'nome' => ['required', 'string', 'max:100'],
+            'nome' => ['required', 'string', 'max:100', 'regex:/^\S+(\s+\S+)+$/u'],
             'email' => ['required', 'email', 'max:100', Rule::unique('tbvitima', 'emailVitima')->ignore($id)],
-            'telefone' => ['required', 'string'],
+            'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
             'nome_mae' => ['nullable', 'string', 'max:100'],
             'nome_pai' => ['nullable', 'string', 'max:100'],
-            'foto' => ['nullable', 'image', 'max:5048'],
-            'cep' => ['required', 'string'],
+            'foto' => ['nullable', 'image', 'max:5120'],
+            'cep' => ['required', 'string', 'regex:/^\d{5}-\d{3}$/'],
             'rua' => ['required', 'string', 'max:150'],
             'numero' => ['required', 'string', 'max:20'],
             'bairro' => ['required', 'string', 'max:100'],
             'cidade' => ['required', 'string', 'max:100'],
-            'uf' => ['required', 'string', 'max:2'],
+            'uf' => ['required', 'string', Rule::in(Formatos::UFS)],
             'complemento' => ['nullable', 'string', 'max:100'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
         ];
     }
 
-    protected function processarDados(Request $request, array $dados): array
+    /** CPF e data de nascimento não mudam depois do cadastro; por isso são descartados na edição. */
+    protected function normalizarEntrada(array $dados, ?int $id = null): array
     {
-        $ehAtualizacao = (bool) $request->route('id');
+        unset($dados['cpf'], $dados['data_nascimento'], $dados['senha_temporaria']);
 
-        if ($ehAtualizacao) {
-            unset($dados['cpf'], $dados['data_nascimento'], $dados['senha_temporaria']);
+        if (isset($dados['telefone'])) {
+            $dados['telefone'] = Formatos::telefone($dados['telefone']);
+        }
+        if (isset($dados['cep'])) {
+            $dados['cep'] = Formatos::cep($dados['cep']);
+        }
+        if (isset($dados['uf'])) {
+            $dados['uf'] = strtoupper(trim($dados['uf']));
         }
 
+        return $dados;
+    }
+
+    protected function processarDados(Request $request, array $dados, ?int $id = null): array
+    {
         if ($request->hasFile('foto')) {
-            $caminho = $request->file('foto')->store('vitimas', 'public');
-            $dados['imagemVitima'] = $caminho;
-        }
-
-        if (!$ehAtualizacao && !empty($dados['cpf'])) {
-            $cpf = preg_replace('/\D/', '', $dados['cpf']);
-
-            $dados['cpf'] = substr($cpf, 0, 3) . '.' .
-                substr($cpf, 3, 3) . '.' .
-                substr($cpf, 6, 3) . '-' .
-                substr($cpf, 9, 2);
-        }
-
-        if (!empty($dados['telefone'])) {
-            $telefone = preg_replace('/\D/', '', $dados['telefone']);
-
-            if (strlen($telefone) === 11) {
-                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
-                    substr($telefone, 2, 5) . '-' .
-                    substr($telefone, 7, 4);
-            } elseif (strlen($telefone) === 10) {
-                $dados['telefone'] = '(' . substr($telefone, 0, 2) . ') ' .
-                    substr($telefone, 2, 4) . '-' .
-                    substr($telefone, 6, 4);
-            }
-        }
-
-        if (!$ehAtualizacao && empty($dados['senha_temporaria'])) {
-            $dados['senha_temporaria'] = Str::random(12);
+            $dados['imagemVitima'] = $request->file('foto')->store('vitimas', 'public');
         }
 
         return $dados;
@@ -172,13 +121,9 @@ class VitimaController extends BaseCrudController
         $telefone = $registro->telefones()->orderBy('id')->first();
 
         if ($telefone) {
-            $telefone->update([
-                'numeroTelefoneVitima' => $dados['telefone'],
-            ]);
+            $telefone->update(['numeroTelefoneVitima' => $dados['telefone']]);
         } else {
-            $registro->telefones()->create([
-                'numeroTelefoneVitima' => $dados['telefone'],
-            ]);
+            $registro->telefones()->create(['numeroTelefoneVitima' => $dados['telefone']]);
         }
 
         $dadosEndereco = [
@@ -191,26 +136,23 @@ class VitimaController extends BaseCrudController
             'cepVitima' => $dados['cep'],
         ];
 
+        // Só atualiza as coordenadas quando a API de CEP devolveu novas (evita perder as antigas).
+        if (!empty($dados['latitude']) && !empty($dados['longitude'])) {
+            $dadosEndereco['latitudeVitima'] = $dados['latitude'];
+            $dadosEndereco['longitudeVitima'] = $dados['longitude'];
+        }
+
         if ($registro->endereco) {
             $registro->endereco()->update($dadosEndereco);
         } else {
             $registro->endereco()->create($dadosEndereco);
         }
-
-        if (!$id) {
-            Mail::to($registro->emailVitima)->send(
-                new VitimaCadastradaMail(
-                    $registro->nomeVitima,
-                    $dados['senha_temporaria']
-                )
-            );
-        }
     }
 
     protected function temVinculosAtivos($registro): bool
     {
-        return $registro->medidas()->where('statusMedida', 'ativo')->exists()
-            || $registro->ocorrencias()->where('statusAtendimento', 'andamento')->exists();
+        return $registro->medidas()->where('statusMedida', 'Ativa')->exists()
+            || $registro->ocorrencias()->whereIn('statusAtendimento', [TbOcorrencia::STATUS_ABERTA, TbOcorrencia::STATUS_ANDAMENTO])->exists();
     }
 
     protected function dadosExtrasVisualizacao($registro): array

@@ -4,15 +4,15 @@
     <h1>Agressores</h1>
 </header>
 <form class="occurrence-filters" method="GET">
-    <a class="victim-primary" href="{{ route('admin.agressores.criar') }}">+ Adicionar</a>
+    <a class="victim-primary" href="{{ route('admin.cadastro.index') }}">+ Novo cadastro</a>
     <div class="admin-search">
         <input name="busca" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('busca') }}">
         <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
     </div>
     <select name="status" aria-label="Status">
         <option value="">Todos os status</option>
-        @foreach(['ativo','inativo'] as $status)
-            <option @selected(request('status')===$status)>{{ $status }}</option>
+        @foreach(\App\Http\Controllers\Admin\AgressorController::STATUS as $status)
+            <option value="{{ $status }}" @selected(request('status')===$status)>{{ $status }}</option>
         @endforeach
     </select>
     <button class="admin-action secondary">Filtrar</button>
@@ -24,6 +24,8 @@
                 <tr>
                     <th>Nome</th>
                     <th>CPF</th>
+                    <th>Bairro</th>
+                    <th>Tornozeleira</th>
                     <th>Status</th>
                     <th>Abrir</th>
                 </tr>
@@ -33,7 +35,9 @@
                     <tr>
                         <td>{{ $agressor->nomeAgressor }}</td>
                         <td>{{ $agressor->cpfAgressor }}</td>
-                        <td>{{ ucfirst($agressor->statusAgressor) }}</td>
+                        <td>{{ $agressor->bairroAgressor ?? '—' }}</td>
+                        <td>{{ $agressor->tornozeleira?->numeroSerieTornozeleira ?? '—' }}</td>
+                        <td>{{ $agressor->statusAgressor }}</td>
                         <td>
                             <a class="admin-text-link" href="{{ route('admin.agressores.visualizar',$agressor->id) }}">Ver cadastro</a>
                         </td>

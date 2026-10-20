@@ -25,7 +25,7 @@ class RelatorioController extends Controller
                 ->whereColumn('relatorios_atendimento.ocorrencia_id', 'tbocorrencia.id');
         });
 
-        $query->whereIn('statusAtendimento', ['realizado', 'concluido']);
+        $query->where('statusAtendimento', \App\Models\TbOcorrencia::STATUS_ENCERRADA);
 
         if ($v = $dados['busca'] ?? $request->query('search')) {
             $query->where(fn ($q) => $q->where('tipoOcorrencia', 'like', "%$v%")->orWhere('localOcorrencia', 'like', "%$v%"));

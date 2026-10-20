@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\tbvitima;
-use App\Models\tbtelefonevitima;
-use App\Models\tbenderecoVitima;
-use App\Models\tblocalizacaoVitima;
+use App\Models\TbVitima;
+use App\Models\TbTelefoneVitima;
+use App\Models\TbEnderecoVitima;
+use App\Models\TbLocalizacaoVitima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -14,21 +14,21 @@ class VitimaController extends Controller
 {
     public function index()
     {
-        $vitimas = tbvitima::paginate(10);
+        $vitimas = TbVitima::paginate(10);
 
         return view('administracao.vitima.lista', compact('vitimas'));
     }
 
     public function show(string $id)
     {
-        $vitima = tbvitima::findOrFail($id);
+        $vitima = TbVitima::findOrFail($id);
 
         return view('administracao.vitima.formulario', compact('vitima'));
     }
 
     public function indexAPIs(string $email, string $senha)
     {
-        $vitima = tbvitima::leftJoin(
+        $vitima = TbVitima::leftJoin(
             'tbtelefonevitima',
             'tbtelefonevitima.idvitima',
             '=',
@@ -62,7 +62,7 @@ class VitimaController extends Controller
 
     public function enderecoAPI(string $id)
     {
-        $endereco = tbenderecoVitima::where(
+        $endereco = TbEnderecoVitima::where(
             'tbEnderecoVitima.idVitima',
             $id
         )->first();
@@ -78,14 +78,14 @@ class VitimaController extends Controller
             'numeroTelefone' => ['sometimes', 'required', 'string', 'max:15'],
         ]);
 
-        $vitima = tbvitima::findOrFail($id);
+        $vitima = TbVitima::findOrFail($id);
 
         $vitima->update([
             'nomeVitima' => $validarDados['nome'] ?? $vitima->nomeVitima,
             'emailVitima' => $validarDados['email'] ?? $vitima->emailVitima,
         ]);
 
-        $telefoneVitima = tbtelefonevitima::where(
+        $telefoneVitima = TbTelefoneVitima::where(
             'idvitima',
             $id
         )->first();
@@ -97,7 +97,7 @@ class VitimaController extends Controller
                     ?? $telefoneVitima->numerotelefonevitima,
             ]);
         } elseif (!empty($validarDados['numeroTelefone'])) {
-            tbtelefonevitima::create([
+            TbTelefoneVitima::create([
                 'idVitima' => $id,
                 'numeroTelefoneVitima' => $validarDados['numeroTelefone'],
             ]);
@@ -117,7 +117,7 @@ class VitimaController extends Controller
             ],
         ]);
 
-        $vitima = tbvitima::findOrFail($id);
+        $vitima = TbVitima::findOrFail($id);
 
         $imagemNova = $request->file('imagem')->store(
             'vitimas',
@@ -163,9 +163,9 @@ class VitimaController extends Controller
             'latitude' => ['required', 'numeric'],
         ]);
 
-        $vitima = tbvitima::findOrFail($id);
+        $vitima = TbVitima::findOrFail($id);
 
-        $local = tblocalizacaoVitima::updateOrCreate(
+        $local = TbLocalizacaoVitima::updateOrCreate(
             [
                 'idVitima' => $vitima->id,
             ],

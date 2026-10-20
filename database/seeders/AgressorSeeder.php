@@ -182,5 +182,21 @@ class AgressorSeeder extends Seeder
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
         ]);
+
+        // Dados padronizados com o cadastro da vítima (filiação, contato e CEP), usados nos novos formulários.
+        $ceps = [
+            'Guaianases' => '08410-000', 'Consolação' => '01301-000', 'República' => '01045-001', 'Tatuapé' => '03306-000',
+            'Capão Redondo' => '05882-000', 'Freguesia do Ó' => '02731-000', 'Sapopemba' => '03971-000', 'Campo Limpo' => '05758-001',
+            'Pirituba' => '05110-000', 'Jardim Ângela' => '04941-003', 'Cidade Tiradentes' => '08473-000', 'Santana' => '02012-000',
+        ];
+        $maes = ['Maria das Graças', 'Lúcia Helena', 'Aparecida', 'Rosa Maria', 'Terezinha', 'Ivone', 'Célia Regina', 'Marlene', 'Neusa', 'Dirce'];
+
+        foreach (DB::table('tbagressor')->get() as $agressor) {
+            DB::table('tbagressor')->where('id', $agressor->id)->update([
+                'nomeMaeAgressor' => $maes[($agressor->id - 1) % count($maes)] . ' ' . explode(' ', $agressor->nomeAgressor)[count(explode(' ', $agressor->nomeAgressor)) - 1],
+                'telefoneAgressor' => '(11) 9' . str_pad((string) (8100 + $agressor->id * 37), 4, '0', STR_PAD_LEFT) . '-' . str_pad((string) (1200 + $agressor->id * 91), 4, '0', STR_PAD_LEFT),
+                'cepAgressor' => $ceps[$agressor->bairroAgressor] ?? null,
+            ]);
+        }
     }
 }

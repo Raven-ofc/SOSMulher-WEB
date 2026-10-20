@@ -148,10 +148,11 @@
                 <h2>Ocorrências</h2>
 
                 @forelse($occurrences as $item)
-                    <p class="victim-related-empty">
+                    <p class="victim-related-empty item-status item-{{ $item->statusClasse() }}">
                         <a href="{{ route('admin.ocorrencias.visualizar', $item->id) }}">
-                            {{ $item->tipoOcorrencia }} — {{ $item->dataOcorrencia }}
+                            {{ $item->tipoOcorrencia }} — {{ \Carbon\Carbon::parse($item->dataOcorrencia)->format('d/m/Y') }}
                         </a>
+                        @include('parciais.status-ocorrencia', ['ocorrencia' => $item])
                     </p>
                 @empty
                     <p class="victim-related-empty">

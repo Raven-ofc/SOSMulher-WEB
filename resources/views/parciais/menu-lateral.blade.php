@@ -1,4 +1,4 @@
-<aside class="admin-sidebar" aria-label="Menu principal">
+<aside class="admin-sidebar" id="menu-principal" aria-label="Menu principal">
     <a class="admin-brand" href="{{ route('admin.painel') }}" aria-label="Página inicial"><img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher"></a>
     <nav class="admin-nav">
         <a href="{{ route('admin.painel') }}" class="admin-nav-item {{ request()->routeIs('admin.painel') ? 'is-active' : '' }}" @if(request()->routeIs('admin.painel')) aria-current="page" @endif>
@@ -21,13 +21,15 @@
             @include('parciais.icone', ['name' => 'archive'])
             Relatórios
         </a>
+        @php($emCadastros = request()->routeIs('admin.cadastro.*', 'admin.vitimas.*', 'admin.agressores.*', 'admin.tornozeleiras.*', 'admin.medidas-protetivas*'))
         <div class="registration-menu">
-            <a href="{{ route('admin.vitimas.index') }}" class="admin-nav-item {{ in_array(request()->route()->getName(), ['admin.vitimas.index', 'admin.vitimas.create', 'admin.vitimas.show', 'admin.vitimas.edit', 'admin.agressores.index', 'admin.agressores.create', 'admin.agressores.show', 'admin.agressores.edit', 'admin.tornozeleiras.index', 'admin.tornozeleiras.create', 'admin.tornozeleiras.show', 'admin.tornozeleiras.edit', 'admin.medidas-protetivas', 'admin.medidas-protetivas.create', 'admin.medidas-protetivas.show', 'admin.medidas-protetivas.edit']) ? 'is-active' : '' }}">
+            <a href="{{ route('admin.cadastro.index') }}" class="admin-nav-item {{ $emCadastros ? 'is-active' : '' }}">
                 @include('parciais.icone', ['name' => 'book'])
                 Cadastros
             </a>
-            @if(in_array(request()->route()->getName(), ['admin.vitimas.index', 'admin.vitimas.create', 'admin.vitimas.show', 'admin.vitimas.edit', 'admin.agressores.index', 'admin.agressores.create', 'admin.agressores.show', 'admin.agressores.edit', 'admin.tornozeleiras.index', 'admin.tornozeleiras.create', 'admin.tornozeleiras.show', 'admin.tornozeleiras.edit', 'admin.medidas-protetivas', 'admin.medidas-protetivas.create', 'admin.medidas-protetivas.show', 'admin.medidas-protetivas.edit']))
-                <div class="registration-subnav" aria-label="Tipos de cadastro">
+            @if($emCadastros)
+                <div class="registration-subnav" aria-label="Cadastros">
+                    <a href="{{ route('admin.cadastro.index') }}" @if(request()->routeIs('admin.cadastro.*')) aria-current="page" @endif>Novo cadastro</a>
                     <a href="{{ route('admin.vitimas.index') }}" @if(request()->routeIs('admin.vitimas.*')) aria-current="page" @endif>Vítimas</a>
                     <a href="{{ route('admin.agressores.index') }}" @if(request()->routeIs('admin.agressores.*')) aria-current="page" @endif>Agressores</a>
                     <a href="{{ route('admin.tornozeleiras.index') }}" @if(request()->routeIs('admin.tornozeleiras.*')) aria-current="page" @endif>Tornozeleiras</a>
