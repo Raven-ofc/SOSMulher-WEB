@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 
 class DatabaseSeeder extends Seeder
 {
@@ -39,6 +40,9 @@ class DatabaseSeeder extends Seeder
 
             OcorrenciaSeeder::class,
             RelatorioAtendimentoSeeder::class, 
+
         ]);
+        
+        Artisan::call('delegacias:geocodificar');
     }
 }

@@ -18,13 +18,23 @@ class LocalizacaoTornozeleiraController extends Controller
             'dataHoraLocalizacao'  => ['nullable', 'date'],
         ]);
 
-        $localizacao = $tornozeleira->localizacoes()->create([
-            'latitudeLocalizacao'  => $dados['latitudeLocalizacao'],
-            'longitudeLocalizacao' => $dados['longitudeLocalizacao'],
-            'dataHoraLocalizacao'  => $dados['dataHoraLocalizacao'] ?? now(),
-        ]);
+        $localizacao = $tornozeleira->localizacoes()->first();
 
-        return response()->json($localizacao, 201);
+        if ($localizacao) {
+            $localizacao->update([
+                'latitudeLocalizacao'  => $dados['latitudeLocalizacao'],
+                'longitudeLocalizacao' => $dados['longitudeLocalizacao'],
+                'dataHoraLocalizacao'  => $dados['dataHoraLocalizacao'] ?? now(),
+            ]);
+        } else {
+            $localizacao = $tornozeleira->localizacoes()->create([
+                'latitudeLocalizacao'  => $dados['latitudeLocalizacao'],
+                'longitudeLocalizacao' => $dados['longitudeLocalizacao'],
+                'dataHoraLocalizacao'  => $dados['dataHoraLocalizacao'] ?? now(),
+            ]);
+        }
+
+        return response()->json($localizacao, 200);
     }
 
     public function index($idTornozeleira)

@@ -18,12 +18,12 @@ return new class extends Migration
             $table->string('statusDelegacia', 200);
             $table->string('logradouroDelegacia', 255);    
             $table->string('numLogradouroDelegacia', 10);
-            $table->string('bairroDelegacia', 100);
+            $table->string('bairroDelegacia', 100)->nullable();
             $table->string('cidadeDelegacia', 100);
             $table->string('ufDelegacia', 100);
-            $table->string('cepDelegacia', 10);
-            $table->decimal('latitudedelegacia', 10, 7);
-            $table->decimal('longitudedelegacia', 10, 7);
+            $table->string('cepDelegacia', 10)->nullable();
+            $table->decimal('latitudedelegacia', 10, 7)-> nullable();
+            $table->decimal('longitudedelegacia', 10, 7)-> nullable();
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tbenderecodelegacia');
+        Schema::dropIfExists('tbdelegacia');
     }
 };
