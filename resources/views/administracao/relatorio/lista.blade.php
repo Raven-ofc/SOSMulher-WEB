@@ -30,7 +30,7 @@
                     <th>Local</th>
                     <th>Bairro</th>
                     <th>Status</th>
-                    <th>Abrir</th>
+                    <th>Vizualizar</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +42,9 @@
                         <td>{{ $relatorio->bairroOcorrencia ?? '—' }}</td>
                         <td>@include('parciais.status-ocorrencia', ['ocorrencia' => $relatorio])</td>
                         <td>
-                            <a href="{{ route('admin.relatorios.visualizar',$relatorio->id) }}">Visualizar ↗</a>
+                            <a href="{{ route('admin.relatorios.visualizar',$relatorio->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">
+                                <i data-lucide="external-link"></i>
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -59,4 +61,13 @@
     </div>
     {{ $relatorios->links() }}
 </section>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+@stack('scripts')
+
+<script>
+    lucide.createIcons();
+</script>
+
 @endsection

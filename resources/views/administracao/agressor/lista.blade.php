@@ -4,7 +4,6 @@
     <h1>Agressores</h1>
 </header>
 <form class="occurrence-filters" method="GET">
-    <a class="victim-primary" href="{{ route('admin.cadastro.index') }}">+ Novo cadastro</a>
     <div class="admin-search">
         <input name="busca" aria-label="Pesquisar por nome ou CPF" placeholder="Nome ou CPF" value="{{ request('busca') }}">
         <button type="submit" aria-label="Pesquisar">@include('parciais.icone', ['name' => 'search'])</button>
@@ -27,7 +26,7 @@
                     <th>Bairro</th>
                     <th>Tornozeleira</th>
                     <th>Status</th>
-                    <th>Abrir</th>
+                    <th>Vizualizar</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,7 +38,9 @@
                         <td>{{ $agressor->tornozeleira?->numeroSerieTornozeleira ?? '—' }}</td>
                         <td>{{ $agressor->statusAgressor }}</td>
                         <td>
-                            <a class="admin-text-link" href="{{ route('admin.agressores.visualizar',$agressor->id) }}">Ver cadastro</a>
+                            <a href="{{ route('admin.agressores.visualizar',$agressor->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">
+                                <i data-lucide="external-link"></i>
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -56,4 +57,13 @@
     </div>
     {{ $agressores->links() }}
 </section>
+</section>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+@stack('scripts')
+
+<script>
+    lucide.createIcons();
+</script>
 @endsection

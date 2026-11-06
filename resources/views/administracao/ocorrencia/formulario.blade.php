@@ -16,24 +16,14 @@
             <legend class="bloco-titulo">Pessoas e ocorrência</legend>
 
             <div class="campo {{ $erro('vitima_id') ? 'is-invalid' : '' }}">
-                <label for="vitima_id">Vítima <span class="obrigatorio" aria-hidden="true">*</span></label>
-                <select id="vitima_id" name="vitima_id" data-obrigatorio>
-                    <option value="">Selecione</option>
-                    @foreach($vitimas as $v)
-                        <option value="{{ $v->id }}" @selected(old('vitima_id') == $v->id)>{{ $v->nomeVitima }} — {{ $v->cpfVitima }}</option>
-                    @endforeach
-                </select>
+                <label for="vitima_id">CPF daVítima <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input type="text" id="vitima_cpf" name="vitima_cpf" value="{{ old('vitima_cpf') }}" placeholder="000.000.000-00" maxlength="14" required>
                 <p class="campo-erro" role="alert" @if(!$erro('vitima_id')) hidden @endif>{{ $erro('vitima_id') }}</p>
             </div>
 
             <div class="campo {{ $erro('agressor_id') ? 'is-invalid' : '' }}">
-                <label for="agressor_id">Agressor <span class="obrigatorio" aria-hidden="true">*</span></label>
-                <select id="agressor_id" name="agressor_id" data-obrigatorio>
-                    <option value="">Selecione</option>
-                    @foreach($agressores as $a)
-                        <option value="{{ $a->id }}" @selected(old('agressor_id') == $a->id)>{{ $a->nomeAgressor }} — {{ $a->cpfAgressor }}</option>
-                    @endforeach
-                </select>
+                <label for="agressor_id">CPF doAgressor <span class="obrigatorio" aria-hidden="true">*</span></label>
+                <input type="text" id="agressor_cpf" name="agressor_cpf" value="{{ old('agressor_cpf') }}" placeholder="000.000.000-00" maxlength="14" required>
                 <p class="campo-erro" role="alert" @if(!$erro('agressor_id')) hidden @endif>{{ $erro('agressor_id') }}</p>
             </div>
 

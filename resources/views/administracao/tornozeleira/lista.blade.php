@@ -15,13 +15,6 @@
     action="{{ route('admin.tornozeleiras.index') }}"
 >
 
-    <a
-        class="victim-primary"
-        href="{{ route('admin.cadastro.index') }}"
-    >
-        + Novo cadastro
-    </a>
-
     <div class="admin-search">
         <label class="somente-leitor" for="device-search">
             Pesquisar tornozeleiras

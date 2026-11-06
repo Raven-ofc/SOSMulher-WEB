@@ -4,7 +4,6 @@
     <h1>Medidas Protetivas</h1>
 </header>
 <form class="occurrence-filters victims-filters" method="GET" action="{{ route('admin.medidas-protetivas') }}">
-    <a class="victim-primary" href="{{ route('admin.cadastro.index') }}">+ Novo cadastro</a>
     <div class="admin-search">
         <label class="somente-leitor" for="measure-search">Pesquisar medidas protetivas</label>
         <input id="measure-search" name="busca" value="{{ request('busca') }}" placeholder="Vítima, agressor, processo…">
@@ -39,7 +38,7 @@
                     <th>Perímetro / alerta</th>
                     <th>Risco</th>
                     <th>Status</th>
-                    <th>Abrir</th>
+                    <th>Vizualizar</th>
                 </tr>
             </thead>
             <tbody>
@@ -53,7 +52,11 @@
                         <td>{{ $medida->distanciaMedida }} m / {{ $medida->raioAlertaMedida }} m</td>
                         <td><span class="selo-risco risco-{{ $medida->nivelRiscoMedida }}">{{ $medida->riscoRotulo() }}</span></td>
                         <td>{{ $medida->statusMedida }}</td>
-                        <td><a class="admin-text-link" href="{{ route('admin.medidas-protetivas.visualizar', $medida->id) }}">Visualizar ↗</a></td>
+                        <td>
+                            <a href="{{ route('admin.medidas-protetivas.visualizar', $medida->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">
+                                <i data-lucide="external-link"></i>
+                            </a>
+                        </td>
                     </tr>
                 @empty
                     <tr>
@@ -72,4 +75,13 @@
     </div>
     {{ $medidas->links() }}
 </section>
+</section>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+@stack('scripts')
+
+<script>
+    lucide.createIcons();
+</script>
 @endsection

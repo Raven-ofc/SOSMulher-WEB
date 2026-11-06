@@ -24,6 +24,7 @@ class OcorrenciaController extends Controller
         'Perseguição (Stalking)',
         'Falha Técnica de Equipamento',
         'Alerta Improcedente',
+        'Outros',
     ];
 
     public function index(Request $request)
@@ -103,10 +104,13 @@ class OcorrenciaController extends Controller
     public function criar()
     {
         return view('administracao.ocorrencia.formulario', [
-            'vitimas' => TbVitima::where('statusVitima', 'ativo')->orderBy('nomeVitima')->get(),
-            'agressores' => TbAgressor::whereIn('statusAgressor', ['Monitorado', 'Foragido'])
-                ->orderBy('nomeAgressor')
-                ->get(),
+
+            // 'vitimas' => TbVitima::where('statusVitima', 'ativo')->orderBy('nomeVitima')->get(),
+
+            // 'agressores' => TbAgressor::whereIn('statusAgressor', ['Monitorado', 'Foragido'])
+            //     ->orderBy('nomeAgressor')
+            //     ->get(),
+
             'tipos' => self::TIPOS,
         ]);
     }
@@ -117,9 +121,41 @@ class OcorrenciaController extends Controller
             $request->merge(['cep' => Formatos::cep($request->input('cep'))]);
         }
 
+        $request->merge([
+            'vitima_cpf' => preg_replace(
+                '/\D/',
+                '',
+                $request->input('vitima_cpf', '')
+            ),
+
+            'agressor_cpf' => preg_replace(
+                '/\D/',
+                '',
+                $request->input('agressor_cpf', '')
+            ),
+        ]);
+
         $dados = $request->validate([
-            'vitima_id' => ['required', Rule::exists('tbvitima', 'id')->where('statusVitima', 'ativo')],
-            'agressor_id' => ['required', Rule::exists('tbagressor', 'id')->whereIn('statusAgressor', ['Monitorado', 'Foragido'])],
+            
+            'vitima_cpf' => [
+                'required',
+                'digits:11',
+                function ($attribute, $value, $fail) {
+                    if (!$this->cpfValido($value)) {
+                        $fail('O CPF da vítima é inválido.');
+                    }
+                },
+            ],
+            'agressor_cpf' => [
+                'required',
+                'digits:11',
+                function ($attribute, $value, $fail) {
+                    if (!$this->cpfValido($value)) {
+                        $fail('O CPF do agressor é inválido.');
+                    }
+                },
+            ],
+
             'tipo' => ['required', 'string', Rule::in(self::TIPOS)],
             'gravidade' => ['required', Rule::in(['baixa', 'media', 'alta'])],
             'data_hora' => ['required', 'date_format:Y-m-d\TH:i', 'before_or_equal:now'],
@@ -139,6 +175,32 @@ class OcorrenciaController extends Controller
             'cep.regex' => 'Informe um CEP válido (00000-000).',
         ]);
 
+        $vitima = TbVitima::whereRaw(
+            "REPLACE(REPLACE(cpfVitima, '.', ''), '-', '') = ?",
+            [$dados['vitima_cpf']]
+        )
+        ->where('statusVitima', 'ativo')
+        ->first();
+
+        $agressor = TbAgressor::whereRaw(
+            "REPLACE(REPLACE(cpfAgressor, '.', ''), '-', '') = ?",
+            [$dados['agressor_cpf']]
+        )
+        ->whereIn('statusAgressor', ['Monitorado', 'Foragido'])
+        ->first();
+
+        if (!$vitima) {
+            throw ValidationException::withMessages([
+                'vitima_cpf' => 'Nenhuma vítima ativa foi encontrada com esse CPF.'
+            ]);
+        }
+
+        if (!$agressor) {
+            throw ValidationException::withMessages([
+                'agressor_cpf' => 'Nenhum agressor monitorado ou foragido foi encontrado com esse CPF.'
+            ]);
+        }
+
         // Sem coordenadas da API de CEP, usa o centro do bairro (quando conhecido) para o mapa.
         $lat = $dados['latitude'] ?? null;
         $lng = $dados['longitude'] ?? null;
@@ -146,12 +208,12 @@ class OcorrenciaController extends Controller
             [$lat, $lng] = Regiao::centroDoBairro($dados['bairro']);
         }
 
-        $ocorrencia = DB::transaction(function () use ($dados, $request, $lat, $lng) {
+        $ocorrencia = DB::transaction(function () use ($dados, $request, $lat, $lng, $vitima, $agressor) {
             $ocorrencia = new TbOcorrencia;
             $ocorrencia->forceFill([
                 'idAutoridade' => $request->user()->id,
-                'idVitima' => $dados['vitima_id'],
-                'idAgressor' => $dados['agressor_id'],
+                'idVitima' => $vitima->id,
+                'idAgressor' => $agressor->id,
                 'tipoOcorrencia' => $dados['tipo'],
                 'gravidadeOcorrencia' => $dados['gravidade'],
                 'dataOcorrencia' => substr($dados['data_hora'], 0, 10),
@@ -234,5 +296,34 @@ class OcorrenciaController extends Controller
 
         return redirect()->route('admin.relatorios.visualizar', $id)
             ->with('status', 'Atendimento finalizado e relatório salvo.');
+    }
+
+    private function cpfValido(string $cpf): bool
+    {
+        $cpf = preg_replace('/\D/', '', $cpf);
+
+        if (strlen($cpf) !== 11 || preg_match('/^(\d)\1{10}$/', $cpf)) {
+            return false;
+        }
+
+        for ($t = 9; $t < 11; $t++) {
+            $soma = 0;
+
+            for ($i = 0; $i < $t; $i++) {
+                $soma += (int) $cpf[$i] * ($t + 1 - $i);
+            }
+
+            $digito = 11 - ($soma % 11);
+
+            if ($digito >= 10) {
+                $digito = 0;
+            }
+
+            if ($digito !== (int) $cpf[$t]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

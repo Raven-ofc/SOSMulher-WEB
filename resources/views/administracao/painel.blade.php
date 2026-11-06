@@ -48,70 +48,174 @@
 
     {{-- ============================ Gráficos ============================ --}}
     <div class="graficos-grade">
-        <section class="admin-panel grafico-painel">
-            <h2>Evolução diária (últimos 30 dias)</h2>
-            <div class="grafico-caixa grafico-largo"><canvas data-grafico="diario" data-tipo="line" role="img" aria-label="Ocorrências por dia nos últimos 30 dias"></canvas></div>
+        <section class="grupo-graficos">
+            <div class="grupo-graficos-cabecalho">
+                <h2>Visão geral das ocorrências</h2>
+                <p>Acompanhe a evolução e a distribuição das ocorrências.</p>
+            </div>
+
+            <div class="grupo-graficos-grade">
+
+                <section class="admin-panel grafico-painel grafico-destaque">
+                    <h3>Evolução diária</h3>
+                    <p class="grafico-descricao">Ocorrências registradas nos últimos 30 dias.</p>
+                    <div class="grafico-caixa grafico-largo">
+                        <canvas data-grafico="diario" data-tipo="line"
+                            role="img" aria-label="Ocorrências por dia nos últimos 30 dias"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por tipo</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="tipo" data-tipo="doughnut"
+                            role="img" aria-label="Ocorrências por tipo"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por status</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="status" data-tipo="doughnut"
+                            role="img" aria-label="Ocorrências por status"></canvas>
+                    </div>
+                </section>
+
+            </div>
         </section>
 
-        <section class="admin-panel grafico-painel">
-            <h2>Ocorrências por tipo</h2>
-            <div class="grafico-caixa"><canvas data-grafico="tipo" data-tipo="doughnut" role="img" aria-label="Ocorrências por tipo"></canvas></div>
+        <section class="grupo-graficos">
+            <div class="grupo-graficos-cabecalho">
+                <h2>Análise das ocorrências</h2>
+                <p>Visualize a gravidade e o comportamento das ocorrências ao longo dos meses.</p>
+            </div>
+
+            <div class="grupo-graficos-grade">
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por gravidade</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="gravidade" data-tipo="bar"
+                            role="img" aria-label="Ocorrências por gravidade"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Últimos 12 meses</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="mensal" data-tipo="bar"
+                            role="img" aria-label="Ocorrências por mês"></canvas>
+                    </div>
+                </section>
+
+            </div>
         </section>
 
-        <section class="admin-panel grafico-painel">
-            <h2>Por status</h2>
-            <div class="grafico-caixa"><canvas data-grafico="status" data-tipo="doughnut" role="img" aria-label="Ocorrências por status"></canvas></div>
+
+        {{-- ================= DISTRIBUIÇÃO GEOGRÁFICA ================= --}}
+        <section class="grupo-graficos">
+            <div class="grupo-graficos-cabecalho">
+                <h2>Distribuição geográfica</h2>
+                <p>Identifique as regiões com maior concentração de ocorrências.</p>
+            </div>
+
+            <div class="grupo-graficos-grade">
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Bairros com mais ocorrências</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="bairro" data-tipo="barh"
+                            role="img" aria-label="Ocorrências por bairro"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por região</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="regiao" data-tipo="bar"
+                            role="img" aria-label="Ocorrências por região"></canvas>
+                    </div>
+                </section>
+
+            </div>
         </section>
 
-        <section class="admin-panel grafico-painel">
-            <h2>Por gravidade</h2>
-            <div class="grafico-caixa"><canvas data-grafico="gravidade" data-tipo="bar" role="img" aria-label="Ocorrências por gravidade"></canvas></div>
+        <section class="grupo-graficos">
+            <div class="grupo-graficos-cabecalho">
+                <h2>Distribuição por período</h2>
+                <p>Identifique os dias e horários com maior incidência de ocorrências.</p>
+            </div>
+
+            <div class="grupo-graficos-grade">
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por horário</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="faixa" data-tipo="bar"
+                            role="img" aria-label="Ocorrências por faixa horária"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Ocorrências por dia da semana</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="diaSemana" data-tipo="bar"
+                            role="img" aria-label="Ocorrências por dia da semana"></canvas>
+                    </div>
+                </section>
+
+            </div>
         </section>
 
-        <section class="admin-panel grafico-painel">
-            <h2>Últimos 12 meses</h2>
-            <div class="grafico-caixa"><canvas data-grafico="mensal" data-tipo="bar" role="img" aria-label="Ocorrências por mês"></canvas></div>
+
+        {{-- ================= MEDIDAS PROTETIVAS ================= --}}
+        <section class="grupo-graficos">
+            <div class="grupo-graficos-cabecalho">
+                <h2>Medidas protetivas e monitoramento</h2>
+                <p>Acompanhe a situação das medidas e dos dispositivos de monitoramento.</p>
+            </div>
+
+            <div class="grupo-graficos-grade">
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Medidas protetivas por status</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="medidas" data-tipo="doughnut"
+                            data-rotulo="Medidas" role="img"
+                            aria-label="Medidas por status"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Nível de risco das medidas</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="risco" data-tipo="bar"
+                            data-rotulo="Medidas" role="img"
+                            aria-label="Medidas por nível de risco"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Tornozeleiras por status</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="tornozeleiras" data-tipo="doughnut"
+                            data-rotulo="Tornozeleiras" role="img"
+                            aria-label="Tornozeleiras por status"></canvas>
+                    </div>
+                </section>
+
+                <section class="admin-panel grafico-painel">
+                    <h3>Nível de bateria das tornozeleiras</h3>
+                    <div class="grafico-caixa">
+                        <canvas data-grafico="bateria" data-tipo="bar"
+                            data-rotulo="Tornozeleiras" role="img"
+                            aria-label="Faixas de bateria"></canvas>
+                    </div>
+                </section>
+
+            </div>
         </section>
 
-        <section class="admin-panel grafico-painel">
-            <h2>Bairros com mais ocorrências</h2>
-            <div class="grafico-caixa"><canvas data-grafico="bairro" data-tipo="barh" role="img" aria-label="Ocorrências por bairro"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Por região</h2>
-            <div class="grafico-caixa"><canvas data-grafico="regiao" data-tipo="bar" role="img" aria-label="Ocorrências por região"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Horário do dia</h2>
-            <div class="grafico-caixa"><canvas data-grafico="faixa" data-tipo="bar" role="img" aria-label="Ocorrências por faixa horária"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Dia da semana</h2>
-            <div class="grafico-caixa"><canvas data-grafico="diaSemana" data-tipo="bar" role="img" aria-label="Ocorrências por dia da semana"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Medidas protetivas por status</h2>
-            <div class="grafico-caixa"><canvas data-grafico="medidas" data-tipo="doughnut" data-rotulo="Medidas" role="img" aria-label="Medidas por status"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Nível de risco das medidas</h2>
-            <div class="grafico-caixa"><canvas data-grafico="risco" data-tipo="bar" data-rotulo="Medidas" role="img" aria-label="Medidas por nível de risco"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Tornozeleiras por status</h2>
-            <div class="grafico-caixa"><canvas data-grafico="tornozeleiras" data-tipo="doughnut" data-rotulo="Tornozeleiras" role="img" aria-label="Tornozeleiras por status"></canvas></div>
-        </section>
-
-        <section class="admin-panel grafico-painel">
-            <h2>Bateria das tornozeleiras ativas</h2>
-            <div class="grafico-caixa"><canvas data-grafico="bateria" data-tipo="bar" data-rotulo="Tornozeleiras" role="img" aria-label="Faixas de bateria"></canvas></div>
-        </section>
     </div>
 
     <script type="application/json" id="dados-graficos">{!! json_encode($graficos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
