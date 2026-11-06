@@ -5,11 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\tbvitima;
 use App\Models\tbtelefonevitima;
 use App\Models\tbenderecoVitima;
+use App\Models\tbAgressor;
+use App\Models\tbTornozeleira;
+use App\Models\tbMedida;
+use App\Models\tbViolacao;
+use App\Models\tbAlerta;
+use App\Models\tbLocalizacaoTornozeleira;
 use App\Models\tblocalizacaoVitima;
+use App\Models\TbMedida as ModelsTbMedida;
 use App\Models\TbVitima as ModelsTbVitima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\Concerns\Has;
 
 class VitimaController extends Controller
@@ -58,6 +66,8 @@ class VitimaController extends Controller
             'telefoneVitima' => $vitima->numFoneVitima,
             'dataNascimentoVitima' => $vitima->dataNascimentoVitima,
             'statusVitima' => $vitima->statusVitima,
+            'maeVitima' => $vitima->nomeMaeVitima,
+            'paiVitima' => $vitima->nomePaiVitima,
             'imagemVitima' => $vitima->imagemVitima,
         ]);
     }
@@ -72,10 +82,110 @@ class VitimaController extends Controller
         return $endereco;
     }
 
+    public function localAgressorVitimaAPI(string $id){
+        $vitima = tbvitima::with([
+            'medidas.agressor.tornozeleira.localizacoes'
+        ])->findOrFail($id);
+
+        $localizacoes = $vitima->medidas->map(function ($medida) {
+            $agressor = $medida->agressor;
+            $tornozeleira = $agressor?->tornozeleira;
+            if(!$tornozeleira){
+                return null;
+            }
+            return [
+                'idAgressor' => $agressor->id,
+                'idMedida' => $medida->id,
+                'idAutoridade'=> $medida->idAutoridade,
+                'nomeAgressor' => $agressor->nomeAgressor,
+                'distanciaMedida' => $medida->distanciaMedida,
+                'raioAlertaMedida' => $medida->raioAlertaMedida,
+                'latitude'=> $tornozeleira->localizacoes->first()?->latitudeLocalizacao,
+                'longitude'=> $tornozeleira->localizacoes->first()?->longitudeLocalizacao,
+                'dataHora'=> $tornozeleira->localizacoes->first()?->dataHoraLocalizacao,
+            ];
+        })->filter()->values();
+
+        return response()->json([
+            'idVitima'=> $vitima->id,
+            'localizacoesAgressor'=>$localizacoes,
+        ], 200);
+    }
+
+    public function registrarAlertaLimiteAPI(Request $request, string $idmedida){
+        return DB::transaction(function () use ($request, $idmedida) {
+            $medida = tbMedida::findOrfail($idmedida);
+
+            $violacao = new tbViolacao();
+
+            $violacao->tipoViolacao = 'Invasão de zona de exclusão';
+            $violacao->descricaoViolacao = $request->descricaoViolacao;
+            $violacao->statusViolacao = 'Em análise';
+            $violacao->latitudeViolacao= $request->latitude;
+            $violacao->longitudeViolacao= $request->longitude;
+            $violacao->dataHoraViolacao= now();
+            $violacao->idmedida= $medida->id;
+            
+            $violacao->save();
+
+            $alerta = new tbAlerta();
+
+            $alerta->tipoAlerta = 'Proximidade crítica';
+            $alerta->descricaoAlerta = 'Agressor ultrapassou o limite da medida protetiva';
+            $alerta->dataHoraAlerta = $violacao->dataHoraViolacao;
+            $alerta->statusAlerta = 'Em andamento';
+            $alerta->idViolacao = $violacao->id;
+            $alerta->idAutoridade = $medida->idAutoridade;
+
+            $alerta->save();
+
+            return response()->json([
+                'mensagem' => 'Violação e alerta enviados à autoridade responsável',
+                'violacao' => $violacao,
+                'alerta'=> $alerta
+            ],201);
+        });
+    }
+
+    public function registrarAlertaPanicoAPI(Request $request, string $idmedida){
+        return DB::transaction(function () use ($request, $idmedida) {
+            $medida = tbMedida::findOrfail($idmedida);
+
+            $violacao = new tbViolacao();
+
+            $violacao->tipoViolacao = $request->tipoViolacao;
+            $violacao->descricaoViolacao = $request->descricaoViolacao;
+            $violacao->statusViolacao = 'Em análise';
+            $violacao->latitudeViolacao= $request->latitudeViolacao;
+            $violacao->longitudeViolacao= $request->longitudeViolacao;
+            $violacao->dataHoraViolacao= now();
+            $violacao->idmedida= $medida->id;
+            
+            $violacao->save();
+
+            $alerta = new tbAlerta();
+
+            $alerta->tipoAlerta = 'Botão do pânico acionado!';
+            $alerta->descricaoAlerta = 'A vítima apertou o botão do pânico';
+            $alerta->dataHoraAlerta = $violacao->dataHoraViolacao;
+            $alerta->statusAlerta = 'Em andamento';
+            $alerta->idViolacao = $violacao->id;
+            $alerta->idAutoridade = $medida->idAutoridade;
+
+            $alerta->save();
+
+            return response()->json([
+                'mensagem' => 'Violação e alerta enviados à autoridade responsável',
+                'violacao' => $violacao,
+                'alerta'=> $alerta
+            ],201);
+        });
+    }
+
+
     public function atualizarAPI(Request $request, string $id)
     {
         $validarDados = $request->validate([
-            'nome' => ['sometimes', 'required', 'string', 'min:3'],
             'email' => ['sometimes', 'required', 'email', 'max:200'],
             'numeroTelefone' => ['sometimes', 'required', 'string', 'max:15'],
         ]);
@@ -83,7 +193,6 @@ class VitimaController extends Controller
         $vitima = TbVitima::findOrFail($id);
 
         $vitima->update([
-            'nomeVitima' => $validarDados['nome'] ?? $vitima->nomeVitima,
             'emailVitima' => $validarDados['email'] ?? $vitima->emailVitima,
         ]);
 

@@ -6,11 +6,14 @@ use App\Models\TbOcorrencia;
 use App\Models\TbVitima;
 use App\Support\Formatos;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Mail\VitimaCadastradaMail;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Lista, detalhes e edição de vítimas.
@@ -192,7 +195,7 @@ class VitimaController extends BaseCrudController
         ];
 
         // Só atualiza as coordenadas quando a API de CEP devolveu novas (evita perder as antigas).
-        if (!empty($dados['latitude']) && !empty($dados['longitude'])) {
+        if (isset($dados['latitude'], $dados['longitude'])) {
             $dadosEndereco['latitudeVitima'] = $dados['latitude'];
             $dadosEndereco['longitudeVitima'] = $dados['longitude'];
         }
@@ -210,11 +213,22 @@ class VitimaController extends BaseCrudController
             'email' => ['required', 'email'],
         ]);
 
-        $vitima = TbVitima::where('emailVitima', '=', $request->email)->first();
+        $email = strtolower(trim($request->email));
+
+        // Verifica se o código foi confirmado
+        $chave = 'recuperacao_autorizada_' . hash('sha256', $email);
+
+        if (!Cache::get($chave)) {
+            return response()->json([
+                'message' => 'Confirme o código de verificação primeiro.'
+            ], 403);
+        }
+
+        $vitima = TbVitima::where('emailVitima', $email)->first();
 
         if (!$vitima) {
             return response()->json([
-                'message' => 'Seu cadastro não foi encontrado, verifique se digitou seu email corretamente.',
+                'message' => 'Cadastro não encontrado.'
             ], 404);
         }
 
@@ -223,16 +237,24 @@ class VitimaController extends BaseCrudController
         $vitima->senhaVitima = Hash::make($senhaTemporaria);
         $vitima->save();
 
-        Mail::to($vitima->emailVitima)->send(
-            new VitimaCadastradaMail(
-                $vitima->nomeVitima,
-                $senhaTemporaria
-            )
-        );
+        try {
+            Mail::to($vitima->emailVitima)->send(
+                new VitimaCadastradaMail(
+                    $vitima->nomeVitima,
+                    $senhaTemporaria
+                )
+            );
+
+            Cache::forget($chave);
+        } catch (\Throwable $erro) {
+            return response()->json([
+                'message' => 'Não foi possível enviar a nova senha.'
+            ], 500);
+        }
 
         return response()->json([
-            'message'=> 'Verifique se sua senha chegou em seu email.'
-        ],200);
+            'message' => 'Verifique seu e-mail para receber sua nova senha.'
+        ], 200);
     }
 
     protected function temVinculosAtivos($registro): bool
