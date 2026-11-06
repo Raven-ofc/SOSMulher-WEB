@@ -11,9 +11,6 @@
     </header>
 
     <form class="occurrence-filters" method="GET">
-        <a class="victim-primary" href="{{ route('admin.cadastro.index') }}">
-            + Novo cadastro
-        </a>
 
         <div class="admin-search">
             <input
@@ -53,7 +50,7 @@
                         <th>Telefone</th>
                         <th>E-mail</th>
                         <th>Status</th>
-                        <th>Abrir</th>
+                        <th>Vizualizar</th>
                     </tr>
                 </thead>
 
@@ -65,15 +62,11 @@
                             <td>{{ $vitima->telefones->first()?->numeroTelefoneVitima ?? '—' }}</td>
                             <td>{{ $vitima->emailVitima }}</td>
                             <td>{{ ucfirst($vitima->statusVitima) }}</td>
-
                             <td>
-                                <a
-                                    class="admin-text-link"
-                                    href="{{ route('admin.vitimas.visualizar', $vitima->id) }}"
-                                >
-                                    Ver cadastro
-                                </a>
-                            </td>
+                            <a href="{{ route('admin.vitimas.visualizar', $vitima->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">
+                                <i data-lucide="external-link"></i>
+                            </a>
+                        </td>
                         </tr>
                     @empty
                         <tr>
@@ -90,4 +83,13 @@
 
         {{ $vitimas->links() }}
     </section>
+    </section>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    @stack('scripts')
+
+    <script>
+        lucide.createIcons();
+    </script>
 @endsection

@@ -40,10 +40,10 @@ class PainelController extends Controller
         $metricas = [
             'Total de ocorrências' => $ocorrencias->count(),
             'Ocorrências hoje' => $ocorrencias->filter(fn ($o) => substr((string) $o->dataOcorrencia, 0, 10) === $hoje->toDateString())->count(),
+            'Ocorrências graves' => $ocorrencias->where('gravidadeOcorrencia', 'alta')->count(),
             'Abertas' => $ocorrencias->where('statusAtendimento', TbOcorrencia::STATUS_ABERTA)->count(),
             'Em andamento' => $ocorrencias->where('statusAtendimento', TbOcorrencia::STATUS_ANDAMENTO)->count(),
             'Encerradas' => $ocorrencias->where('statusAtendimento', TbOcorrencia::STATUS_ENCERRADA)->count(),
-            'Ocorrências graves' => $ocorrencias->where('gravidadeOcorrencia', 'alta')->count(),
         ];
 
         $dados = compact('estatisticas', 'metricas', 'recentes');

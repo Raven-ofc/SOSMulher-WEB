@@ -2,6 +2,7 @@
 
 @section('admin-content')
 
+
 <header class="admin-heading">
     <h1>Ocorrências</h1>
 </header>
@@ -52,7 +53,8 @@
                     <th>Local</th>
                     <th>Bairro</th>
                     <th>Status</th>
-                    <th>Abrir</th>
+                    <th>Vizualizar</th>
+                    </th>
                 </tr>
             </thead>
             <tbody>
@@ -64,7 +66,9 @@
                         <td>{{ $ocorrencia->bairroOcorrencia ?? '—' }}</td>
                         <td>@include('parciais.status-ocorrencia', ['ocorrencia' => $ocorrencia])</td>
                         <td>
-                            <a href="{{ route('admin.ocorrencias.visualizar', $ocorrencia->id) }}">Visualizar ↗</a>
+                            <a href="{{ route('admin.ocorrencias.visualizar', $ocorrencia->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">
+                                <i data-lucide="external-link"></i>
+                            </a>
                         </td>
                     </tr>
                 @empty
@@ -82,4 +86,13 @@
 
     {{ $ocorrencias->links() }}
 </section>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+
+@stack('scripts')
+
+<script>
+    lucide.createIcons();
+</script>
+
 @endsection
