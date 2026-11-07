@@ -59,8 +59,20 @@ class AgressorController extends BaseCrudController
             'complementoAgressor' => $dados['complemento'] ?? null,
         ];
 
-        if (!empty($dados['imagemAgressor'])) {
-            $mapeado['imagemAgressor'] = $dados['imagemAgressor'];
+        if (!empty($dados['imagemAgressor1'])) {
+            $mapeado['imagemAgressor1'] = $dados['imagemAgressor1'];
+        }
+
+        if (!empty($dados['imagemAgressor2'])) {
+            $mapeado['imagemAgressor2'] = $dados['imagemAgressor2'];
+        }
+
+        if (!empty($dados['imagemAgressor3'])) {
+            $mapeado['imagemAgressor3'] = $dados['imagemAgressor3'];
+        }
+
+        if (!empty($dados['imagemAgressor4'])) {
+            $mapeado['imagemAgressor4'] = $dados['imagemAgressor4'];
         }
 
         if (!empty($dados['latitude']) && !empty($dados['longitude'])) {
@@ -99,7 +111,10 @@ class AgressorController extends BaseCrudController
     {
         return [
             'nome' => ['required', 'string', 'max:100', 'regex:/^\S+(\s+\S+)+$/u'],
-            'foto' => ['nullable', 'image', 'max:5120'],
+            'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'foto2' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'foto3' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'foto4' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
             'nome_mae' => ['required', 'string', 'max:100'],
             'nome_pai' => ['nullable', 'string', 'max:100'],
             'telefone' => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
@@ -135,8 +150,17 @@ class AgressorController extends BaseCrudController
 
     protected function processarDados(Request $request, array $dados, ?int $id = null): array
     {
-        if ($request->hasFile('foto')) {
-            $dados['imagemAgressor'] = $request->file('foto')->store('agressores', 'public');
+        $camposFotos = [
+            'foto'  => 'imagemAgressor1',
+            'foto2' => 'imagemAgressor2',
+            'foto3' => 'imagemAgressor3',
+            'foto4' => 'imagemAgressor4',
+        ];
+
+        foreach ($camposFotos as $campo => $coluna) {
+            if ($request->hasFile($campo)) {
+                $dados[$coluna] = $request->file($campo)->store('agressores', 'public');
+            }
         }
 
         return $dados;

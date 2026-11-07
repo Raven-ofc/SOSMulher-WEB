@@ -125,4 +125,7 @@ Route::prefix('administracao')->name('admin.')->group(function () {
     Route::get('perfil/editar', [PerfilController::class, 'editar'])->name('perfil.editar');
     Route::patch('perfil', [PerfilController::class, 'atualizar'])->name('perfil.atualizar');
     Route::get('perfil/foto', [PerfilController::class, 'foto'])->name('perfil.foto');
+
+    /* ------------------------------ Violações ------------------------------ */
+    Route::get('violacoes', [MapaController::class, 'violacoes'])->name('violacoes.visualizar');
 });

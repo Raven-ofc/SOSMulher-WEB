@@ -38,7 +38,7 @@
                     <th>Perímetro / alerta</th>
                     <th>Risco</th>
                     <th>Status</th>
-                    <th>Vizualizar</th>
+                    <th>Abrir</th>
                 </tr>
             </thead>
             <tbody>

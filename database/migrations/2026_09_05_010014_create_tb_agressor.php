@@ -13,7 +13,10 @@ return new class extends Migration
     {
         Schema::create('tbagressor', function (Blueprint $table) {
             $table->id();
-            $table->string('imagemAgressor', 255)->nullable() ;
+            $table->string('imagemAgressor1', 255)->nullable() ;
+            $table->string('imagemAgressor2', 255)->nullable() ;
+            $table->string('imagemAgressor3', 255)->nullable() ;
+            $table->string('imagemAgressor4', 255)->nullable() ;
             $table->string('nomeAgressor', 100);
             $table->string('cpfAgressor', 14)->unique();
             $table->string('logradouroAgressor', 255);

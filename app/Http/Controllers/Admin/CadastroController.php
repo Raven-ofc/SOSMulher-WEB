@@ -172,27 +172,42 @@ class CadastroController extends Controller
 
         // 3) Agressor (já com a tornozeleira atribuída) ------------------------
         $agressor = new TbAgressor;
-        $agressor->forceFill([
-            'imagemAgressor' => $request->hasFile('agressor.foto') ? $request->file('agressor.foto')->store('agressores', 'public') : null,
-            'nomeAgressor' => $a['nome'],
-            'cpfAgressor' => $a['cpf'],
-            'dataNascimentoAgressor' => $a['data_nascimento'],
-            'nomeMaeAgressor' => $a['nome_mae'],
-            'nomePaiAgressor' => $a['nome_pai'] ?? null,
-            'telefoneAgressor' => $a['telefone'],
-            'emailAgressor' => $a['email'] ?? null,
-            'cepAgressor' => $a['cep'],
-            'logradouroAgressor' => $a['rua'],
-            'numLogradouroAgressor' => $a['numero'],
-            'bairroAgressor' => $a['bairro'],
-            'cidadeAgressor' => $a['cidade'],
-            'ufAgressor' => $a['uf'],
-            'complementoAgressor' => $a['complemento'] ?? null,
-            'latitudeAgressor' => $a['latitude'] ?? null,
-            'longitudeAgressor' => $a['longitude'] ?? null,
-            'statusAgressor' => 'Monitorado',
-            'idTornozeleira' => $tornozeleira->id,
-        ])->save();
+
+        $imagensAgressor = [];
+
+        $camposFotos = [
+            'foto'  => 'imagemAgressor1',
+            'foto2' => 'imagemAgressor2',
+            'foto3' => 'imagemAgressor3',
+            'foto4' => 'imagemAgressor4',
+        ];
+
+        foreach ($camposFotos as $campo => $coluna) {
+            $imagensAgressor[$coluna] = $request->hasFile("agressor.$campo")
+                ? $request->file("agressor.$campo")->store('agressores', 'public')
+                : null;
+        }
+
+        $agressor->forceFill(array_merge($imagensAgressor, [
+                    'nomeAgressor' => $a['nome'],
+                    'cpfAgressor' => $a['cpf'],
+                    'dataNascimentoAgressor' => $a['data_nascimento'],
+                    'nomeMaeAgressor' => $a['nome_mae'],
+                    'nomePaiAgressor' => $a['nome_pai'] ?? null,
+                    'telefoneAgressor' => $a['telefone'],
+                    'emailAgressor' => $a['email'] ?? null,
+                    'cepAgressor' => $a['cep'],
+                    'logradouroAgressor' => $a['rua'],
+                    'numLogradouroAgressor' => $a['numero'],
+                    'bairroAgressor' => $a['bairro'],
+                    'cidadeAgressor' => $a['cidade'],
+                    'ufAgressor' => $a['uf'],
+                    'complementoAgressor' => $a['complemento'] ?? null,
+                    'latitudeAgressor' => $a['latitude'] ?? null,
+                    'longitudeAgressor' => $a['longitude'] ?? null,
+                    'statusAgressor' => 'Monitorado',
+                    'idTornozeleira' => $tornozeleira->id,
+                ]))->save();
 
         // 4) Medida protetiva ---------------------------------------------------
         $medida = new TbMedida;
@@ -253,26 +268,58 @@ class CadastroController extends Controller
         };
     }
 
-    private function regrasPessoa(string $p, string $tabela, string $colunaCpf, bool $comEmail): array
-    {
-        return [
-            "$p.foto" => ['nullable', 'image', 'max:5120'],
+    private function regrasPessoa(string $p,string $tabela,string $colunaCpf,bool $comEmail): array {
+
+        $regras = [
+            "$p.foto" => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120'
+            ],
+
             "$p.nome" => ['required', 'string', 'max:100', 'regex:/^\S+(\s+\S+)+$/u'],
             "$p.cpf" => ['required', 'string', new Cpf, Rule::unique($tabela, $colunaCpf)],
             "$p.data_nascimento" => ['required', 'date_format:Y-m-d', 'after:1900-01-01', 'before_or_equal:today'],
+
             "$p.nome_mae" => ['required', 'string', 'max:100'],
+
             "$p.nome_pai" => ['nullable', 'string', 'max:100'],
+
             "$p.telefone" => ['required', 'string', 'regex:/^\(\d{2}\) \d{4,5}-\d{4}$/'],
+
             "$p.cep" => ['required', 'string', 'regex:/^\d{5}-\d{3}$/'],
+
             "$p.rua" => ['required', 'string', 'max:150'],
+
             "$p.numero" => ['required', 'string', 'max:20'],
+
             "$p.bairro" => ['required', 'string', 'max:100'],
+
             "$p.cidade" => ['required', 'string', 'max:100'],
+
             "$p.uf" => ['required', 'string', Rule::in(Formatos::UFS)],
+
             "$p.complemento" => ['nullable', 'string', 'max:100'],
+
             "$p.latitude" => ['nullable', 'numeric', 'between:-90,90'],
+
             "$p.longitude" => ['nullable', 'numeric', 'between:-180,180'],
         ];
+
+        // Somente o agressor possui quatro imagens.
+        if ($p === 'agressor') {
+            foreach (['foto2', 'foto3', 'foto4'] as $campo) {
+                $regras["$p.$campo"] = [
+                    'nullable',
+                    'image',
+                    'mimes:jpg,jpeg,png,webp',
+                    'max:5120'
+                ];
+            }
+        }
+
+        return $regras;
     }
 
     private function regrasTornozeleira(array $dados): array

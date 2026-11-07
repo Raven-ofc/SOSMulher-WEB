@@ -42,7 +42,7 @@
     {{-- ============================ 1. VÍTIMA ============================ --}}
     <section data-fase="vitima" aria-labelledby="titulo-vitima">
         <h2 class="fase-titulo" id="titulo-vitima">1. Dados da vítima</h2>
-        @include('parciais.campos-pessoa', ['prefixo' => 'vitima', 'emailObrigatorio' => true, 'ufs' => $ufs])
+        @include('parciais.campos-pessoa', ['prefixo' => 'vitima', 'emailObrigatorio' => true, 'ufs' => $ufs, 'multiplasFotos' => false])
         <div class="fase-acoes">
             <a class="botao-secundario" href="{{ route('admin.vitimas.index') }}">Cancelar</a>
             <button type="button" class="victim-primary" data-proximo>Próximo: Agressor →</button>
@@ -52,7 +52,12 @@
     {{-- ============================ 2. AGRESSOR ============================ --}}
     <section data-fase="agressor" aria-labelledby="titulo-agressor" hidden>
         <h2 class="fase-titulo" id="titulo-agressor">2. Dados do agressor</h2>
-        @include('parciais.campos-pessoa', ['prefixo' => 'agressor', 'emailObrigatorio' => false, 'ufs' => $ufs])
+        @include('parciais.campos-pessoa', [
+            'prefixo' => 'agressor',
+            'emailObrigatorio' => false,
+            'ufs' => $ufs,
+            'multiplasFotos' => true
+        ])
         <div class="fase-acoes">
             <button type="button" class="botao-secundario" data-anterior>← Voltar</button>
             <button type="button" class="victim-primary" data-proximo>Próximo: Tornozeleira →</button>

@@ -9,7 +9,10 @@ class TbAgressor extends Model
     protected $table = 'tbagressor';
 
     protected $fillable = [
-        'imagemAgressor',
+        'imagemAgressor1',
+        'imagemAgressor2',
+        'imagemAgressor3',
+        'imagemAgressor4',
         'nomeAgressor',
         'cpfAgressor',
         'nomeMaeAgressor',
