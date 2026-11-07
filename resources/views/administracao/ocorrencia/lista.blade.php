@@ -53,8 +53,7 @@
                     <th>Local</th>
                     <th>Bairro</th>
                     <th>Status</th>
-                    <th>Vizualizar</th>
-                    </th>
+                    <th>Abrir</th>
                 </tr>
             </thead>
             <tbody>

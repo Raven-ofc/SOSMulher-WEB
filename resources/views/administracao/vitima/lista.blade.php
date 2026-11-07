@@ -46,11 +46,11 @@
                 <thead>
                     <tr>
                         <th>Nome</th>
-                        <th>CPF</th>
-                        <th>Telefone</th>
                         <th>E-mail</th>
+                        <th>CPF</th>
+                        <!-- <th>Telefone</th> -->
                         <th>Status</th>
-                        <th>Vizualizar</th>
+                        <th>Abrir</th>
                     </tr>
                 </thead>
 
@@ -58,9 +58,9 @@
                     @forelse($vitimas as $vitima)
                         <tr>
                             <td>{{ $vitima->nomeVitima }}</td>
-                            <td>{{ $vitima->cpfVitima }}</td>
-                            <td>{{ $vitima->telefones->first()?->numeroTelefoneVitima ?? '—' }}</td>
                             <td>{{ $vitima->emailVitima }}</td>
+                            <td>{{ $vitima->cpfVitima }}</td>
+                            <!-- <td>{{ $vitima->telefones->first()?->numeroTelefoneVitima ?? '—' }}</td> -->
                             <td>{{ ucfirst($vitima->statusVitima) }}</td>
                             <td>
                             <a href="{{ route('admin.vitimas.visualizar', $vitima->id) }}" class="btn-visualizar" title="Visualizar ocorrência" aria-label="Visualizar ocorrência">

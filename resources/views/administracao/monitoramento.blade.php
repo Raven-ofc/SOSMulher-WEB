@@ -38,6 +38,7 @@
             <label class="opcao"><input type="checkbox" id="c-ocorrencias" checked> <i class="ponto ponto-ocorrencia"></i> Ocorrências</label>
             <label class="opcao"><input type="checkbox" id="c-tornozeleiras" checked> <i class="ponto ponto-tornozeleira"></i> Tornozeleiras</label>
             <label class="opcao"><input type="checkbox" id="c-vitimas"> <i class="ponto ponto-vitima"></i> Vítimas (última localização)</label>
+            <label class="opcao"><input type="checkbox" id="c-violacoes"> <i class="ponto ponto-violacao"></i> Violações</label>
         </div>
 
         <ul class="legenda-status legenda-mapa" aria-label="Cores das ocorrências">

@@ -9,6 +9,7 @@
       ufs       lista de UFs
 --}}
 @php
+    $multiplasFotos = $multiplasFotos ?? false;
     $prefixo = $prefixo ?? null;
     $valores = $valores ?? [];
     $edicao = $edicao ?? false;
@@ -25,7 +26,37 @@
     <fieldset class="bloco">
         <legend class="bloco-titulo">Dados pessoais</legend>
 
-        @include('parciais.foto-upload', ['id' => $i('foto'), 'name' => $n('foto'), 'atual' => $valores['foto_url'] ?? null, 'erro' => $e('foto')])
+        @if($multiplasFotos ?? false)
+
+            <div class="fotos-grade">
+
+                @foreach([1, 2, 3, 4] as $numero)
+
+                    @php
+                        $campo = $numero === 1 ? 'foto' : 'foto' . $numero;
+                    @endphp
+
+                    @include('parciais.foto-upload', [
+                        'id' => $i($campo),
+                        'name' => $n($campo),
+                        'atual' => $valores[$campo . '_url'] ?? null,
+                        'erro' => $e($campo)
+                    ])
+
+                @endforeach
+
+            </div>
+
+        @else
+
+            @include('parciais.foto-upload', [
+                'id' => $i('foto'),
+                'name' => $n('foto'),
+                'atual' => $valores['foto_url'] ?? null,
+                'erro' => $e('foto')
+            ])
+
+        @endif
 
         @include('parciais.campo', ['id' => $i('nome'), 'name' => $n('nome'), 'label' => 'Nome completo', 'value' => $v('nome'), 'obrigatorio' => true,
             'erro' => $e('nome'), 'attrs' => 'maxlength="100" data-tipo="nomecompleto" placeholder="Nome e sobrenome" autocomplete="off"'])

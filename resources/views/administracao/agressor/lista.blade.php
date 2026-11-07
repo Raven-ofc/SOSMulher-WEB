@@ -26,7 +26,7 @@
                     <th>Bairro</th>
                     <th>Tornozeleira</th>
                     <th>Status</th>
-                    <th>Vizualizar</th>
+                    <th>Abrir</th>
                 </tr>
             </thead>
             <tbody>

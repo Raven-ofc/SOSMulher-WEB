@@ -25,6 +25,7 @@ class MapaController extends Controller
             'ocorrencias' => $this->ocorrencias(),
             'tornozeleiras' => $this->tornozeleiras(),
             'vitimas' => $this->vitimas(),
+            'violacoes' => $this->violacoes(),
         ];
 
         $resumo = [
@@ -138,5 +139,33 @@ class MapaController extends Controller
                 'url' => route('admin.vitimas.visualizar', $l->idVitima),
             ];
         })->values()->all();
+    }
+
+    private function violacoes(): array
+    {
+        $ultimas = TbAlerta::with('violacao')
+            ->orderByDesc('dataHoraAlerta')
+            ->get()
+            ->unique('idTornozeleira');
+
+        return $ultimas->map(function (TbAlerta $a) {
+            $v = $a->violacao;
+            if (!$v) {
+                return null;
+            }
+
+            return [
+                'id' => $v->id,
+                'titulo' => 'Violação de tornozeleira',
+                'agressor' => $v->agressor?->nomeAgressor ?? 'Agressor desconhecido',
+                'bairro' => $v->agressor?->bairroAgressor,
+                'cep' => $v->agressor?->cepAgressor,
+                'regiao' => Regiao::deLocal($v->agressor?->bairroAgressor, $v->agressor?->cepAgressor),
+                'data' => Carbon::parse($a->dataHoraAlerta)->format('d/m/Y H:i'),
+                'lat' => (float) $a->latitudeAlerta,
+                'lng' => (float) $a->longitudeAlerta,
+                'url' => route('admin.violacoes.visualizar', $a->id),
+            ];
+        })->filter()->values()->all();
     }
 }
