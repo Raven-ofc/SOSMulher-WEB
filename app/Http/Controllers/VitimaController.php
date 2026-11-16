@@ -13,9 +13,11 @@ use App\Models\tbAlerta;
 use App\Models\tbLocalizacaoTornozeleira;
 use App\Models\tblocalizacaoVitima;
 use App\Models\TbMedida as ModelsTbMedida;
+use App\Models\TbOcorrencia;
 use App\Models\TbVitima as ModelsTbVitima;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Fluent\Concerns\Has;
@@ -82,37 +84,39 @@ class VitimaController extends Controller
         return $endereco;
     }
 
-    public function localAgressorVitimaAPI(string $id){
+    public function localAgressorVitimaAPI(string $id)
+    {
         $vitima = tbvitima::with([
-            'medidas.agressor.tornozeleira.localizacoes'
+            'medidas.agressor.tornozeleira'
         ])->findOrFail($id);
 
         $localizacoes = $vitima->medidas->map(function ($medida) {
             $agressor = $medida->agressor;
             $tornozeleira = $agressor?->tornozeleira;
-            if(!$tornozeleira){
+            if (!$tornozeleira) {
                 return null;
             }
             return [
                 'idAgressor' => $agressor->id,
                 'idMedida' => $medida->id,
-                'idAutoridade'=> $medida->idAutoridade,
+                'idAutoridade' => $medida->idAutoridade,
                 'nomeAgressor' => $agressor->nomeAgressor,
                 'distanciaMedida' => $medida->distanciaMedida,
                 'raioAlertaMedida' => $medida->raioAlertaMedida,
-                'latitude'=> $tornozeleira->localizacoes->first()?->latitudeLocalizacao,
-                'longitude'=> $tornozeleira->localizacoes->first()?->longitudeLocalizacao,
-                'dataHora'=> $tornozeleira->localizacoes->first()?->dataHoraLocalizacao,
+                'latitude' => $tornozeleira->localizacoes->first()?->latitudeLocalizacao,
+                'longitude' => $tornozeleira->localizacoes->first()?->longitudeLocalizacao,
+                'dataHora' => $tornozeleira->localizacoes->first()?->dataHoraLocalizacao,
             ];
         })->filter()->values();
 
         return response()->json([
-            'idVitima'=> $vitima->id,
-            'localizacoesAgressor'=>$localizacoes,
+            'idVitima' => $vitima->id,
+            'localizacoesAgressor' => $localizacoes,
         ], 200);
     }
 
-    public function registrarAlertaLimiteAPI(Request $request, string $idmedida){
+    public function registrarAlertaLimiteAPI(Request $request, string $idmedida)
+    {
         return DB::transaction(function () use ($request, $idmedida) {
             $medida = tbMedida::findOrfail($idmedida);
 
@@ -121,11 +125,11 @@ class VitimaController extends Controller
             $violacao->tipoViolacao = 'Invasão de zona de exclusão';
             $violacao->descricaoViolacao = $request->descricaoViolacao;
             $violacao->statusViolacao = 'Em análise';
-            $violacao->latitudeViolacao= $request->latitude;
-            $violacao->longitudeViolacao= $request->longitude;
-            $violacao->dataHoraViolacao= now();
-            $violacao->idmedida= $medida->id;
-            
+            $violacao->latitudeViolacao = $request->latitude;
+            $violacao->longitudeViolacao = $request->longitude;
+            $violacao->dataHoraViolacao = now();
+            $violacao->idmedida = $medida->id;
+
             $violacao->save();
 
             $alerta = new tbAlerta();
@@ -142,12 +146,13 @@ class VitimaController extends Controller
             return response()->json([
                 'mensagem' => 'Violação e alerta enviados à autoridade responsável',
                 'violacao' => $violacao,
-                'alerta'=> $alerta
-            ],201);
+                'alerta' => $alerta
+            ], 201);
         });
     }
 
-    public function registrarAlertaPanicoAPI(Request $request, string $idmedida){
+    public function registrarAlertaPanicoAPI(Request $request, string $idmedida)
+    {
         return DB::transaction(function () use ($request, $idmedida) {
             $medida = tbMedida::findOrfail($idmedida);
 
@@ -156,12 +161,65 @@ class VitimaController extends Controller
             $violacao->tipoViolacao = $request->tipoViolacao;
             $violacao->descricaoViolacao = $request->descricaoViolacao;
             $violacao->statusViolacao = 'Em análise';
-            $violacao->latitudeViolacao= $request->latitudeViolacao;
-            $violacao->longitudeViolacao= $request->longitudeViolacao;
-            $violacao->dataHoraViolacao= now();
-            $violacao->idmedida= $medida->id;
-            
+            $violacao->latitudeViolacao = $request->latitudeViolacao;
+            $violacao->longitudeViolacao = $request->longitudeViolacao;
+            $violacao->dataHoraViolacao = now();
+            $violacao->idmedida = $medida->id;
+
             $violacao->save();
+
+            $response = Http::withHeaders([
+                'User-Agent' => 'SOSMulher/1.0'
+            ])->get('https://nominatim.openstreetmap.org/reverse', [
+                'format' => 'jsonv2',
+                'lat' => $request->latitudeViolacao,
+                'lon' => $request->longitudeViolacao,
+                'addressdetails' => 1,
+            ]);
+
+            $endereco = $response->successful()
+                ? $response->json('address', [])
+                : [];
+
+            $bairro = $endereco['suburb']
+                ?? $endereco['neighbourhood']
+                ?? $endereco['quarter']
+                ?? null;
+
+            $cep = $endereco['postcode'] ?? null;
+
+            $logradouro = $endereco['road'] ?? null;
+            $numero = $endereco['house_number'] ?? null;
+
+            $cidade = $endereco['city']
+                ?? $endereco['town']
+                ?? $endereco['municipality']
+                ?? null;
+
+            $local = implode(', ', array_filter([
+                $logradouro && $numero
+                    ? "$logradouro, $numero"
+                    : $logradouro,
+                $bairro,
+                $cidade
+            ]));
+
+            $ocorrencia = new TbOcorrencia();
+
+            $ocorrencia->dataOcorrencia = now()->toDateString();
+            $ocorrencia->dataHoraOcorrencia = now();
+            $ocorrencia->descricaoOcorrencia = $request->descricaoViolacao;
+            $ocorrencia->tipoOcorrencia = $request->tipoViolacao;
+            $ocorrencia->gravidadeOcorrencia = 'media';
+            $ocorrencia->statusAtendimento = 'aberta';
+            $ocorrencia->bairroOcorrencia = $bairro;
+            $ocorrencia->cep = $cep;
+            $ocorrencia->localOcorrencia = $local ?: 'Logradouro não identificado';
+            $ocorrencia->idVitima = $medida->idVitima;
+            $ocorrencia->idAgressor = $medida->idAgressor;
+            $ocorrencia->idAutoridade = $medida->idAutoridade;
+
+            $ocorrencia->save();
 
             $alerta = new tbAlerta();
 
@@ -177,8 +235,8 @@ class VitimaController extends Controller
             return response()->json([
                 'mensagem' => 'Violação e alerta enviados à autoridade responsável',
                 'violacao' => $violacao,
-                'alerta'=> $alerta
-            ],201);
+                'alerta' => $alerta
+            ], 201);
         });
     }
 
@@ -204,7 +262,7 @@ class VitimaController extends Controller
         if ($telefoneVitima) {
             $telefoneVitima->update([
                 'numerotelefonevitima' =>
-                    $validarDados['numeroTelefone']
+                $validarDados['numeroTelefone']
                     ?? $telefoneVitima->numerotelefonevitima,
             ]);
         } elseif (!empty($validarDados['numeroTelefone'])) {

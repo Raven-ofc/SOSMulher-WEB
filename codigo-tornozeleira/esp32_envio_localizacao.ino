@@ -16,7 +16,7 @@ const char* password = "***REMOVIDO***";
 
 // Troque SEU_IP pelo IP da maquina rodando "php artisan serve --host=0.0.0.0"
 // e o "1" pelo id da tornozeleira cadastrada na tabela tbtornozeleira
-const char* apiUrl = "http://***REMOVIDO***.7:8000/api/tornozeleiras/1/localizacoes";
+const char* apiUrl = "http://seuip:8000/api/tornozeleiras/1/localizacoes";
 
 // Intervalo minimo entre envios (20 segundos), pra nao mandar a cada sentenca NMEA
 const unsigned long INTERVALO_ENVIO = 20000;

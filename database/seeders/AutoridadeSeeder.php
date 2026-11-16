@@ -17,10 +17,10 @@ class AutoridadeSeeder extends Seeder
         DB::table('tbautoridade')->insert([
             [
                 'id' => 1,
-                'nomeAutoridade' => 'Raven',
+                'nomeAutoridade' => 'Carlos Nobrega Valente',
                 'imagemAutoridade' => 'iaciasi.png',
-                'emailAutoridade' => 'raven.oficial.tcc@gmail.com',
-                'cpfAutoridade' => '123.456.789-00',
+                'emailAutoridade' => 'carlos.nv@gmail.com',
+                'cpfAutoridade' => '529.982.247-25',
                 'matriculaAutoridade' => '123456789',
                 'cargoAutoridade' => 'Administrador',
                 'unidadeAutoridade' => 'Unidade Administrativa',

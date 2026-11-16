@@ -29,9 +29,6 @@
             <label for="name">Nome completo</label>
             <input id="name" name="nome" required maxlength="100" value="{{ old('nome', auth()->user()->nomeAutoridade) }}">
 
-            <label for="cpf">CPF</label>
-            <input id="cpf" name="cpf" type="text" inputmode="numeric" readonly value="{{ auth()->user()->cpfAutoridade }}">
-
             <label for="phone">Telefone</label>
             <input id="phone" name="telefone" type="tel" inputmode="numeric" maxlength="15" value="{{ old('telefone', optional($telefone)->numTelefoneAutoridade) }}">
         </div>
