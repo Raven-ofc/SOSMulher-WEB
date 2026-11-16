@@ -7,8 +7,8 @@
 // WIFI
 // ========================================
 
-const char* ssid     = "Bob";
-const char* password = "***REMOVIDO***";
+const char* ssid     = "";
+const char* password = "";
 
 // ========================================
 // API
