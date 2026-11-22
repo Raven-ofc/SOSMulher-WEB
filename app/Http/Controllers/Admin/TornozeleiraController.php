@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\TbTornozeleira;
 use Illuminate\Validation\Rule;
+use App\Models\TbLocalizacaoTornozeleira;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Lista, detalhes e edição de tornozeleiras.
@@ -83,4 +85,22 @@ class TornozeleiraController extends BaseCrudController
     {
         return $registro->agressor()->exists();
     }
+
+    protected function dadosExtrasVisualizacao(Model $registro): array
+    {
+        $localizacao = TbLocalizacaoTornozeleira::where(
+            'idTornozeleira',
+            $registro->id
+        )
+            ->whereNotNull('latitudeLocalizacao')
+            ->whereNotNull('longitudeLocalizacao')
+            ->orderByDesc('dataHoraLocalizacao')
+            ->orderByDesc('id')
+            ->first();
+
+        return [
+            'localizacao' => $localizacao,
+        ];
+    }
+
 }

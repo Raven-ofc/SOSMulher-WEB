@@ -1,5 +1,5 @@
 <aside class="admin-sidebar" id="menu-principal" aria-label="Menu principal">
-    <a class="admin-brand" href="{{ route('admin.painel') }}" aria-label="Página inicial"><img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher"></a>
+    <a class="admin-brand" href="{{ route('admin.painel') }}" aria-label="Página inicial"><img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher"><h1 class="admin-brand-name">SOS Mulher</h1></a>
     <nav class="admin-nav">
         <a href="{{ route('admin.painel') }}" class="admin-nav-item {{ request()->routeIs('admin.painel') ? 'is-active' : '' }}" @if(request()->routeIs('admin.painel')) aria-current="page" @endif>
             @include('parciais.icone', ['name' => 'home'])

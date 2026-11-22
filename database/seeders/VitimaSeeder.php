@@ -16,7 +16,7 @@ class VitimaSeeder extends Seeder
                 'nomeVitima' => 'Maria da Penha',
                 'senhaVitima' => Hash::make('123456'),
                 'cpfVitima' => '113.402.006-00',
-                'emailVitima' => 'MariaPn@gmail.com',
+                'emailVitima' => 'mariapn757@gmail.com',
                 'dataNascimentoVitima' => '1945-02-01',
                 'nomeMaeVitima' => 'Francisca da Penha',
                 'nomePaiVitima' => 'Manuel do Nascimento',

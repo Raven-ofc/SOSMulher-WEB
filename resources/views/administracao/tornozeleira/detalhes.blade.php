@@ -95,6 +95,47 @@
 
     </section>
 
+    <section
+    class="admin-panel device-card"
+    aria-label="Mapa da tornozeleira"
+    >
+        <header>
+            <h2>Localização do equipamento</h2>
+        </header>
+
+        @if($localizacao)
+            <div
+                id="mapa-tornozeleira"
+                class="device-map"
+                data-latitude="{{ $localizacao->latitudeLocalizacao }}"
+                data-longitude="{{ $localizacao->longitudeLocalizacao }}"
+            ></div>
+
+            <p class="mapa-atualizacao">
+                Última atualização:
+                {{ \Carbon\Carbon::parse($localizacao->dataHoraLocalizacao)->format('d/m/Y H:i:s') }}
+            </p>
+        @else
+            <div class="mapa-sem-localizacao">
+                <p>
+                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                    Não há localização registrada para esta tornozeleira.
+                </p>
+            </div>
+        @endif
+    </section>
+
 </div>
+
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+></script>
+
+<script src="{{ asset('js/tornozeleira-detalhes.js') }}"></script>
 
 @endsection

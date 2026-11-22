@@ -28,6 +28,11 @@ Route::prefix('administracao')->name('admin.')->group(function () {
 
     /* ------------------------------ Mapa de monitoramento ------------------------------ */
     Route::get('/monitoramento', [MapaController::class, 'index'])->name('monitoramento');
+    Route::get(
+        '/monitoramento/tornozeleiras/{tornozeleira}/vitimas',
+        [MapaController::class, 'vitimasDaTornozeleira']
+    )->whereNumber('tornozeleira')
+    ->name('monitoramento.tornozeleira.vitimas');
 
     /* ------------------------------ Cadastro unificado em fases ------------------------------ */
     // vítima > agressor > tornozeleira > medida protetiva

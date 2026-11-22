@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('complementoAgressor', 100)->nullable();
             $table->date('dataNascimentoAgressor');
             $table->string('statusAgressor', 30);
-            $table->foreignId('idTornozeleira')->unique()->constrained('tbtornozeleira')->onDelete('cascade');
+            $table->foreignId('idTornozeleira')->nullable()->unique()->constrained('tbtornozeleira')->nullOnDelete();            
             $table->timestamps();
         });
     }

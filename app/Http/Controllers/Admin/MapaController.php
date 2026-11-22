@@ -24,8 +24,6 @@ class MapaController extends Controller
         $pontos = [
             'ocorrencias' => $this->ocorrencias(),
             'tornozeleiras' => $this->tornozeleiras(),
-            'vitimas' => $this->vitimas(),
-            'violacoes' => $this->violacoes(),
         ];
 
         $resumo = [
@@ -33,7 +31,8 @@ class MapaController extends Controller
             'tornozeleirasOnline' => collect($pontos['tornozeleiras'])->where('online', true)->count(),
             'ocorrenciasHoje' => TbOcorrencia::whereDate('dataOcorrencia', today())->count(),
             'ocorrenciasAbertas' => TbOcorrencia::where('statusAtendimento', TbOcorrencia::STATUS_ABERTA)->count(),
-        ];
+            'localizacoesVitimas' => TbLocalizacaoVitima::count(),
+            ];
 
         $alertas = TbAlerta::with('violacao')->orderByDesc('dataHoraAlerta')->limit(6)->get();
 
@@ -110,6 +109,8 @@ class MapaController extends Controller
                     'lat' => (float) $loc->latitudeLocalizacao,
                     'lng' => (float) $loc->longitudeLocalizacao,
                     'url' => route('admin.tornozeleiras.visualizar', $tz->id),
+                    'urlVitimas' => route('admin.monitoramento.tornozeleira.vitimas',$tz->id
+                ),
                 ];
             })
             ->filter()
@@ -117,55 +118,60 @@ class MapaController extends Controller
             ->all();
     }
 
-    private function vitimas(): array
+
+    public function vitimasDaTornozeleira(int $tornozeleira)
     {
-        $ultimas = TbLocalizacaoVitima::with('vitima.endereco')
+        // 1. Identifica o agressor vinculado à tornozeleira.
+        $agressor = TbAgressor::where('idTornozeleira', $tornozeleira)
+            ->firstOrFail();
+
+        // 2. Busca a ocorrência mais recente desse agressor.
+        $ocorrencia = TbOcorrencia::where('idAgressor', $agressor->getKey())
+            ->orderByDesc('dataHoraOcorrencia')
+            ->orderByDesc('id')
+            ->first();
+
+        // Não existe ocorrência ou vítima associada.
+        if (!$ocorrencia || !$ocorrencia->idVitima) {
+            return response()->json([]);
+        }
+
+        // 3. Recupera a última localização da vítima dessa ocorrência.
+        $localizacao = TbLocalizacaoVitima::with('vitima.endereco')
+            ->where('idVitima', $ocorrencia->idVitima)
             ->orderByDesc('dataHoraLocalizacao')
-            ->get()
-            ->unique('idVitima');
+            ->first();
 
-        return $ultimas->map(function (TbLocalizacaoVitima $l) {
-            $endereco = $l->vitima?->endereco;
+        if (
+            !$localizacao ||
+            !$localizacao->vitima ||
+            $localizacao->latitudeLocalizacao === null ||
+            $localizacao->longitudeLocalizacao === null
+        ) {
+            return response()->json([]);
+        }
 
-            return [
-                'id' => $l->idVitima,
-                'titulo' => $l->vitima?->nomeVitima ?? 'Vítima',
+        $vitima = $localizacao->vitima;
+        $endereco = $vitima->endereco;
+
+        return response()->json([
+            [
+                'id' => $vitima->getKey(),
+                'titulo' => $vitima->nomeVitima,
                 'bairro' => $endereco?->bairroVitima,
                 'cep' => $endereco?->cepVitima,
-                'regiao' => Regiao::deLocal($endereco?->bairroVitima, $endereco?->cepVitima),
-                'data' => Carbon::parse($l->dataHoraLocalizacao)->format('d/m/Y H:i'),
-                'lat' => (float) $l->latitudeLocalizacao,
-                'lng' => (float) $l->longitudeLocalizacao,
-                'url' => route('admin.vitimas.visualizar', $l->idVitima),
-            ];
-        })->values()->all();
+                'regiao' => Regiao::deLocal(
+                    $endereco?->bairroVitima,
+                    $endereco?->cepVitima
+                ),
+                'data' => Carbon::parse(
+                    $localizacao->dataHoraLocalizacao
+                )->format('d/m/Y H:i'),
+                'lat' => (float) $localizacao->latitudeLocalizacao,
+                'lng' => (float) $localizacao->longitudeLocalizacao,
+            ]
+        ]);
     }
 
-    private function violacoes(): array
-    {
-        $ultimas = TbAlerta::with('violacao')
-            ->orderByDesc('dataHoraAlerta')
-            ->get()
-            ->unique('idTornozeleira');
 
-        return $ultimas->map(function (TbAlerta $a) {
-            $v = $a->violacao;
-            if (!$v) {
-                return null;
-            }
-
-            return [
-                'id' => $v->id,
-                'titulo' => 'Violação de tornozeleira',
-                'agressor' => $v->agressor?->nomeAgressor ?? 'Agressor desconhecido',
-                'bairro' => $v->agressor?->bairroAgressor,
-                'cep' => $v->agressor?->cepAgressor,
-                'regiao' => Regiao::deLocal($v->agressor?->bairroAgressor, $v->agressor?->cepAgressor),
-                'data' => Carbon::parse($a->dataHoraAlerta)->format('d/m/Y H:i'),
-                'lat' => (float) $a->latitudeAlerta,
-                'lng' => (float) $a->longitudeAlerta,
-                'url' => route('admin.violacoes.visualizar', $a->id),
-            ];
-        })->filter()->values()->all();
-    }
 }

@@ -35,10 +35,20 @@ class CadastroController extends Controller
     public function index()
     {
         return view('administracao.cadastro.formulario', [
-            'tornozeleirasDisponiveis' => TbTornozeleira::where('statusTornozeleira', 'Disponível')
-                ->whereDoesntHave('agressor')
-                ->orderBy('numeroSerieTornozeleira')
-                ->get(),
+           'tornozeleirasDisponiveis' => TbTornozeleira::where(function ($query) {
+                // Tornozeleiras que nunca foram atribuídas ou estão livres.
+                $query->where(function ($q) {
+                    $q->where('statusTornozeleira', 'Disponível')
+                    ->whereDoesntHave('agressor');
+                })
+
+                // Tornozeleiras de agressores presos ou inativos.
+                ->orWhereHas('agressor', function ($q) {
+                    $q->whereIn('statusAgressor', ['Preso', 'Inativo']);
+                });
+            })
+            ->orderBy('numeroSerieTornozeleira')
+            ->get(),
             'tiposMedida' => TbMedida::TIPOS,
             'riscos' => TbMedida::RISCOS,
             'ufs' => Formatos::UFS,
@@ -148,11 +158,38 @@ class CadastroController extends Controller
 
         // 2) Tornozeleira (criada/atribuída antes do agressor por causa da chave estrangeira) ----
         if (($t['modo'] ?? 'nova') === 'existente') {
-            $tornozeleira = TbTornozeleira::lockForUpdate()->findOrFail($t['tornozeleira_id']);
 
-            if ($tornozeleira->statusTornozeleira !== 'Disponível' || $tornozeleira->agressor()->exists()) {
+            $tornozeleira = TbTornozeleira::lockForUpdate()
+                ->findOrFail($t['tornozeleira_id']);
+
+            $agressorAntigo = $tornozeleira->agressor()
+                ->lockForUpdate()
+                ->first();
+
+            if ($agressorAntigo) {
+
+                if (!in_array($agressorAntigo->statusAgressor, ['Preso', 'Inativo'], true)) {
+                    throw ValidationException::withMessages([
+                        'tornozeleira.tornozeleira_id' =>
+                            'Esta tornozeleira ainda está vinculada a um agressor que não pode liberá-la.',
+                    ]);
+                }
+
+                // Libera a tornozeleira sem excluir o cadastro antigo.
+                $agressorAntigo->idTornozeleira = null;
+                $agressorAntigo->save();
+
+                AdminAudit::record(
+                    'tbagressor',
+                    $agressorAntigo->id,
+                    'liberacao_tornozeleira'
+                );
+
+            } elseif ($tornozeleira->statusTornozeleira !== 'Disponível') {
+
                 throw ValidationException::withMessages([
-                    'tornozeleira.tornozeleira_id' => 'Esta tornozeleira acabou de ser utilizada. Escolha outra.',
+                    'tornozeleira.tornozeleira_id' =>
+                        'Esta tornozeleira não está disponível para reutilização.',
                 ]);
             }
 
@@ -160,8 +197,12 @@ class CadastroController extends Controller
                 'statusTornozeleira' => 'Ativa',
                 'dataInstalacaoTornozeleira' => $t['dataInstalacao'] ?? now()->toDateString(),
             ])->save();
+
         } else {
+
+            // Cadastro de uma tornozeleira nova.
             $tornozeleira = new TbTornozeleira;
+
             $tornozeleira->forceFill([
                 'numeroSerieTornozeleira' => $t['numeroSerie'],
                 'statusTornozeleira' => 'Ativa',
@@ -169,6 +210,7 @@ class CadastroController extends Controller
                 'bateriaTornozeleira' => 100,
             ])->save();
         }
+
 
         // 3) Agressor (já com a tornozeleira atribuída) ------------------------
         $agressor = new TbAgressor;
@@ -189,25 +231,25 @@ class CadastroController extends Controller
         }
 
         $agressor->forceFill(array_merge($imagensAgressor, [
-                    'nomeAgressor' => $a['nome'],
-                    'cpfAgressor' => $a['cpf'],
-                    'dataNascimentoAgressor' => $a['data_nascimento'],
-                    'nomeMaeAgressor' => $a['nome_mae'],
-                    'nomePaiAgressor' => $a['nome_pai'] ?? null,
-                    'telefoneAgressor' => $a['telefone'],
-                    'emailAgressor' => $a['email'] ?? null,
-                    'cepAgressor' => $a['cep'],
-                    'logradouroAgressor' => $a['rua'],
-                    'numLogradouroAgressor' => $a['numero'],
-                    'bairroAgressor' => $a['bairro'],
-                    'cidadeAgressor' => $a['cidade'],
-                    'ufAgressor' => $a['uf'],
-                    'complementoAgressor' => $a['complemento'] ?? null,
-                    'latitudeAgressor' => $a['latitude'] ?? null,
-                    'longitudeAgressor' => $a['longitude'] ?? null,
-                    'statusAgressor' => 'Monitorado',
-                    'idTornozeleira' => $tornozeleira->id,
-                ]))->save();
+            'nomeAgressor' => $a['nome'],
+            'cpfAgressor' => $a['cpf'],
+            'dataNascimentoAgressor' => $a['data_nascimento'],
+            'nomeMaeAgressor' => $a['nome_mae'],
+            'nomePaiAgressor' => $a['nome_pai'] ?? null,
+            'telefoneAgressor' => $a['telefone'],
+            'emailAgressor' => $a['email'] ?? null,
+            'cepAgressor' => $a['cep'],
+            'logradouroAgressor' => $a['rua'],
+            'numLogradouroAgressor' => $a['numero'],
+            'bairroAgressor' => $a['bairro'],
+            'cidadeAgressor' => $a['cidade'],
+            'ufAgressor' => $a['uf'],
+            'complementoAgressor' => $a['complemento'] ?? null,
+            'latitudeAgressor' => $a['latitude'] ?? null,
+            'longitudeAgressor' => $a['longitude'] ?? null,
+            'statusAgressor' => 'Monitorado',
+            'idTornozeleira' => $tornozeleira->id,
+        ]))->save();
 
         // 4) Medida protetiva ---------------------------------------------------
         $medida = new TbMedida;
@@ -326,21 +368,41 @@ class CadastroController extends Controller
     {
         $modo = $dados['tornozeleira']['modo'] ?? 'nova';
 
-        $regras = ['tornozeleira.modo' => ['required', Rule::in(['nova', 'existente'])]];
+        $regras = [
+            'tornozeleira.modo' => [
+                'required',
+                Rule::in(['nova', 'existente'])
+            ],
+        ];
 
         if ($modo === 'existente') {
+
             $regras['tornozeleira.tornozeleira_id'] = [
                 'required',
-                Rule::exists('tbtornozeleira', 'id')->where('statusTornozeleira', 'Disponível'),
-                Rule::unique('tbagressor', 'idTornozeleira'),
+                Rule::exists('tbtornozeleira', 'id'),
             ];
-            $regras['tornozeleira.dataInstalacao'] = ['required', 'date_format:Y-m-d', 'before_or_equal:today'];
+
+            $regras['tornozeleira.dataInstalacao'] = [
+                'required',
+                'date_format:Y-m-d',
+                'before_or_equal:today'
+            ];
+
         } else {
+
             $regras['tornozeleira.numeroSerie'] = [
-                'required', 'string', 'max:100', 'regex:/^[A-Za-z0-9\-_.]+$/',
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[A-Za-z0-9\\-\_.]+$/',
                 Rule::unique('tbtornozeleira', 'numeroSerieTornozeleira'),
             ];
-            $regras['tornozeleira.dataInstalacao'] = ['required', 'date_format:Y-m-d', 'before_or_equal:today'];
+
+            $regras['tornozeleira.dataInstalacao'] = [
+                'required',
+                'date_format:Y-m-d',
+                'before_or_equal:today'
+            ];
         }
 
         return $regras;
@@ -379,7 +441,7 @@ class CadastroController extends Controller
             'medida.tipos.required' => 'Selecione ao menos um tipo de medida.',
             'medida.tipos.min' => 'Selecione ao menos um tipo de medida.',
             'medida.descricao.min' => 'Descreva a medida com ao menos 10 caracteres.',
-            'tornozeleira.tornozeleira_id.unique' => 'Esta tornozeleira já está vinculada a outro agressor.',
+            
         ];
     }
 
