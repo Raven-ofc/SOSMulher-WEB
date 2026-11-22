@@ -45,9 +45,11 @@
             @endforeach
         </ul>
 
-        <div id="mapa" class="monitoring-map" role="application" aria-label="Mapa com ocorrências e tornozeleiras"></div>
+        <div id="mapa" class="monitoring-map" role="application" aria-label="Mapa com ocorrências e tornozeleiras"
+        data-url-novas="{{ route('admin.monitoramento.novas') }}" data-ultimo-id="{{ $ultimaOcorrenciaId }}"></div>
         <p id="mapa-contagem" class="mapa-contagem" aria-live="polite"></p>
         <script type="application/json" id="dados-mapa">{!! json_encode($pontos, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
+        <div id="toast-ocorrencias" class="toast-area" aria-live="assertive"></div>
     </section>
 
     <aside class="monitoring-side" aria-label="Resumo do monitoramento">
@@ -62,11 +64,11 @@
             </div>
             <div class="admin-stat">
                 <span class="stat-icon red">@include('parciais.icone', ['name' => 'warning'])</span>
-                <div><strong>{{ $resumo['ocorrenciasHoje'] }}</strong><span>Ocorrências hoje</span></div>
+                <div><strong data-resumo="ocorrenciasHoje">{{ $resumo['ocorrenciasHoje'] }}</strong><span>Ocorrências hoje</span></div>
             </div>
             <div class="admin-stat metrica-aberta">
                 <span class="stat-icon red">@include('parciais.icone', ['name' => 'clip'])</span>
-                <div><strong>{{ $resumo['ocorrenciasAbertas'] }}</strong><span>Ocorrências abertas</span></div>
+                <div><strong data-resumo="ocorrenciasAbertas">{{ $resumo['ocorrenciasAbertas'] }}</strong><span>Ocorrências abertas</span></div>
             </div>
         </div>
         <section class="admin-panel admin-alerts">

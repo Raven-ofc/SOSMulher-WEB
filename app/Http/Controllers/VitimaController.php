@@ -132,6 +132,62 @@ class VitimaController extends Controller
 
             $violacao->save();
 
+
+            $response = Http::withHeaders([
+                'User-Agent' => 'SOSMulher/1.0'
+            ])->get('https://nominatim.openstreetmap.org/reverse', [
+                'format' => 'jsonv2',
+                'lat' => $request->latitude,
+                'lon' => $request->longitude,
+                'addressdetails' => 1,
+            ]);
+
+            $endereco = $response->successful()
+                ? $response->json('address', [])
+                : [];
+
+            $bairro = $endereco['suburb']
+                ?? $endereco['neighbourhood']
+                ?? $endereco['quarter']
+                ?? null;
+
+            $cep = $endereco['postcode'] ?? null;
+
+            $logradouro = $endereco['road'] ?? null;
+            $numero = $endereco['house_number'] ?? null;
+
+            $cidade = $endereco['city']
+                ?? $endereco['town']
+                ?? $endereco['municipality']
+                ?? null;
+
+            $local = implode(', ', array_filter([
+                $logradouro && $numero
+                    ? "$logradouro, $numero"
+                    : $logradouro,
+                $bairro,
+                $cidade
+            ]));
+
+            $ocorrencia = new TbOcorrencia();
+
+            $ocorrencia->dataOcorrencia = now()->toDateString();
+            $ocorrencia->dataHoraOcorrencia = now();
+            $ocorrencia->descricaoOcorrencia = $request->descricaoViolacao;
+            $ocorrencia->tipoOcorrencia = 'Invasão de zona de exclusão';
+            $ocorrencia->gravidadeOcorrencia = 'media';
+            $ocorrencia->statusAtendimento = 'aberta';
+            $ocorrencia->bairroOcorrencia = $bairro;
+            $ocorrencia->cep = $cep;
+            $ocorrencia->localOcorrencia = $local ?: 'Logradouro não identificado';
+            $ocorrencia->idVitima = $medida->idVitima;
+            $ocorrencia->latitudeOcorrencia = $request->latitude;
+            $ocorrencia->longitudeOcorrencia = $request->longitude;
+            $ocorrencia->idAgressor = $medida->idAgressor;
+            $ocorrencia->idAutoridade = $medida->idAutoridade;
+
+            $ocorrencia->save();
+
             $alerta = new tbAlerta();
 
             $alerta->tipoAlerta = 'Proximidade crítica';
@@ -151,18 +207,19 @@ class VitimaController extends Controller
         });
     }
 
-    public function registrarAlertaPanicoAPI(Request $request, string $idmedida)
+    public function registrarAlertaPanicoAPI(string $idmedida)
     {
-        return DB::transaction(function () use ($request, $idmedida) {
+        return DB::transaction(function () use ($idmedida) {
             $medida = tbMedida::findOrfail($idmedida);
+            $localizacao = tblocalizacaoVitima::where('idVitima', '=', $medida->idVitima)->first();
 
             $violacao = new tbViolacao();
 
-            $violacao->tipoViolacao = $request->tipoViolacao;
-            $violacao->descricaoViolacao = $request->descricaoViolacao;
+            $violacao->tipoViolacao = 'Botão do Pânico';
+            $violacao->descricaoViolacao = 'Vítima acionou o botão do pânico';
             $violacao->statusViolacao = 'Em análise';
-            $violacao->latitudeViolacao = $request->latitudeViolacao;
-            $violacao->longitudeViolacao = $request->longitudeViolacao;
+            $violacao->latitudeViolacao = $localizacao->latitudeLocalizacao;
+            $violacao->longitudeViolacao = $localizacao->longitudeLocalizacao;
             $violacao->dataHoraViolacao = now();
             $violacao->idmedida = $medida->id;
 
@@ -172,8 +229,102 @@ class VitimaController extends Controller
                 'User-Agent' => 'SOSMulher/1.0'
             ])->get('https://nominatim.openstreetmap.org/reverse', [
                 'format' => 'jsonv2',
-                'lat' => $request->latitudeViolacao,
-                'lon' => $request->longitudeViolacao,
+                'lat' => $localizacao->latitudeLocalizacao,
+                'lon' => $localizacao->longitudeLocalizacao,
+                'addressdetails' => 1,
+            ]);
+
+            $endereco = $response->successful()
+                ? $response->json('address', [])
+                : [];
+
+            $bairro = $endereco['suburb']
+                ?? $endereco['neighbourhood']
+                ?? $endereco['quarter']
+                ?? null;
+
+            $cep = $endereco['postcode'] ?? null;
+
+            $logradouro = $endereco['road'] ?? null;
+            $numero = $endereco['house_number'] ?? null;
+
+            $cidade = $endereco['city']
+                ?? $endereco['town']
+                ?? $endereco['municipality']
+                ?? null;
+
+            $local = implode(', ', array_filter([
+                $logradouro && $numero
+                    ? "$logradouro, $numero"
+                    : $logradouro,
+                $bairro,
+                $cidade
+            ]));
+
+            $ocorrencia = new TbOcorrencia();
+
+            $ocorrencia->dataOcorrencia = now()->toDateString();
+            $ocorrencia->dataHoraOcorrencia = now();
+            $ocorrencia->descricaoOcorrencia = 'Vítima acionou botão do pânico';
+            $ocorrencia->tipoOcorrencia = 'Botão do Pânico';
+            $ocorrencia->gravidadeOcorrencia = 'media';
+            $ocorrencia->statusAtendimento = 'aberta';
+            $ocorrencia->bairroOcorrencia = $bairro;
+            $ocorrencia->cep = $cep;
+            $ocorrencia->latitudeOcorrencia = $localizacao->latitudeLocalizacao;
+            $ocorrencia->longitudeOcorrencia = $localizacao->longitudeLocalizacao;
+            $ocorrencia->localOcorrencia = $local ?: 'Logradouro não identificado';
+            $ocorrencia->idVitima = $medida->idVitima;
+            $ocorrencia->idAgressor = $medida->idAgressor;
+            $ocorrencia->idAutoridade = $medida->idAutoridade;
+
+
+            $ocorrencia->save();
+
+
+            $alerta = new tbAlerta();
+
+            $alerta->tipoAlerta = 'Botão do pânico acionado!';
+            $alerta->descricaoAlerta = 'A vítima apertou o botão do pânico';
+            $alerta->dataHoraAlerta = $violacao->dataHoraViolacao;
+            $alerta->statusAlerta = 'Em andamento';
+            $alerta->idViolacao = $violacao->id;
+            $alerta->idAutoridade = $medida->idAutoridade;
+
+            $alerta->save();
+
+            return response()->json([
+                'mensagem' => 'Violação e alerta enviados à autoridade responsável',
+                'violacao' => $violacao,
+                'alerta' => $alerta
+            ], 201);
+        });
+    }
+
+    public function registrarAlertaBotaoAPI(Request $request, string $idmedida)
+    {
+        return DB::transaction(function () use ($request, $idmedida) {
+            $medida = tbMedida::findOrfail($idmedida);
+            $localizacao = tblocalizacaoVitima::where('idVitima', '=', $medida->idVitima)->first();
+
+            $violacao = new tbViolacao();
+
+            $violacao->tipoViolacao = $request->tipoViolacao;
+            $violacao->descricaoViolacao = $request->descricaoViolacao;
+            $violacao->statusViolacao = 'Em análise';
+            $violacao->latitudeViolacao = $localizacao->latitudeLocalizacao;
+            $violacao->longitudeViolacao = $localizacao->longitudeLocalizacao;
+            $violacao->dataHoraViolacao = now();
+            $violacao->idmedida = $medida->id;
+
+            $violacao->save();
+
+            $response = Http::withHeaders([
+                'User-Agent' => 'SOSMulher/1.0'
+            ])->get('https://nominatim.openstreetmap.org/reverse', [
+                'format' => 'jsonv2',
+                'lat' => $localizacao->latitudeLocalizacao,
+                'lon' => $localizacao->longitudeLocalizacao,
                 'addressdetails' => 1,
             ]);
 
@@ -216,6 +367,8 @@ class VitimaController extends Controller
             $ocorrencia->cep = $cep;
             $ocorrencia->localOcorrencia = $local ?: 'Logradouro não identificado';
             $ocorrencia->idVitima = $medida->idVitima;
+            $ocorrencia->latitudeOcorrencia = $localizacao->latitudeLocalizacao;
+            $ocorrencia->longitudeOcorrencia = $localizacao->longitudeLocalizacao;
             $ocorrencia->idAgressor = $medida->idAgressor;
             $ocorrencia->idAutoridade = $medida->idAutoridade;
 

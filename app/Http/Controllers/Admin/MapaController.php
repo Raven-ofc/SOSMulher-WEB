@@ -32,7 +32,7 @@ class MapaController extends Controller
             'ocorrenciasHoje' => TbOcorrencia::whereDate('dataOcorrencia', today())->count(),
             'ocorrenciasAbertas' => TbOcorrencia::where('statusAtendimento', TbOcorrencia::STATUS_ABERTA)->count(),
             'localizacoesVitimas' => TbLocalizacaoVitima::count(),
-            ];
+        ];
 
         $alertas = TbAlerta::with('violacao')->orderByDesc('dataHoraAlerta')->limit(6)->get();
 
@@ -41,6 +41,7 @@ class MapaController extends Controller
             'resumo' => $resumo,
             'alertas' => $alertas,
             'regioes' => Regiao::todas(),
+            'ultimaOcorrenciaId' => (int) TbOcorrencia::max('id'),
             'statusOcorrencia' => TbOcorrencia::STATUS,
         ]);
     }
@@ -74,7 +75,7 @@ class MapaController extends Controller
                     'url' => route('admin.ocorrencias.visualizar', $o->id),
                 ];
             })
-            ->filter(fn ($p) => $p['lat'] !== null && $p['lng'] !== null)
+            ->filter(fn($p) => $p['lat'] !== null && $p['lng'] !== null)
             ->values()
             ->all();
     }
@@ -109,8 +110,10 @@ class MapaController extends Controller
                     'lat' => (float) $loc->latitudeLocalizacao,
                     'lng' => (float) $loc->longitudeLocalizacao,
                     'url' => route('admin.tornozeleiras.visualizar', $tz->id),
-                    'urlVitimas' => route('admin.monitoramento.tornozeleira.vitimas',$tz->id
-                ),
+                    'urlVitimas' => route(
+                        'admin.monitoramento.tornozeleira.vitimas',
+                        $tz->id
+                    ),
                 ];
             })
             ->filter()
@@ -173,5 +176,56 @@ class MapaController extends Controller
         ]);
     }
 
+    private function pontoDeOcorrencia(TbOcorrencia $o): ?array
+    {
+        $lat = $o->latitudeOcorrencia;
+        $lng = $o->longitudeOcorrencia;
+        if ($lat === null || $lng === null) {
+            [$lat, $lng] = Regiao::centroDoBairro($o->bairroOcorrencia);
+        }
+        if ($lat === null || $lng === null) {
+            return null;
+        }
 
+        return [
+            'id' => $o->id,
+            'titulo' => $o->tipoOcorrencia,
+            'status' => $o->statusAtendimento,
+            'statusRotulo' => $o->statusRotulo(),
+            'classe' => $o->statusClasse(),
+            'gravidade' => $o->gravidadeOcorrencia,
+            'local' => $o->localOcorrencia,
+            'bairro' => $o->bairroOcorrencia,
+            'cep' => $o->cep,
+            'regiao' => Regiao::deLocal($o->bairroOcorrencia, $o->cep),
+            'data' => Carbon::parse($o->dataHoraOcorrencia)->format('d/m/Y H:i'),
+            'lat' => (float) $lat,
+            'lng' => (float) $lng,
+            'url' => route('admin.ocorrencias.visualizar', $o->id),
+        ];
+    }
+
+    public function novasOcorrencias(Request $request)
+    {
+        $depoisDe = (int) $request->query('depois_de', 0);
+
+        $novas = TbOcorrencia::with('vitima:id,nomeVitima')
+            ->where('id', '>', $depoisDe)
+            ->orderBy('id')
+            ->limit(50)
+            ->get();
+
+        return response()->json([
+            // avança o cursor mesmo se alguma ocorrência não tiver coordenadas
+            'ultimoId' => max($depoisDe, (int) $novas->max('id')),
+            'ocorrencias' => $novas
+                ->map(fn(TbOcorrencia $o) => $this->pontoDeOcorrencia($o))
+                ->filter()
+                ->values(),
+            'resumo' => [
+                'ocorrenciasHoje' => TbOcorrencia::whereDate('dataOcorrencia', today())->count(),
+                'ocorrenciasAbertas' => TbOcorrencia::where('statusAtendimento', TbOcorrencia::STATUS_ABERTA)->count(),
+            ],
+        ]);
+    }
 }

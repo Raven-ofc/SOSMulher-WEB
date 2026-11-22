@@ -13,7 +13,7 @@ class VitimaSeeder extends Seeder
         DB::table('tbvitima')->insert([
             [
                 'id' => 1,
-                'nomeVitima' => 'Maria da Penha',
+                'nomeVitima' => 'Maria Pereira Nunes',
                 'senhaVitima' => Hash::make('123456'),
                 'cpfVitima' => '113.402.006-00',
                 'emailVitima' => 'mariapn757@gmail.com',

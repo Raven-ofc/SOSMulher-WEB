@@ -7,6 +7,8 @@ use App\Models\TbAgressor;
 use App\Support\Formatos;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Lista, detalhes e edição de agressores.
@@ -30,6 +32,43 @@ class AgressorController extends BaseCrudController
     protected function statusPermitidos(): array
     {
         return self::STATUS;
+    }
+    public function alterarStatus(Request $request, int $id)
+    {
+        $dados = $request->validate([
+            'status' => ['required', 'string', Rule::in(self::STATUS)]
+        ]);
+
+        DB::transaction(function () use ($id, $dados) {
+
+            $agressor = TbAgressor::lockForUpdate()->findOrFail($id);
+
+            // Verifica se pode ser inativado
+            if (
+                $dados['status'] === 'Inativo' &&
+                $this->temVinculosAtivos($agressor)
+            ) {
+                throw ValidationException::withMessages([
+                    'status' => 'Há vínculos ativos. Resolva antes de inativar.'
+                ]);
+            }
+
+            // Atualiza o status do agressor
+            $agressor->statusAgressor = $dados['status'];
+            $agressor->save();
+
+            // Encerra as medidas protetivas ativas
+            if (in_array($dados['status'], ['Preso', 'Foragido', 'Inativo'], true)) {
+
+                $agressor->medidas()
+                    ->where('statusMedida', 'Ativa')
+                    ->update([
+                        'statusMedida' => 'Encerrada',
+                    ]);
+            }
+        });
+
+        return back()->with('status', 'Status atualizado.');
     }
 
     protected function statusInativo(): string

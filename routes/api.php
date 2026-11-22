@@ -20,8 +20,10 @@ Route::get('/vitima/{email}/{senha}', 'App\Http\Controllers\VitimaController@ind
 Route::get('/endereco/{id}','App\Http\Controllers\VitimaController@enderecoAPI');
 Route::get('/localAgressor/{id}','App\Http\Controllers\VitimaController@localAgressorVitimaAPI');
 Route::put('/atualizarVitima/{id}', 'App\Http\Controllers\VitimaController@AtualizarAPI');
+Route::put('/atualizarSenha/{id}', 'App\Http\Controllers\Admin\VitimaController@alterarSenha');
 Route::post('/Enviar-Violacao/{idmedida}', 'App\Http\Controllers\VitimaController@registrarAlertaLimiteAPI');
-Route::post('/registrarViolacao/{idmedida}', 'App\Http\Controllers\VitimaController@registrarAlertaPanicoAPI');
+Route::post('/Panico-Violacao/{idmedida}', 'App\Http\Controllers\VitimaController@registrarAlertaPanicoAPI');
+Route::post('/registrarViolacao/{idmedida}', 'App\Http\Controllers\VitimaController@registrarAlertaBotaoAPI');
 Route::post('/atualizarImagem/{id}', 'App\Http\Controllers\VitimaController@atualizarImagemAPI');
 Route::post('/recuperarSenha', 'App\Http\Controllers\Admin\VitimaController@recuperarSenhaAPI');
 Route::put('/atualizarLocalizacao/{id}', 'App\Http\Controllers\VitimaController@atualizarLocalizacaoAPI');

@@ -209,8 +209,9 @@ class VitimaController extends BaseCrudController
 
     public function recuperarSenhaAPI(Request $request)
     {
-        $request->validate([
+        $dados = $request->validate([
             'email' => ['required', 'email'],
+            'senha' => ['required', 'string', 'min:8', 'confirmed']
         ]);
 
         $email = strtolower(trim($request->email));
@@ -232,29 +233,37 @@ class VitimaController extends BaseCrudController
             ], 404);
         }
 
-        $senhaTemporaria = Str::random(12);
-
-        $vitima->senhaVitima = Hash::make($senhaTemporaria);
+        $vitima->senhaVitima = Hash::make($dados['senha']);
         $vitima->save();
 
-        try {
-            Mail::to($vitima->emailVitima)->send(
-                new VitimaCadastradaMail(
-                    $vitima->nomeVitima,
-                    $senhaTemporaria
-                )
-            );
-
-            Cache::forget($chave);
-        } catch (\Throwable $erro) {
-            return response()->json([
-                'message' => 'Não foi possível enviar a nova senha.'
-            ], 500);
-        }
+        Cache::forget($chave);
 
         return response()->json([
-            'message' => 'Verifique seu e-mail para receber sua nova senha.'
+            'message' => 'Senha alterada com sucesso!'
         ], 200);
+    }
+
+    public function alterarSenha(Request $request, string $id)
+    {
+        $dados = $request->validate([
+            'senhaAtual' => ['required', 'string'],
+            'senha' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $vitima = TbVitima::findOrFail($id);
+
+        if (!Hash::check($dados['senhaAtual'], $vitima->senhaVitima)) {
+            return response()->json([
+                'message' => 'A senha atual está incorreta.'
+            ], 422);
+        }
+
+        $vitima->senhaVitima = Hash::make($dados['senha']);
+        $vitima->save();
+
+        return response()->json([
+            'message' => 'Senha alterada com sucesso.'
+        ]);
     }
 
     protected function temVinculosAtivos($registro): bool

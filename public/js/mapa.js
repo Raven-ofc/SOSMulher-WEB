@@ -102,6 +102,29 @@
 
         return d;
     }
+    var marcadoresOcorrencia = {};
+
+    function criarMarcadorOcorrencia(p) {
+        var m = L.circleMarker([p.lat, p.lng], {
+            radius: p.gravidade === 'alta' ? 11 : 8,
+            color: '#fff',
+            weight: 2,
+            fillColor: COR_STATUS[p.status] || '#7a4dd8',
+            fillOpacity: 0.95
+        });
+
+        m.bindPopup(popup(p.titulo, [
+            ['Status', p.statusRotulo],
+            ['Gravidade', p.gravidade],
+            ['Quando', p.data],
+            ['Local', p.local],
+            ['Bairro', p.bairro],
+            ['CEP', p.cep],
+            ['Região', p.regiao]
+        ], p.url));
+
+        return m;
+    }
 
     function digitos(v) {
         return String(v || '').replace(/\D/g, '');
@@ -244,13 +267,28 @@
             });
     }
 
-    function desenhar() {
+    function desenhar(opcoes) {
+        var ajustar = !opcoes || opcoes.ajustar !== false
         var limites = [];
 
         var total = {
             ocorrencias: 0,
             tornozeleiras: 0
         };
+        marcadoresOcorrencia = {};
+        Object.keys(camadas).forEach(function (k) { camadas[k].clearLayers(); });
+
+        if (el.chk.ocorrencias.checked) {
+            dados.ocorrencias
+                .filter(function (p) { return passa(p, true); })
+                .forEach(function (p) {
+                    var m = criarMarcadorOcorrencia(p);
+                    marcadoresOcorrencia[p.id] = m;
+                    camadas.ocorrencias.addLayer(m);
+                    limites.push([p.lat, p.lng]);
+                    total.ocorrencias++;
+                });
+        }
 
         Object.keys(camadas).forEach(function (k) {
             camadas[k].clearLayers();
@@ -336,6 +374,10 @@
                 maxZoom: 15
             });
         }
+
+        if (ajustar && limites.length) {
+            mapa.fitBounds(limites, { padding: [40, 40], maxZoom: 15 });
+        }
     }
 
     el.regiao.addEventListener('change', function () {
@@ -351,6 +393,16 @@
         el.chk[k].addEventListener('change', desenhar);
     });
 
+    function limparFiltros() {
+        el.regiao.value = '';
+        el.cep.value = '';
+        el.status.value = '';
+        atualizarBairros();
+        desenhar();
+    }
+
+    el.limpar.addEventListener('click', limparFiltros);
+
     el.limpar.addEventListener('click', function () {
         el.regiao.value = '';
         el.cep.value = '';
@@ -363,6 +415,113 @@
     window.addEventListener('resize', function () {
         mapa.invalidateSize();
     });
+
+    /* ---------- Novas ocorrências ---------- */
+    var URL_NOVAS = caixa.getAttribute('data-url-novas');
+    var ultimoId = parseInt(caixa.getAttribute('data-ultimo-id'), 10) || 0;
+    var INTERVALO_MS = 10000;
+    var consultando = false;
+    var areaAviso = document.getElementById('toast-ocorrencias');
+
+    function atualizarResumo(resumo) {
+        if (!resumo) { return; }
+
+        Array.prototype.forEach.call(document.querySelectorAll('[data-resumo]'), function (n) {
+            var v = resumo[n.getAttribute('data-resumo')];
+            if (v !== undefined) { n.textContent = v; }
+        });
+    }
+
+    function focarOcorrencia(p) {
+        // se um filtro estiver escondendo o ponto, limpa os filtros
+        if (!el.chk.ocorrencias.checked || !passa(p, true)) {
+            el.chk.ocorrencias.checked = true;
+            limparFiltros();
+        }
+
+        var m = marcadoresOcorrencia[p.id];
+        if (m) {
+            mapa.setView([p.lat, p.lng], 16);
+            m.openPopup();
+        }
+    }
+
+    function avisar(p) {
+        if (!areaAviso) { return; }
+
+        var t = document.createElement('div');
+        t.className = 'toast-ocorrencia';
+        t.setAttribute('role', 'alert');
+
+        // textContent (e não innerHTML): local e descrição vêm de dados externos
+        var titulo = document.createElement('strong');
+        titulo.textContent = 'Nova ocorrência: ' + p.titulo;
+
+        var detalhe = document.createElement('span');
+        detalhe.textContent = (p.local || 'Local não identificado') + ' · ' + p.data;
+
+        var acoes = document.createElement('div');
+        acoes.className = 'toast-acoes';
+
+        var ver = document.createElement('button');
+        ver.type = 'button';
+        ver.textContent = 'Ver no mapa';
+        ver.addEventListener('click', function () {
+            focarOcorrencia(p);
+            t.remove();
+        });
+
+        var fechar = document.createElement('button');
+        fechar.type = 'button';
+        fechar.className = 'botao-secundario';
+        fechar.textContent = 'Fechar';
+        fechar.addEventListener('click', function () { t.remove(); });
+
+        acoes.appendChild(ver);
+        acoes.appendChild(fechar);
+        t.appendChild(titulo);
+        t.appendChild(detalhe);
+        t.appendChild(acoes);
+        areaAviso.appendChild(t);
+    }
+
+    function consultarNovas() {
+        if (consultando || !URL_NOVAS) { return; }
+        consultando = true;
+
+        fetch(URL_NOVAS + '?depois_de=' + ultimoId, {
+            headers: { 'Accept': 'application/json' },
+            credentials: 'same-origin'
+        })
+            .then(function (r) {
+                if (!r.ok) { throw new Error('Falha ao consultar novas ocorrências.'); }
+                return r.json();
+            })
+            .then(function (res) {
+                ultimoId = res.ultimoId;
+                atualizarResumo(res.resumo);
+
+                var novas = (res.ocorrencias || []).filter(function (p) {
+                    return !dados.ocorrencias.some(function (o) { return o.id === p.id; });
+                });
+
+                if (!novas.length) { return; }
+
+                novas.forEach(function (p) { dados.ocorrencias.unshift(p); });
+                desenhar({ ajustar: false });
+                novas.forEach(avisar);
+
+                // abre automaticamente o balão da mais recente
+                var ultima = novas[novas.length - 1];
+                if (marcadoresOcorrencia[ultima.id]) {
+                    marcadoresOcorrencia[ultima.id].openPopup();
+                }
+            })
+            .catch(function (erro) { console.error(erro); })
+            .then(function () { consultando = false; });
+    }
+
+    setInterval(consultarNovas, INTERVALO_MS);
 
     atualizarBairros();
     desenhar();

@@ -35,20 +35,20 @@ class CadastroController extends Controller
     public function index()
     {
         return view('administracao.cadastro.formulario', [
-           'tornozeleirasDisponiveis' => TbTornozeleira::where(function ($query) {
+            'tornozeleirasDisponiveis' => TbTornozeleira::where(function ($query) {
                 // Tornozeleiras que nunca foram atribuídas ou estão livres.
                 $query->where(function ($q) {
                     $q->where('statusTornozeleira', 'Disponível')
-                    ->whereDoesntHave('agressor');
+                        ->whereDoesntHave('agressor');
                 })
 
-                // Tornozeleiras de agressores presos ou inativos.
-                ->orWhereHas('agressor', function ($q) {
-                    $q->whereIn('statusAgressor', ['Preso', 'Inativo']);
-                });
+                    // Tornozeleiras de agressores presos ou inativos.
+                    ->orWhereHas('agressor', function ($q) {
+                        $q->whereIn('statusAgressor', ['Preso', 'Inativo']);
+                    });
             })
-            ->orderBy('numeroSerieTornozeleira')
-            ->get(),
+                ->orderBy('numeroSerieTornozeleira')
+                ->get(),
             'tiposMedida' => TbMedida::TIPOS,
             'riscos' => TbMedida::RISCOS,
             'ufs' => Formatos::UFS,
@@ -93,7 +93,7 @@ class CadastroController extends Controller
         $dados = $validator->validated();
 
         try {
-            $resultado = DB::transaction(fn () => $this->gravar($request, $dados));
+            $resultado = DB::transaction(fn() => $this->gravar($request, $dados));
         } catch (ValidationException $e) {
             return back()->withErrors($e->errors())->withInput($request->except(['vitima.foto', 'agressor.foto']));
         }
@@ -171,7 +171,7 @@ class CadastroController extends Controller
                 if (!in_array($agressorAntigo->statusAgressor, ['Preso', 'Inativo'], true)) {
                     throw ValidationException::withMessages([
                         'tornozeleira.tornozeleira_id' =>
-                            'Esta tornozeleira ainda está vinculada a um agressor que não pode liberá-la.',
+                        'Esta tornozeleira ainda está vinculada a um agressor que não pode liberá-la.',
                     ]);
                 }
 
@@ -184,12 +184,11 @@ class CadastroController extends Controller
                     $agressorAntigo->id,
                     'liberacao_tornozeleira'
                 );
-
             } elseif ($tornozeleira->statusTornozeleira !== 'Disponível') {
 
                 throw ValidationException::withMessages([
                     'tornozeleira.tornozeleira_id' =>
-                        'Esta tornozeleira não está disponível para reutilização.',
+                    'Esta tornozeleira não está disponível para reutilização.',
                 ]);
             }
 
@@ -197,7 +196,6 @@ class CadastroController extends Controller
                 'statusTornozeleira' => 'Ativa',
                 'dataInstalacaoTornozeleira' => $t['dataInstalacao'] ?? now()->toDateString(),
             ])->save();
-
         } else {
 
             // Cadastro de uma tornozeleira nova.
@@ -270,6 +268,38 @@ class CadastroController extends Controller
             'statusMedida' => 'Ativa',
         ])->save();
 
+        // 5) Localização da tornozeleira
+
+        if (
+            $a['latitude'] !== null &&
+            $a['longitude'] !== null
+        ) {
+            $localizacao = $tornozeleira->localizacoes()->firstOrNew([]);
+
+            $localizacao->fill([
+                'latitudeLocalizacao' => $a['latitude'],
+                'longitudeLocalizacao' => $a['longitude'],
+                'dataHoraLocalizacao' => now(),
+            ]);
+
+            $localizacao->save();
+        }
+
+        if(
+            $v['latitude']!==null &&
+            $v['longitude']!==null
+        ){
+            $localizacaoVitima = $vitima->localizacoes()->firstOrNew([]);
+
+            $localizacaoVitima->fill([
+                'latitudeLocalizacao'=>$v['latitude'],
+                'longitudeLocalizacao'=>$v['longitude'],
+                'dataHoraLocalizacao'=>now(),
+            ]);
+
+            $localizacaoVitima->save();
+        }
+
         AdminAudit::record('tbvitima', $vitima->id, 'criacao');
         AdminAudit::record('tbtornozeleira', $tornozeleira->id, 'atribuicao');
         AdminAudit::record('tbagressor', $agressor->id, 'criacao');
@@ -297,7 +327,9 @@ class CadastroController extends Controller
                 [
                     'agressor.email' => ['nullable', 'email', 'max:100'],
                     'agressor.cpf' => [
-                        'required', 'string', new Cpf,
+                        'required',
+                        'string',
+                        new Cpf,
                         Rule::unique('tbagressor', 'cpfAgressor'),
                         'different:vitima.cpf',
                     ],
@@ -310,7 +342,8 @@ class CadastroController extends Controller
         };
     }
 
-    private function regrasPessoa(string $p,string $tabela,string $colunaCpf,bool $comEmail): array {
+    private function regrasPessoa(string $p, string $tabela, string $colunaCpf, bool $comEmail): array
+    {
 
         $regras = [
             "$p.foto" => [
@@ -387,7 +420,6 @@ class CadastroController extends Controller
                 'date_format:Y-m-d',
                 'before_or_equal:today'
             ];
-
         } else {
 
             $regras['tornozeleira.numeroSerie'] = [
@@ -441,7 +473,7 @@ class CadastroController extends Controller
             'medida.tipos.required' => 'Selecione ao menos um tipo de medida.',
             'medida.tipos.min' => 'Selecione ao menos um tipo de medida.',
             'medida.descricao.min' => 'Descreva a medida com ao menos 10 caracteres.',
-            
+
         ];
     }
 

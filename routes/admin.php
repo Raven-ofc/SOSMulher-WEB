@@ -32,7 +32,9 @@ Route::prefix('administracao')->name('admin.')->group(function () {
         '/monitoramento/tornozeleiras/{tornozeleira}/vitimas',
         [MapaController::class, 'vitimasDaTornozeleira']
     )->whereNumber('tornozeleira')
-    ->name('monitoramento.tornozeleira.vitimas');
+        ->name('monitoramento.tornozeleira.vitimas');
+    Route::get('/monitoramento/novas-ocorrencias', [MapaController::class, 'novasOcorrencias'])
+        ->name('monitoramento.novas');
 
     /* ------------------------------ Cadastro unificado em fases ------------------------------ */
     // vítima > agressor > tornozeleira > medida protetiva
