@@ -14,6 +14,7 @@
         <main class="screen">
             <div class="card welcome-card">
                 <img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher">
+                <h2 class="admin-brand-name" >SOS Mulher</h2>
                 <h1 class="screen-title">Sistema de Monitoramento de Medidas Protetivas</h1>
                 <p class="screen-subtitle">Tecnologia para apoiar o acompanhamento e a proteção de vítimas.</p>
                 <div class="welcome-actions">

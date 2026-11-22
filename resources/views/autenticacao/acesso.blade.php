@@ -15,6 +15,7 @@
             <div class="card login-card">
                 <a class="link back-link" href="{{ route('home') }}">‹ voltar</a>
                 <img class="logo" src="{{ asset('img/logo.svg') }}" alt="Símbolo de proteção à mulher">
+                <p class="admin-brand-name" >SOS Mulher</p>
                 <h1 class="screen-title">Acesso ao sistema</h1>
                 <p class="screen-subtitle">Entre com suas credenciais para acessar o painel de monitoramento.</p>
                 @if(session('status'))
